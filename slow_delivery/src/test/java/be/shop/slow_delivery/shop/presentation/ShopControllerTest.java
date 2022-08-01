@@ -42,7 +42,7 @@ class ShopControllerTest {
 
         ShopSimpleInfo shopSimpleInfo =
                 new ShopSimpleInfo(1L, shop.getName(), shop.getMinOrderAmount().toInt(),
-                        "thumbnail stored path", 3000);
+                        "thumbnail stored path", List.of(3000, 5000));
 
         given(shopQueryService.findSimpleInfo(any(Long.class))).willReturn(shopSimpleInfo);
 

@@ -12,12 +12,15 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-public class DefaultDeliveryFees {
+public class DefaultDeliveryFeeOptions {
     @OrderBy("orderAmount asc")
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<OrderAmountDeliveryFee> deliveryFees = new ArrayList<>();
-
+    List<OrderAmountDeliveryFee> deliveryFeeOptions = new ArrayList<>();
     void add(OrderAmountDeliveryFee deliveryFee) {
-        deliveryFees.add(deliveryFee);
+        deliveryFeeOptions.add(deliveryFee);
+    }
+
+    List<OrderAmountDeliveryFee> getDeliveryFeeOptions() {
+        return deliveryFeeOptions;
     }
 }
