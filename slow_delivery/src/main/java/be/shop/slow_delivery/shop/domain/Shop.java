@@ -2,14 +2,12 @@ package be.shop.slow_delivery.shop.domain;
 
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
+@Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

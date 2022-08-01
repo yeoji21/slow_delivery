@@ -11,6 +11,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 @EqualsAndHashCode(of = "value")
 public class Money {
+    public static final Money EMPTY = new Money(0);
     private int value;
 
     public Money(int value) {
