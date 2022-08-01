@@ -1,0 +1,7 @@
+package be.shop.slow_delivery.category.infra;
+
+import be.shop.slow_delivery.category.domain.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+}

@@ -34,6 +34,11 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+
+//	//mySql
+//	runtimeOnly 'mysql:mysql-connector-java'
+//	implementation group: 'org.javassist', name: 'javassist', version: '3.29.0-GA'
+
 }
 
 tasks.named('test') {
