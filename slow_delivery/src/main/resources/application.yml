@@ -1,0 +1,18 @@
+spring:
+  session:
+    store-type: jdbc
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/jpa/h2/bin/be_shop
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 500
+    open-in-view: false
+
