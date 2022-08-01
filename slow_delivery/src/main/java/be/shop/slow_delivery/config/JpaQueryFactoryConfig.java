@@ -1,4 +1,4 @@
-package be.shop.slow_delivery.common.config;
+package be.shop.slow_delivery.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.context.annotation.Bean;

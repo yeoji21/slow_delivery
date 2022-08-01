@@ -1,16 +1,17 @@
 package be.shop.slow_delivery.shop.domain;
 
+import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
 import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
-@EqualsAndHashCode(exclude = "id")
+@EqualsAndHashCode(exclude = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "order_amount_delivery_fee")
 @Entity
-public class OrderAmountDeliveryFee {
+public class OrderAmountDeliveryFee extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
