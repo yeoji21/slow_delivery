@@ -37,12 +37,17 @@ class ShopControllerTest {
         Shop shop = Shop.builder()
                 .name("A shop")
                 .minOrderAmount(new Money(10_000))
-                .deliveryFees(List.of(new OrderAmountDeliveryFee(new Money(15_000), new Money(3000))))
+                .build();
+
+        OrderAmountDeliveryFee orderAmountDeliveryFee = OrderAmountDeliveryFee.builder()
+                .shop(shop)
+                .orderAmount(new Money(15_000))
+                .fee(new Money(3000))
                 .build();
 
         ShopSimpleInfo shopSimpleInfo =
                 new ShopSimpleInfo(1L, shop.getName(), shop.getMinOrderAmount().toInt(),
-                        "thumbnail stored path", List.of(3000, 5000));
+                        "thumbnail stored path", List.of(orderAmountDeliveryFee.getFee().toInt()));
 
         given(shopQueryService.findSimpleInfo(any(Long.class))).willReturn(shopSimpleInfo);
 

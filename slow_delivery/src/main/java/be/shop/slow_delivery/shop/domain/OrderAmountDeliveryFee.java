@@ -18,24 +18,21 @@ public class OrderAmountDeliveryFee extends BaseTimeEntity {
 
     @Getter(AccessLevel.PROTECTED)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id")
+    @JoinColumn(name = "shop_id", nullable = false)
     private Shop shop;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "order_price"))
+    @AttributeOverride(name = "value", column = @Column(name = "order_price", nullable = false))
     private Money orderAmount;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "fee"))
+    @AttributeOverride(name = "value", column = @Column(name = "fee", nullable = false))
     private Money fee;
 
     @Builder
-    public OrderAmountDeliveryFee(Money orderAmount, Money fee) {
+    public OrderAmountDeliveryFee(Shop shop, Money orderAmount, Money fee) {
+        this.shop = shop;
         this.orderAmount = orderAmount;
         this.fee = fee;
-    }
-
-    void setShop(Shop shop) {
-        this.shop = shop;
     }
 }

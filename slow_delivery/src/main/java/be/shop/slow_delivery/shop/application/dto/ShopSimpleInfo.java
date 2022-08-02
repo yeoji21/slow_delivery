@@ -1,7 +1,6 @@
 package be.shop.slow_delivery.shop.application.dto;
 
 
-import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.shop.domain.Shop;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
@@ -9,8 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /*
@@ -33,9 +32,10 @@ public class ShopSimpleInfo {
         this.shopName = shop.getName();
         this.minOrderAmount = shop.getMinOrderAmount().toInt();
         this.thumbnail = thumbnailPath;
-        this.defaultDeliveryFees = shop.getDefaultDeliveryFees()
-                .stream()
-                .map(Money::toInt)
-                .collect(Collectors.toList());
+        this.defaultDeliveryFees = new ArrayList<>();
+    }
+
+    public void setDefaultDeliveryFees(List<Integer> defaultDeliveryFees) {
+        this.defaultDeliveryFees.addAll(defaultDeliveryFees);
     }
 }

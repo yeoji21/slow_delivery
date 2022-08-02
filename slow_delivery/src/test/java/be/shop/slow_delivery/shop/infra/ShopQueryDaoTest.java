@@ -1,6 +1,7 @@
 package be.shop.slow_delivery.shop.infra;
 
 import be.shop.slow_delivery.common.domain.Money;
+import be.shop.slow_delivery.config.ApplicationAuditingConfig;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.file.domain.File;
 import be.shop.slow_delivery.file.domain.FileName;
@@ -17,11 +18,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import({JpaQueryFactoryConfig.class, ShopQueryDao.class})
+@Import({JpaQueryFactoryConfig.class, ShopQueryDao.class, ApplicationAuditingConfig.class})
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
@@ -38,6 +38,9 @@ class ShopQueryDaoTest {
         Shop shop = createShop();
         shop.setShopThumbnail(thumbnailFile.getId());
 
+        em.flush();
+        em.clear();
+
         //when
         ShopSimpleInfo info = shopQueryDao.findSimpleInfo(shop.getId())
                 .orElseThrow(IllegalArgumentException::new);
@@ -49,25 +52,28 @@ class ShopQueryDaoTest {
         assertThat(info.getMinOrderAmount()).isEqualTo(shop.getMinOrderAmount().toInt());
         assertThat(info.getDefaultDeliveryFees()).hasSize(2);
         info.getDefaultDeliveryFees()
-                .forEach(deliveryFee -> assertThat(deliveryFee).isGreaterThan(0));
+                .forEach(deliveryFee -> assertThat(deliveryFee).isGreaterThan(1000));
     }
 
     private Shop createShop() {
         Shop shop = Shop.builder()
                 .name("A shop")
                 .minOrderAmount(new Money(10_000))
-                .deliveryFees(List.of(
-                        OrderAmountDeliveryFee.builder()
-                                .orderAmount(new Money(20_000))
-                                .fee(new Money(2000))
-                                .build(),
-                        OrderAmountDeliveryFee.builder()
-                                .orderAmount(new Money(15_000))
-                                .fee(new Money(3000))
-                                .build()))
                 .build();
-
         em.persist(shop);
+
+        em.persist(OrderAmountDeliveryFee.builder()
+                .shop(shop)
+                .orderAmount(new Money(20_000))
+                .fee(new Money(2000))
+                .build()
+        );
+        em.persist(OrderAmountDeliveryFee.builder()
+                .shop(shop)
+                .orderAmount(new Money(15_000))
+                .fee(new Money(3000))
+                .build()
+        );
         return shop;
     }
 
