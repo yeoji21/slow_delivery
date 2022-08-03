@@ -43,13 +43,15 @@ public class Shop extends BaseTimeEntity {
     private ShopLocation location;
 
     @Builder
-    public Shop(String name,
+    public Shop(Long id,
+                String name,
                 Money minOrderAmount,
                 PhoneNumber phoneNumber,
                 String introduction,
                 BusinessTimeInfo businessTimeInfo,
                 ShopLocation location,
                 Long shopThumbnailFileId) {
+        this.id = id;
         this.name = name;
         this.minOrderAmount = minOrderAmount;
         this.phoneNumber = phoneNumber;

@@ -6,10 +6,12 @@ import be.shop.slow_delivery.config.ApplicationAuditingConfig;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.file.domain.File;
 import be.shop.slow_delivery.file.domain.FileName;
+import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
 import be.shop.slow_delivery.shop.domain.Shop;
+import be.shop.slow_delivery.shop.domain.ShopLocation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,13 +59,44 @@ class ShopQueryDaoTest {
                 .forEach(deliveryFee -> assertThat(deliveryFee).isGreaterThan(1000));
     }
 
+
+    @Test
+    void 단건_가게_상세정보_조회() throws Exception{
+        //given
+        File thumbnailFile = createThumbnailFile();
+        Shop shop = createShop();
+        shop.updateShopThumbnail(thumbnailFile.getId());
+
+        em.flush();
+        em.clear();
+
+        //when
+        ShopDetailInfo info = shopQueryDao.findDetailInfo(shop.getId())
+                .orElseThrow(IllegalArgumentException::new);
+
+        //then
+        assertThat(info.getShopId()).isEqualTo(shop.getId());
+        assertThat(info.getShopName()).isEqualTo(shop.getName());
+        assertThat(info.getThumbnailPath()).isEqualTo(thumbnailFile.getFilePath());
+        assertThat(info.getMinOrderAmount()).isEqualTo(shop.getMinOrderAmount().toInt());
+        assertThat(info.getDefaultDeliveryFees()).hasSize(2);
+        info.getDefaultDeliveryFees()
+                .forEach(deliveryFee -> assertThat(deliveryFee).isGreaterThan(1000));
+        assertThat(info.getStreetAddress()).isEqualTo(shop.getLocation().getStreetAddress());
+        assertThat(info.getOpeningHours()).isEqualTo(shop.getBusinessTimeInfo().getOpeningHours());
+        assertThat(info.getPhoneNumber()).isEqualTo(shop.getPhoneNumber().toString());
+    }
+
+
     private Shop createShop() {
         Shop shop = Shop.builder()
                 .name("A shop")
                 .minOrderAmount(new Money(10_000))
-                .phoneNumber(new PhoneNumber("111-1111-1111"))
-                .businessTimeInfo(new BusinessTimeInfo("", ""))
+                .phoneNumber(new PhoneNumber("010-1234-5678"))
+                .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
+                .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
                 .build();
+
         em.persist(shop);
 
         em.persist(OrderAmountDeliveryFee.builder()

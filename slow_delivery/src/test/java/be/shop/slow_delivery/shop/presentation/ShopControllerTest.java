@@ -1,10 +1,13 @@
 package be.shop.slow_delivery.shop.presentation;
 
 import be.shop.slow_delivery.common.domain.Money;
+import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
+import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
-import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
+import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.Shop;
+import be.shop.slow_delivery.shop.domain.ShopLocation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,20 +37,9 @@ class ShopControllerTest {
 
     @Test
     void 단건_가게_간략정보_조회() throws Exception{
-        Shop shop = Shop.builder()
-                .name("A shop")
-                .minOrderAmount(new Money(10_000))
-                .build();
-
-        OrderAmountDeliveryFee orderAmountDeliveryFee = OrderAmountDeliveryFee.builder()
-                .shop(shop)
-                .orderAmount(new Money(15_000))
-                .fee(new Money(3000))
-                .build();
-
         ShopSimpleInfo shopSimpleInfo =
-                new ShopSimpleInfo(1L, shop.getName(), shop.getMinOrderAmount().toInt(),
-                        "thumbnail stored path", List.of(orderAmountDeliveryFee.getFee().toInt()));
+                new ShopSimpleInfo(1L, "A shop", 15_000,
+                        "thumbnail stored path", List.of(3000, 2000));
 
         given(shopQueryService.findSimpleInfo(any(Long.class))).willReturn(shopSimpleInfo);
 
@@ -55,5 +47,27 @@ class ShopControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(shopSimpleInfo)));
+    }
+
+    @Test
+    void 단건_가게_상세정보_조회() throws Exception{
+        Shop shop = Shop.builder()
+                .id(1L)
+                .name("A shop")
+                .minOrderAmount(new Money(10_000))
+                .phoneNumber(new PhoneNumber("010-1234-5678"))
+                .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
+                .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
+                .build();
+
+        ShopDetailInfo shopDetailInfo = new ShopDetailInfo(shop, "thumbnail path", List.of(3000, 2000));
+
+        given(shopQueryService.findDetailInfo(any(Long.class))).willReturn(shopDetailInfo);
+
+        mockMvc.perform(get("/shop/{shopId}/detail", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(shopDetailInfo)));
+
     }
 }
