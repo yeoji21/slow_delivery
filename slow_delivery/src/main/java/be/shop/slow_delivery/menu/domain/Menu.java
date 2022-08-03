@@ -8,14 +8,10 @@ import javax.persistence.*;
 @Entity
 @Table(name="menu")
 @Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu{
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_id")
     private Long menuPK;
 
@@ -35,6 +31,7 @@ public class Menu{
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
+    @Builder
     public Menu(Shop shop,String menuName, String introduction,Boolean isDisplay,Integer displayOrder){
         this.shop=shop;
         this.menuName=menuName;

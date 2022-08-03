@@ -1,6 +1,5 @@
-package be.shop.slow_delivery.menu.infra;
+package be.shop.slow_delivery.menu.domain;
 
-import be.shop.slow_delivery.menu.domain.Menu;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MenuRepository extends JpaRepository<Menu,Long> {
