@@ -1,11 +1,13 @@
 package be.shop.slow_delivery.shop.infra;
 
 import be.shop.slow_delivery.common.domain.Money;
+import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.config.ApplicationAuditingConfig;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.file.domain.File;
 import be.shop.slow_delivery.file.domain.FileName;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
 import be.shop.slow_delivery.shop.domain.Shop;
 import org.junit.jupiter.api.Test;
@@ -36,7 +38,7 @@ class ShopQueryDaoTest {
         //given
         File thumbnailFile = createThumbnailFile();
         Shop shop = createShop();
-        shop.setShopThumbnail(thumbnailFile.getId());
+        shop.updateShopThumbnail(thumbnailFile.getId());
 
         em.flush();
         em.clear();
@@ -48,7 +50,7 @@ class ShopQueryDaoTest {
         //then
         assertThat(info.getShopId()).isEqualTo(shop.getId());
         assertThat(info.getShopName()).isEqualTo(shop.getName());
-        assertThat(info.getThumbnail()).isEqualTo(thumbnailFile.getFilePath());
+        assertThat(info.getThumbnailPath()).isEqualTo(thumbnailFile.getFilePath());
         assertThat(info.getMinOrderAmount()).isEqualTo(shop.getMinOrderAmount().toInt());
         assertThat(info.getDefaultDeliveryFees()).hasSize(2);
         info.getDefaultDeliveryFees()
@@ -59,6 +61,8 @@ class ShopQueryDaoTest {
         Shop shop = Shop.builder()
                 .name("A shop")
                 .minOrderAmount(new Money(10_000))
+                .phoneNumber(new PhoneNumber("111-1111-1111"))
+                .businessTimeInfo(new BusinessTimeInfo("", ""))
                 .build();
         em.persist(shop);
 

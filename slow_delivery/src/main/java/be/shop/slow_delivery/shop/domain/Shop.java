@@ -59,7 +59,7 @@ public class Shop extends BaseTimeEntity {
         this.shopThumbnailFileId = shopThumbnailFileId;
     }
 
-    public void setShopThumbnail(Long fileId) {
+    public void updateShopThumbnail(Long fileId) {
         this.shopThumbnailFileId = fileId;
     }
 }
