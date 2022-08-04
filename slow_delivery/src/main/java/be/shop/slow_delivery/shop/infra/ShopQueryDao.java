@@ -8,7 +8,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static be.shop.slow_delivery.file.domain.QFile.file;
@@ -23,7 +22,7 @@ public class ShopQueryDao {
     private final JPAQueryFactory queryFactory;
 
     public Optional<ShopSimpleInfo> findSimpleInfo(long shopId){
-        Map<Long, ShopSimpleInfo> deliveryFees =
+        return Optional.ofNullable(
                 queryFactory
                         .from(shop)
                         .where(shop.id.eq(shopId))
@@ -34,12 +33,12 @@ public class ShopQueryDao {
                                         new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
                                                 list(orderAmountDeliveryFee.fee.value))
                                 )
-                        );
-        return Optional.ofNullable(deliveryFees.get(shopId));
+                        ).get(shopId)
+        );
     }
 
     public Optional<ShopDetailInfo> findDetailInfo(long shopId) {
-        Map<Long, ShopDetailInfo> deliveryFees =
+        return Optional.ofNullable(
                 queryFactory
                         .from(shop)
                         .where(shop.id.eq(shopId))
@@ -49,7 +48,7 @@ public class ShopQueryDao {
                                 groupBy(shop.id).as(
                                         new QShopDetailInfo(shop, file.filePath, list(orderAmountDeliveryFee.fee.value))
                                 )
-                        );
-        return Optional.ofNullable(deliveryFees.get(shopId));
+                        ).get(shopId)
+        );
     }
 }

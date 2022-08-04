@@ -38,7 +38,10 @@ class SlowDeliveryApplicationTests {
 						.build()
 				)
 				.businessTimeInfo(new BusinessTimeInfo("매일 10시~21시", "매주 첫째주 일요일"))
+				.categoryId(1L)
+				.categoryId(2L)
 				.build();
+
 		em.persist(shop);
 	}
 }

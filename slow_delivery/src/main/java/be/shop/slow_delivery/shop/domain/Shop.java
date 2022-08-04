@@ -6,19 +6,20 @@ import be.shop.slow_delivery.common.domain.PhoneNumber;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SecondaryTable(
         name = "shop_location",
-        pkJoinColumns = @PrimaryKeyJoinColumn(name = "shop_id", referencedColumnName = "id")
+        pkJoinColumns = @PrimaryKeyJoinColumn(name = "shop_id", referencedColumnName = "shop_id")
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "shop")
 public class Shop extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "shop_id")
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -42,6 +43,14 @@ public class Shop extends BaseTimeEntity {
     @Embedded
     private ShopLocation location;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "shop_category",
+            joinColumns = @JoinColumn(name = "shop_id", referencedColumnName = "shop_id")
+    )
+    @Column(name = "category_id")
+    private Set<Long> categoryIds;
+
     @Builder
     public Shop(Long id,
                 String name,
@@ -50,7 +59,8 @@ public class Shop extends BaseTimeEntity {
                 String introduction,
                 BusinessTimeInfo businessTimeInfo,
                 ShopLocation location,
-                Long shopThumbnailFileId) {
+                Long shopThumbnailFileId,
+                @Singular Set<Long> categoryIds) {
         this.id = id;
         this.name = name;
         this.minOrderAmount = minOrderAmount;
@@ -59,6 +69,8 @@ public class Shop extends BaseTimeEntity {
         this.businessTimeInfo = businessTimeInfo;
         this.location = location;
         this.shopThumbnailFileId = shopThumbnailFileId;
+        this.categoryIds = categoryIds;
+        if(categoryIds.size() == 0) throw new IllegalArgumentException();
     }
 
     public void updateShopThumbnail(Long fileId) {
