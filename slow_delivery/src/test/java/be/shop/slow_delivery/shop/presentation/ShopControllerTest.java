@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.shop.presentation;
 
+import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
@@ -64,7 +65,7 @@ class ShopControllerTest {
                 .phoneNumber(new PhoneNumber("010-1234-5678"))
                 .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
                 .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
-                .categoryId(1L)
+                .category(new Category("음식"))
                 .build();
 
         ShopDetailInfo shopDetailInfo = new ShopDetailInfo(shop, "thumbnail path", List.of(3000, 2000));

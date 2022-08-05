@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.shop.infra;
 
+import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.config.ApplicationAuditingConfig;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
@@ -88,8 +90,13 @@ class ShopQueryDaoTest {
         assertThat(info.getPhoneNumber()).isEqualTo(shop.getPhoneNumber().toString());
     }
 
-    @Test
+    @Test @Rollback(value = false)
     void 카테고리별_가게목록_조회() throws Exception{
+        Category chicken = new Category("치킨");
+        em.persist(chicken);
+        Category pizza = new Category("피자");
+        em.persist(pizza);
+
         //given
         for (int i = 0; i < 10; i++) {
             Shop shop = Shop.builder()
@@ -98,7 +105,7 @@ class ShopQueryDaoTest {
                     .phoneNumber(new PhoneNumber("010-1234-5678"))
                     .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
                     .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
-                    .categoryId((long) i % 2)
+                    .category(i % 2 == 0 ? chicken : pizza)
                     .build();
             em.persist(shop);
 
@@ -113,7 +120,7 @@ class ShopQueryDaoTest {
         em.clear();
 
         //when
-        ShopListQueryResult shopListQueryResult = shopQueryDao.findShopListByCategory(1L);
+        ShopListQueryResult shopListQueryResult = shopQueryDao.findShopListByCategory(chicken.getId());
 
         //then
         assertThat(shopListQueryResult.getShopList().size()).isEqualTo(5);
@@ -124,13 +131,16 @@ class ShopQueryDaoTest {
 
 
     private Shop createShop() {
+        Category food = new Category("음식");
+        em.persist(food);
+
         Shop shop = Shop.builder()
                 .name("A shop")
                 .minOrderAmount(new Money(10_000))
                 .phoneNumber(new PhoneNumber("010-1234-5678"))
                 .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
                 .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
-                .categoryId(1L)
+                .category(food)
                 .build();
 
         em.persist(shop);

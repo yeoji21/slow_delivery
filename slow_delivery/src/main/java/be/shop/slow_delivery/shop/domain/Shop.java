@@ -1,11 +1,14 @@
 package be.shop.slow_delivery.shop.domain;
 
+import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -43,13 +46,9 @@ public class Shop extends BaseTimeEntity {
     @Embedded
     private ShopLocation location;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "category_shop",
-            joinColumns = @JoinColumn(name = "shop_id", referencedColumnName = "shop_id")
-    )
-    @Column(name = "category_id")
-    private Set<Long> categoryIds;
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryShop> categories = new ArrayList<>();
+
 
     @Builder
     public Shop(Long id,
@@ -60,7 +59,7 @@ public class Shop extends BaseTimeEntity {
                 BusinessTimeInfo businessTimeInfo,
                 ShopLocation location,
                 Long shopThumbnailFileId,
-                @Singular Set<Long> categoryIds) {
+                @Singular Set<Category> categories) {
         this.id = id;
         this.name = name;
         this.minOrderAmount = minOrderAmount;
@@ -69,11 +68,15 @@ public class Shop extends BaseTimeEntity {
         this.businessTimeInfo = businessTimeInfo;
         this.location = location;
         this.shopThumbnailFileId = shopThumbnailFileId;
-        this.categoryIds = categoryIds;
-        if(categoryIds.size() == 0) throw new IllegalArgumentException();
+        categories.forEach(category -> this.categories.add(new CategoryShop(this, category.getId())));
+        if(this.categories.size() == 0) throw new IllegalArgumentException();
     }
 
     public void updateShopThumbnail(Long fileId) {
         this.shopThumbnailFileId = fileId;
+    }
+
+    public void belongToCategory(Category category) {
+        categories.add(new CategoryShop(this, category.getId()));
     }
 }

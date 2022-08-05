@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static be.shop.slow_delivery.file.domain.QFile.file;
+import static be.shop.slow_delivery.shop.domain.QCategoryShop.categoryShop;
 import static be.shop.slow_delivery.shop.domain.QOrderAmountDeliveryFee.orderAmountDeliveryFee;
 import static be.shop.slow_delivery.shop.domain.QShop.shop;
 import static com.querydsl.core.group.GroupBy.groupBy;
@@ -19,6 +20,7 @@ import static com.querydsl.core.group.GroupBy.list;
 public class ShopQueryDao {
     private final JPAQueryFactory queryFactory;
 
+    // 단건 가게 간략 정보
     public Optional<ShopSimpleInfo> findSimpleInfo(long shopId){
         return Optional.ofNullable(
                 queryFactory
@@ -35,6 +37,7 @@ public class ShopQueryDao {
         );
     }
 
+    // 단건 가게 상세 정보
     public Optional<ShopDetailInfo> findDetailInfo(long shopId) {
         return Optional.ofNullable(
                 queryFactory
@@ -50,12 +53,14 @@ public class ShopQueryDao {
         );
     }
 
+    // 카테고리별 가게 목록 (간략 정보)
     public ShopListQueryResult findShopListByCategory(long categoryId) {
         List<ShopSimpleInfo> shopSimpleInfoList = queryFactory
                 .from(shop)
-                .where(shop.categoryIds.contains(categoryId))
+                .innerJoin(categoryShop).on(categoryShop.shop.eq(shop))
                 .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
                 .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
+                .where(categoryShop.categoryId.eq(categoryId))
                 .transform(
                         groupBy(shop).list(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
                                 list(orderAmountDeliveryFee.fee.value)))
