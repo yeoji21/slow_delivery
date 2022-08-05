@@ -1,13 +1,11 @@
 package be.shop.slow_delivery.shop.infra;
 
-import be.shop.slow_delivery.shop.application.dto.QShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.QShopSimpleInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.application.dto.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static be.shop.slow_delivery.file.domain.QFile.file;
@@ -27,7 +25,7 @@ public class ShopQueryDao {
                         .from(shop)
                         .where(shop.id.eq(shopId))
                         .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
-                        .join(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
+                        .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                         .transform(
                                 groupBy(shop.id).as(
                                         new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
@@ -43,12 +41,26 @@ public class ShopQueryDao {
                         .from(shop)
                         .where(shop.id.eq(shopId))
                         .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
-                        .join(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
+                        .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                         .transform(
                                 groupBy(shop.id).as(
                                         new QShopDetailInfo(shop, file.filePath, list(orderAmountDeliveryFee.fee.value))
                                 )
                         ).get(shopId)
         );
+    }
+
+    public ShopListQueryResult findShopListByCategory(long categoryId) {
+        List<ShopSimpleInfo> shopSimpleInfoList = queryFactory
+                .from(shop)
+                .where(shop.categoryIds.contains(categoryId))
+                .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
+                .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
+                .transform(
+                        groupBy(shop).list(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
+                                list(orderAmountDeliveryFee.fee.value)))
+                );
+
+        return new ShopListQueryResult(shopSimpleInfoList);
     }
 }

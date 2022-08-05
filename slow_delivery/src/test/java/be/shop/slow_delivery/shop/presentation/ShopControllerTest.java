@@ -4,6 +4,7 @@ import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
+import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.Shop;
@@ -38,8 +39,13 @@ class ShopControllerTest {
     @Test
     void 단건_가게_간략정보_조회() throws Exception{
         ShopSimpleInfo shopSimpleInfo =
-                new ShopSimpleInfo(1L, "A shop", 15_000,
-                        "thumbnail stored path", List.of(3000, 2000));
+                ShopSimpleInfo.builder()
+                        .shopId(1L)
+                        .shopName("A shop")
+                        .minOrderAmount(15_000)
+                        .thumbnailPath("thumbnail stored path")
+                        .defaultDeliveryFees(List.of(3000, 2000))
+                        .build();
 
         given(shopQueryService.findSimpleInfo(any(Long.class))).willReturn(shopSimpleInfo);
 
@@ -58,6 +64,7 @@ class ShopControllerTest {
                 .phoneNumber(new PhoneNumber("010-1234-5678"))
                 .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
                 .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
+                .categoryId(1L)
                 .build();
 
         ShopDetailInfo shopDetailInfo = new ShopDetailInfo(shop, "thumbnail path", List.of(3000, 2000));
@@ -68,6 +75,37 @@ class ShopControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(shopDetailInfo)));
+    }
 
+    @Test
+    void 카테고리별_가게_목록_조회() throws Exception{
+        List<ShopSimpleInfo> shopList = getShopSimpleInfoList();
+        ShopListQueryResult result = new ShopListQueryResult(shopList);
+
+        given(shopQueryService.findShopListByCategory(1L)).willReturn(result);
+
+        mockMvc.perform(get("/category/{categoryId}/shop", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)));
+    }
+
+    private List<ShopSimpleInfo> getShopSimpleInfoList() {
+        ShopSimpleInfo AShopInfo = ShopSimpleInfo.builder()
+                .shopId(1L)
+                .shopName("A shop")
+                .minOrderAmount(15_000)
+                .thumbnailPath("thumbnail stored path")
+                .defaultDeliveryFees(List.of(3000, 2000))
+                .build();
+        ShopSimpleInfo BShopInfo = ShopSimpleInfo.builder()
+                .shopId(2L)
+                .shopName("B shop")
+                .minOrderAmount(10_000)
+                .thumbnailPath("thumbnail stored path")
+                .defaultDeliveryFees(List.of(2000, 1000))
+                .build();
+
+        return List.of(AShopInfo, BShopInfo);
     }
 }

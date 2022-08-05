@@ -2,9 +2,7 @@ package be.shop.slow_delivery.shop.application.dto;
 
 import be.shop.slow_delivery.shop.domain.Shop;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -15,7 +13,6 @@ import java.util.List;
     소개글, 전화번호, 영업 시간, 휴무일, 도로명 주소
  */
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ShopDetailInfo {
     private long shopId;
     private String shopName;

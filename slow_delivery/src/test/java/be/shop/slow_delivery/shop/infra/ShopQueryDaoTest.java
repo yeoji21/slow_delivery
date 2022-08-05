@@ -7,6 +7,7 @@ import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.file.domain.File;
 import be.shop.slow_delivery.file.domain.FileName;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
+import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
@@ -87,6 +88,40 @@ class ShopQueryDaoTest {
         assertThat(info.getPhoneNumber()).isEqualTo(shop.getPhoneNumber().toString());
     }
 
+    @Test
+    void 카테고리별_가게목록_조회() throws Exception{
+        //given
+        for (int i = 0; i < 10; i++) {
+            Shop shop = Shop.builder()
+                    .name(i + " shop")
+                    .minOrderAmount(new Money(10_000))
+                    .phoneNumber(new PhoneNumber("010-1234-5678"))
+                    .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
+                    .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
+                    .categoryId((long) i % 2)
+                    .build();
+            em.persist(shop);
+
+            OrderAmountDeliveryFee deliveryFee = OrderAmountDeliveryFee.builder()
+                    .shop(shop)
+                    .orderAmount(new Money(i * 1000))
+                    .fee(new Money(1000))
+                    .build();
+            em.persist(deliveryFee);
+        }
+        em.flush();
+        em.clear();
+
+        //when
+        ShopListQueryResult shopListQueryResult = shopQueryDao.findShopListByCategory(1L);
+
+        //then
+        assertThat(shopListQueryResult.getShopList().size()).isEqualTo(5);
+        shopListQueryResult.getShopList()
+                .forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size())
+                                                .isEqualTo(1));
+    }
+
 
     private Shop createShop() {
         Shop shop = Shop.builder()
@@ -95,6 +130,7 @@ class ShopQueryDaoTest {
                 .phoneNumber(new PhoneNumber("010-1234-5678"))
                 .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
                 .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
+                .categoryId(1L)
                 .build();
 
         em.persist(shop);

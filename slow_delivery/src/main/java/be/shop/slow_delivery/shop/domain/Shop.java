@@ -45,7 +45,7 @@ public class Shop extends BaseTimeEntity {
 
     @ElementCollection
     @CollectionTable(
-            name = "shop_category",
+            name = "category_shop",
             joinColumns = @JoinColumn(name = "shop_id", referencedColumnName = "shop_id")
     )
     @Column(name = "category_id")
