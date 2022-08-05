@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class MenuListResponseDto {
 
-    private Long shopPK;
+    private Long shopId;
 
     private MenuListDto menuListDto;
 
