@@ -7,6 +7,7 @@ import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -25,7 +26,9 @@ public class ShopController {
     }
 
     @GetMapping("/category/{categoryId}/shop")
-    public ShopListQueryResult getShopListByCategory(@PathVariable long categoryId) {
-        return shopQueryService.findShopListByCategory(categoryId);
+    public ShopListQueryResult getShopListByCategory(@PathVariable long categoryId,
+                                                     @RequestParam(required = false) Long cursor,
+                                                     @RequestParam(required = false, defaultValue = "10") int size) {
+        return shopQueryService.findShopListByCategory(categoryId, cursor, size);
     }
 }

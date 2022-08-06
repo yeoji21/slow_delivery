@@ -20,11 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -90,22 +90,44 @@ class ShopQueryDaoTest {
         assertThat(info.getPhoneNumber()).isEqualTo(shop.getPhoneNumber().toString());
     }
 
-    @Test @Rollback(value = false)
+    @Test
     void 카테고리별_가게목록_조회() throws Exception{
+        //given
         Category chicken = new Category("치킨");
         em.persist(chicken);
         Category pizza = new Category("피자");
         em.persist(pizza);
 
-        //given
-        for (int i = 0; i < 10; i++) {
+        settingShopData(chicken, pizza);
+
+        //when
+        int size = 10;
+        ShopListQueryResult fistResult = shopQueryDao.findShopListByCategory(chicken.getId(), null, size);
+
+        //then
+        List<ShopSimpleInfo> fistShopList = fistResult.getShopList();
+        assertThat(fistShopList.size()).isEqualTo(size);
+        fistShopList.forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size())
+                                                .isEqualTo(1));
+
+        long cursorId = fistShopList.get(fistShopList.size() - 1).getShopId();
+        ShopListQueryResult secondResult = shopQueryDao.findShopListByCategory(chicken.getId(), cursorId, size);
+
+        List<ShopSimpleInfo> secondShopList = secondResult.getShopList();
+        assertThat(secondShopList.size()).isEqualTo(size);
+        secondShopList.forEach(shop -> assertThat(shop.getShopId()).isLessThan(cursorId));
+    }
+
+    private void settingShopData(Category... categories) {
+        for (int i = 0; i < 100; i++) {
             Shop shop = Shop.builder()
                     .name(i + " shop")
                     .minOrderAmount(new Money(10_000))
                     .phoneNumber(new PhoneNumber("010-1234-5678"))
                     .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
                     .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
-                    .category(i % 2 == 0 ? chicken : pizza)
+//                    .category(i % categories.length == 0 ? categories[0] : categories[1])
+                    .category(categories[i % categories.length])
                     .build();
             em.persist(shop);
 
@@ -116,17 +138,9 @@ class ShopQueryDaoTest {
                     .build();
             em.persist(deliveryFee);
         }
+
         em.flush();
         em.clear();
-
-        //when
-        ShopListQueryResult shopListQueryResult = shopQueryDao.findShopListByCategory(chicken.getId());
-
-        //then
-        assertThat(shopListQueryResult.getShopList().size()).isEqualTo(5);
-        shopListQueryResult.getShopList()
-                .forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size())
-                                                .isEqualTo(1));
     }
 
 

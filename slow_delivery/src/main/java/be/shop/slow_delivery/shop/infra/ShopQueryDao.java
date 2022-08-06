@@ -1,6 +1,7 @@
 package be.shop.slow_delivery.shop.infra;
 
 import be.shop.slow_delivery.shop.application.dto.*;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -54,18 +55,30 @@ public class ShopQueryDao {
     }
 
     // 카테고리별 가게 목록 (간략 정보)
-    public ShopListQueryResult findShopListByCategory(long categoryId) {
-        List<ShopSimpleInfo> shopSimpleInfoList = queryFactory
+    public ShopListQueryResult findShopListByCategory(long categoryId, Long cursorId, int size) {
+        List<ShopSimpleInfo> infoList = queryFactory
                 .from(shop)
                 .innerJoin(categoryShop).on(categoryShop.shop.eq(shop))
                 .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
                 .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
-                .where(categoryShop.categoryId.eq(categoryId))
+                .where(categoryShop.categoryId.eq(categoryId), isShopIdLt(cursorId))
+                .limit(size + 1)
+                .orderBy(shop.id.desc())
                 .transform(
                         groupBy(shop).list(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
                                 list(orderAmountDeliveryFee.fee.value)))
                 );
 
-        return new ShopListQueryResult(shopSimpleInfoList);
+        boolean hasNext = false;
+        if (infoList.size() > size) {
+            infoList.remove(size);
+            hasNext = true;
+        }
+
+        return new ShopListQueryResult(infoList, hasNext);
+    }
+
+    private BooleanExpression isShopIdLt(Long cursorId) {
+        return cursorId != null ? shop.id.lt(cursorId) : null;
     }
 }

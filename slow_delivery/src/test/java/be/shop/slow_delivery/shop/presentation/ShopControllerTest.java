@@ -81,9 +81,9 @@ class ShopControllerTest {
     @Test
     void 카테고리별_가게_목록_조회() throws Exception{
         List<ShopSimpleInfo> shopList = getShopSimpleInfoList();
-        ShopListQueryResult result = new ShopListQueryResult(shopList);
+        ShopListQueryResult result = new ShopListQueryResult(shopList, true);
 
-        given(shopQueryService.findShopListByCategory(1L)).willReturn(result);
+        given(shopQueryService.findShopListByCategory(1L, null, 10)).willReturn(result);
 
         mockMvc.perform(get("/category/{categoryId}/shop", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
