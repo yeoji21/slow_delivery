@@ -27,6 +27,6 @@ public class ShopQueryService {
 
     @Transactional(readOnly = true)
     public ShopListQueryResult findShopListByCategory(long categoryId, Long cursor, int size) {
-        return shopQueryDao.findShopListByCategory(categoryId, cursor, size);
+        return shopQueryDao.findByCategory(categoryId, cursor, size);
     }
 }

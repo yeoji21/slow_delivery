@@ -7,6 +7,7 @@ import be.shop.slow_delivery.config.ApplicationAuditingConfig;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.file.domain.File;
 import be.shop.slow_delivery.file.domain.FileName;
+import be.shop.slow_delivery.shop.application.dto.DeliveryFeeCursor;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
@@ -102,7 +103,8 @@ class ShopQueryDaoTest {
 
         //when
         int size = 10;
-        ShopListQueryResult fistResult = shopQueryDao.findShopListByCategory(chicken.getId(), null, size);
+        ShopListQueryResult fistResult =
+                shopQueryDao.findByCategory(chicken.getId(), null, size);
 
         //then
         List<ShopSimpleInfo> fistShopList = fistResult.getShopList();
@@ -111,11 +113,42 @@ class ShopQueryDaoTest {
                                                 .isEqualTo(1));
 
         long cursorId = fistShopList.get(fistShopList.size() - 1).getShopId();
-        ShopListQueryResult secondResult = shopQueryDao.findShopListByCategory(chicken.getId(), cursorId, size);
+        ShopListQueryResult secondResult = shopQueryDao.findByCategory(chicken.getId(), cursorId, size);
 
         List<ShopSimpleInfo> secondShopList = secondResult.getShopList();
         assertThat(secondShopList.size()).isEqualTo(size);
         secondShopList.forEach(shop -> assertThat(shop.getShopId()).isLessThan(cursorId));
+    }
+
+    @Test
+    void 배달비_낮은순_카테고리별_가게목록_조회() throws Exception{
+        //given
+        Category chicken = new Category("치킨");
+        em.persist(chicken);
+        Category pizza = new Category("피자");
+        em.persist(pizza);
+
+        settingShopData(chicken, pizza);
+
+        //when
+        int size = 10;
+        ShopListQueryResult fistResult =
+                shopQueryDao.findByCategoryOrderByDeliveryFee(chicken.getId(), DeliveryFeeCursor.EMPTY , size);
+
+        //then
+        List<ShopSimpleInfo> fistShopList = fistResult.getShopList();
+        assertThat(fistShopList.size()).isEqualTo(size);
+        fistShopList.forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size())
+                .isEqualTo(1));
+
+        Long cursorId = fistShopList.get(fistShopList.size() - 1).getShopId();
+        ShopSimpleInfo lastShopInfo = fistShopList.get(fistShopList.size() - 1);
+        Integer cursorFee = lastShopInfo.getDefaultDeliveryFees().get(lastShopInfo.getDefaultDeliveryFees().size() -1 );
+
+        ShopListQueryResult secondResult = shopQueryDao.findByCategoryOrderByDeliveryFee(chicken.getId(), new DeliveryFeeCursor(cursorFee, cursorId), size);
+        List<ShopSimpleInfo> secondShopList = secondResult.getShopList();
+        assertThat(secondShopList.size()).isEqualTo(size);
+        secondShopList.forEach(shop -> shop.getDefaultDeliveryFees().forEach(fee -> assertThat(fee).isGreaterThan(cursorFee)));
     }
 
     private void settingShopData(Category... categories) {
@@ -126,15 +159,14 @@ class ShopQueryDaoTest {
                     .phoneNumber(new PhoneNumber("010-1234-5678"))
                     .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
                     .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
-//                    .category(i % categories.length == 0 ? categories[0] : categories[1])
                     .category(categories[i % categories.length])
                     .build();
             em.persist(shop);
 
             OrderAmountDeliveryFee deliveryFee = OrderAmountDeliveryFee.builder()
                     .shop(shop)
-                    .orderAmount(new Money(i * 1000))
-                    .fee(new Money(1000))
+                    .orderAmount(new Money(15_000))
+                    .fee(new Money(i * 500))
                     .build();
             em.persist(deliveryFee);
         }
