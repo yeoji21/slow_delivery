@@ -1,12 +1,15 @@
 package be.shop.slow_delivery.shop.infra;
 
-import be.shop.slow_delivery.shop.application.dto.*;
+import be.shop.slow_delivery.application.dto.*;
+import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.StringExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,6 +19,7 @@ import static be.shop.slow_delivery.shop.domain.QOrderAmountDeliveryFee.orderAmo
 import static be.shop.slow_delivery.shop.domain.QShop.shop;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
+import static java.util.stream.Collectors.groupingBy;
 
 @RequiredArgsConstructor
 @Repository
@@ -56,26 +60,27 @@ public class ShopQueryDao {
     }
 
     // 카테고리별 가게 목록 (간략 정보) -> 기본순 (shopId로 정렬)
-    public ShopListQueryResult findByCategory(long categoryId, Long cursorShopId, int size) {
+    public ShopListQueryResult findByCategory(long categoryId, String cursor, int size) {
         List<ShopSimpleInfo> infoList = queryFactory
+                .select(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath))
                 .from(shop)
                 .innerJoin(categoryShop).on(categoryShop.shop.eq(shop))
                 .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
-                .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
-                .where(categoryShop.categoryId.eq(categoryId), isShopIdLt(cursorShopId))
+                .where(categoryShop.categoryId.eq(categoryId), shopIdCustomCursor(cursor))
                 .limit(size + 1)
                 .orderBy(shop.id.desc())
-                .transform(
-                        groupBy(shop).list(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
-                                list(orderAmountDeliveryFee.fee.value)))
-                );
+                .fetch();
 
-        return new ShopListQueryResult(infoList, size);
+        setDeliveryFees(infoList);
+
+        boolean hasNext = hasNext(size, infoList);
+        String nextCursor = getShopIdNextCursor(infoList);
+        return new ShopListQueryResult(infoList, hasNext, nextCursor);
     }
 
     // 카테고리별 가게 목록 (간략 정보) -> 배달비 낮은 순 (가게별 기본 배달비 중 가장 낮은 배달비를 기준으로 정렬)
     public ShopListQueryResult findByCategoryOrderByDeliveryFee(long categoryId, DeliveryFeeCursor cursor, int size) {
-            List<Long> shopIds = queryFactory
+        List<Long> shopIds = queryFactory
                 .select(orderAmountDeliveryFee.shop.id, orderAmountDeliveryFee.fee.value.min())
                 .from(orderAmountDeliveryFee)
                 .join(categoryShop).on(categoryShop.shop.eq(orderAmountDeliveryFee.shop))
@@ -102,6 +107,55 @@ public class ShopQueryDao {
                 );
 
         return new ShopListQueryResult(infoList, size);
+    }
+
+    private String getShopIdNextCursor(List<ShopSimpleInfo> infoList) {
+        long lastShopId = infoList.get(infoList.size() - 1).getShopId();
+        return String.format("%020d", lastShopId);
+    }
+
+    private boolean hasNext(int size, List<ShopSimpleInfo> infoList) {
+        boolean hasNext = false;
+        if (infoList.size() > size) {
+            infoList.remove(size);
+            hasNext = true;
+        }
+        return hasNext;
+    }
+
+    private void setDeliveryFees(List<ShopSimpleInfo> infoList) {
+        Map<Long, List<OrderAmountDeliveryFee>> deliveryFeeMap = findDeliveryFeeMap(infoList);
+
+        infoList.forEach(
+                info -> {
+                    List<Integer> deliveryFees = deliveryFeeMap.get(info.getShopId())
+                            .stream()
+                            .map(deliveryFee -> deliveryFee.getFee().toInt())
+                            .collect(Collectors.toList());
+                    info.setDefaultDeliveryFees(deliveryFees);
+                }
+        );
+    }
+
+    private Map<Long, List<OrderAmountDeliveryFee>> findDeliveryFeeMap(List<ShopSimpleInfo> infoList) {
+        List<Long> shopIds = infoList.stream()
+                .map(ShopSimpleInfo::getShopId)
+                .collect(Collectors.toList());
+
+        return queryFactory
+                .select(orderAmountDeliveryFee)
+                .from(orderAmountDeliveryFee)
+                .where(orderAmountDeliveryFee.shop.id.in(shopIds))
+                .fetch()
+                .stream()
+                .collect(groupingBy(OrderAmountDeliveryFee::getShopId));
+    }
+
+    private BooleanExpression shopIdCustomCursor(String customCursor) {
+        if(customCursor == null || customCursor.length() < 20) return null;
+
+        return StringExpressions.lpad(shop.id.stringValue(), 20, '0')
+                .lt(customCursor);
     }
 
     private BooleanExpression cursorCondition(Integer cursorFee, Long cursorShopId) {

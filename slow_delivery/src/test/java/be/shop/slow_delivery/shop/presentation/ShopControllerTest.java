@@ -3,10 +3,10 @@ package be.shop.slow_delivery.shop.presentation;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
-import be.shop.slow_delivery.shop.application.ShopQueryService;
-import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.application.ShopQueryService;
+import be.shop.slow_delivery.application.dto.ShopDetailInfo;
+import be.shop.slow_delivery.application.dto.ShopListQueryResult;
+import be.shop.slow_delivery.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
@@ -81,7 +81,7 @@ class ShopControllerTest {
     @Test
     void 카테고리별_가게_목록_조회() throws Exception{
         List<ShopSimpleInfo> shopList = getShopSimpleInfoList();
-        ShopListQueryResult result = new ShopListQueryResult(shopList, true);
+        ShopListQueryResult result = new ShopListQueryResult(shopList, true, "nextCursor");
 
         given(shopQueryService.findShopListByCategory(1L, null, 10)).willReturn(result);
 

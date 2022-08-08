@@ -7,10 +7,10 @@ import be.shop.slow_delivery.config.ApplicationAuditingConfig;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.file.domain.File;
 import be.shop.slow_delivery.file.domain.FileName;
-import be.shop.slow_delivery.shop.application.dto.DeliveryFeeCursor;
-import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.application.dto.DeliveryFeeCursor;
+import be.shop.slow_delivery.application.dto.ShopDetailInfo;
+import be.shop.slow_delivery.application.dto.ShopListQueryResult;
+import be.shop.slow_delivery.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
 import be.shop.slow_delivery.shop.domain.Shop;
@@ -103,17 +103,15 @@ class ShopQueryDaoTest {
 
         //when
         int size = 10;
-        ShopListQueryResult fistResult =
-                shopQueryDao.findByCategory(chicken.getId(), null, size);
+        ShopListQueryResult fistResult = shopQueryDao.findByCategory(chicken.getId(), "null", size);
 
         //then
         List<ShopSimpleInfo> fistShopList = fistResult.getShopList();
         assertThat(fistShopList.size()).isEqualTo(size);
-        fistShopList.forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size())
-                                                .isEqualTo(1));
+        fistShopList.forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size()).isEqualTo(2));
 
         long cursorId = fistShopList.get(fistShopList.size() - 1).getShopId();
-        ShopListQueryResult secondResult = shopQueryDao.findByCategory(chicken.getId(), cursorId, size);
+        ShopListQueryResult secondResult = shopQueryDao.findByCategory(chicken.getId(), fistResult.getNextCursor(), size);
 
         List<ShopSimpleInfo> secondShopList = secondResult.getShopList();
         assertThat(secondShopList.size()).isEqualTo(size);
@@ -139,7 +137,7 @@ class ShopQueryDaoTest {
         List<ShopSimpleInfo> fistShopList = fistResult.getShopList();
         assertThat(fistShopList.size()).isEqualTo(size);
         fistShopList.forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size())
-                .isEqualTo(1));
+                .isEqualTo(2));
 
         Long cursorId = fistShopList.get(fistShopList.size() - 1).getShopId();
         ShopSimpleInfo lastShopInfo = fistShopList.get(fistShopList.size() - 1);
@@ -169,6 +167,13 @@ class ShopQueryDaoTest {
                     .fee(new Money(i * 500))
                     .build();
             em.persist(deliveryFee);
+
+            OrderAmountDeliveryFee deliveryFee2 = OrderAmountDeliveryFee.builder()
+                    .shop(shop)
+                    .orderAmount(new Money(15_000))
+                    .fee(new Money(i * 500))
+                    .build();
+            em.persist(deliveryFee2);
         }
 
         em.flush();

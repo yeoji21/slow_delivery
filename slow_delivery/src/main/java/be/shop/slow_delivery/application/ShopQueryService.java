@@ -1,8 +1,8 @@
-package be.shop.slow_delivery.shop.application;
+package be.shop.slow_delivery.application;
 
-import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.application.dto.ShopListQueryResult;
+import be.shop.slow_delivery.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.infra.ShopQueryDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class ShopQueryService {
     }
 
     @Transactional(readOnly = true)
-    public ShopListQueryResult findShopListByCategory(long categoryId, Long cursor, int size) {
+    public ShopListQueryResult findShopListByCategory(long categoryId, String cursor, int size) {
         return shopQueryDao.findByCategory(categoryId, cursor, size);
     }
 }

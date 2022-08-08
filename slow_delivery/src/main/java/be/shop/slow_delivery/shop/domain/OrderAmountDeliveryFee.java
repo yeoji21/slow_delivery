@@ -35,4 +35,8 @@ public class OrderAmountDeliveryFee extends BaseTimeEntity {
         this.orderAmount = orderAmount;
         this.fee = fee;
     }
+
+    public Long getShopId() {
+        return shop.getId();
+    }
 }

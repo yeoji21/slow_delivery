@@ -1,4 +1,4 @@
-package be.shop.slow_delivery.shop.application.dto;
+package be.shop.slow_delivery.application.dto;
 
 
 import com.querydsl.core.annotations.QueryProjection;
@@ -29,4 +29,15 @@ public class ShopSimpleInfo {
         this.defaultDeliveryFees = defaultDeliveryFees;
     }
 
+    @QueryProjection
+    public ShopSimpleInfo(long shopId, String shopName, int minOrderAmount, String thumbnailPath) {
+        this.shopId = shopId;
+        this.shopName = shopName;
+        this.minOrderAmount = minOrderAmount;
+        this.thumbnailPath = thumbnailPath;
+    }
+
+    public void setDefaultDeliveryFees(List<Integer> defaultDeliveryFees) {
+        this.defaultDeliveryFees = defaultDeliveryFees;
+    }
 }
