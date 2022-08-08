@@ -26,7 +26,12 @@ public class ShopQueryService {
     }
 
     @Transactional(readOnly = true)
-    public ShopListQueryResult findShopListByCategory(long categoryId, String cursor, int size) {
-        return shopQueryDao.findByCategory(categoryId, cursor, size);
+    public ShopListQueryResult findShopListByCategory(long categoryId, String order, String cursor, int size) {
+        if(order.equals("newest"))
+            return shopQueryDao.findByCategory(categoryId, cursor, size);
+        else if(order.equals("delivery-fee"))
+            return shopQueryDao.findByCategoryOrderByDeliveryFee(categoryId, cursor, size);
+        else
+            throw new IllegalArgumentException();
     }
 }

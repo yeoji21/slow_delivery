@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -130,8 +131,7 @@ class ShopQueryDaoTest {
 
         //when
         int size = 10;
-        ShopListQueryResult fistResult =
-                shopQueryDao.findByCategoryOrderByDeliveryFee(chicken.getId(), null , size);
+        ShopListQueryResult fistResult = shopQueryDao.findByCategoryOrderByDeliveryFee(chicken.getId(), null , size);
 
         //then
         List<ShopSimpleInfo> fistShopList = fistResult.getShopList();
@@ -140,7 +140,10 @@ class ShopQueryDaoTest {
                 .isEqualTo(2));
 
         ShopSimpleInfo lastShopInfo = fistShopList.get(fistShopList.size() - 1);
-        Integer cursorFee = lastShopInfo.getDefaultDeliveryFees().get(0);
+        Integer cursorFee = lastShopInfo.getDefaultDeliveryFees()
+                .stream()
+                .min(Comparator.comparing((Integer fee) -> fee))
+                .get();
 
         String nextCursor = fistResult.getNextCursor();
 

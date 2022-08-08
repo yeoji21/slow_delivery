@@ -27,8 +27,9 @@ public class ShopController {
 
     @GetMapping("/category/{categoryId}/shop")
     public ShopListQueryResult getShopListByCategory(@PathVariable long categoryId,
+                                                     @RequestParam(required = true) String order,
                                                      @RequestParam(required = false) String cursor,
                                                      @RequestParam(required = false, defaultValue = "10") int size) {
-        return shopQueryService.findShopListByCategory(categoryId, cursor, size);
+        return shopQueryService.findShopListByCategory(categoryId, order, cursor, size);
     }
 }

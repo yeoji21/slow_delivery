@@ -82,10 +82,11 @@ class ShopControllerTest {
     void 카테고리별_가게_목록_조회() throws Exception{
         List<ShopSimpleInfo> shopList = getShopSimpleInfoList();
         ShopListQueryResult result = new ShopListQueryResult(shopList, true, "nextCursor");
+        String order = "newest";
 
-        given(shopQueryService.findShopListByCategory(1L, null, 10)).willReturn(result);
+        given(shopQueryService.findShopListByCategory(1L, order, null, 10)).willReturn(result);
 
-        mockMvc.perform(get("/category/{categoryId}/shop", 1L)
+        mockMvc.perform(get("/category/{categoryId}/shop?order={order}", 1L, order)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)));

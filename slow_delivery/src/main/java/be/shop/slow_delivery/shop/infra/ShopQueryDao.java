@@ -71,11 +71,11 @@ public class ShopQueryDao {
                 .limit(size + 1)
                 .orderBy(shop.id.desc())
                 .fetch();
+        hasDataCheck(infoList);
 
         setDeliveryFees(infoList);
-
         boolean hasNext = hasNext(size, infoList);
-        String nextCursor = getShopIdNextCursor(infoList);
+        String nextCursor = hasNext ? getShopIdNextCursor(infoList) : null;
         return new ShopListQueryResult(infoList, hasNext, nextCursor);
     }
 
@@ -106,13 +106,13 @@ public class ShopQueryDao {
                                 list(orderAmountDeliveryFee.fee.value)))
                 );
 
-        infoList.sort(Comparator.comparingLong(info -> shopIds.indexOf(info.getShopId())));
+        hasDataCheck(infoList);
 
+        infoList.sort(Comparator.comparingLong(info -> shopIds.indexOf(info.getShopId())));
         boolean hasNext = hasNext(size, infoList);
-        String nextCursor = getDeliveryFeeNextCursor(infoList);
+        String nextCursor = hasNext ? getDeliveryFeeNextCursor(infoList) : null;
         return new ShopListQueryResult(infoList, hasNext, nextCursor);
     }
-
     private String getDeliveryFeeNextCursor(List<ShopSimpleInfo> infoList) {
         ShopSimpleInfo lastOne = infoList.get(infoList.size() - 1);
 
@@ -151,6 +151,11 @@ public class ShopQueryDao {
                     info.setDefaultDeliveryFees(deliveryFees);
                 }
         );
+    }
+
+    private void hasDataCheck(List<ShopSimpleInfo> infoList) {
+        if(infoList.size() == 0)
+            throw new IllegalArgumentException("has no data");
     }
 
     private Map<Long, List<OrderAmountDeliveryFee>> findDeliveryFeeMap(List<ShopSimpleInfo> infoList) {
