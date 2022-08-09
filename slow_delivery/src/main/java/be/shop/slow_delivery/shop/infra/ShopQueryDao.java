@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.shop.infra;
 
+import be.shop.slow_delivery.exception.NotFoundException;
 import be.shop.slow_delivery.shop.application.dto.*;
 import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static be.shop.slow_delivery.exception.ErrorCode.SHOP_NOT_FOUND;
 import static be.shop.slow_delivery.file.domain.QFile.file;
 import static be.shop.slow_delivery.shop.domain.QCategoryShop.categoryShop;
 import static be.shop.slow_delivery.shop.domain.QOrderAmountDeliveryFee.orderAmountDeliveryFee;
@@ -154,9 +156,8 @@ public class ShopQueryDao {
     }
 
     private void hasDataCheck(List<ShopSimpleInfo> infoList) {
-        // TODO: 2022/08/09 exception
         if(infoList.size() == 0)
-            throw new IllegalArgumentException("has no data");
+            throw new NotFoundException(SHOP_NOT_FOUND);
     }
 
     private Map<Long, List<OrderAmountDeliveryFee>> findDeliveryFeeMap(List<ShopSimpleInfo> infoList) {
@@ -175,14 +176,12 @@ public class ShopQueryDao {
 
     private BooleanExpression shopIdCursorCondition(String cursor) {
         if(cursorValidate(cursor)) return null;
-
         return StringExpressions.lpad(shop.id.stringValue(), 20, '0')
                 .lt(cursor);
     }
 
     private BooleanExpression deliveryFeeCursorCondition(String cursor) {
         if(cursorValidate(cursor)) return null;
-
         return StringExpressions.lpad(orderAmountDeliveryFee.fee.value.min().stringValue(), 10, '0')
                 .concat(StringExpressions.lpad(orderAmountDeliveryFee.shop.id.stringValue(), 10, '0'))
                 .gt(cursor);

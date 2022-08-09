@@ -4,12 +4,15 @@ import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
+import be.shop.slow_delivery.exception.InvalidValueException;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static be.shop.slow_delivery.exception.ErrorCode.CATEGORY_COUNT;
 
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -69,8 +72,8 @@ public class Shop extends BaseTimeEntity {
         this.location = location;
         this.shopThumbnailFileId = shopThumbnailFileId;
         categories.forEach(category -> this.categories.add(new CategoryShop(this, category.getId())));
-        // TODO: 2022/08/09 exception
-        if(this.categories.size() == 0) throw new IllegalArgumentException();
+        if(this.categories.size() == 0)
+            throw new InvalidValueException(CATEGORY_COUNT);
     }
 
     public void updateShopThumbnail(Long fileId) {

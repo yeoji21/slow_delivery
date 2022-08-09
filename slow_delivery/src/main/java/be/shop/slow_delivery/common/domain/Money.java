@@ -1,11 +1,14 @@
 package be.shop.slow_delivery.common.domain;
 
 
+import be.shop.slow_delivery.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
+
+import static be.shop.slow_delivery.exception.ErrorCode.MONEY_VALUE;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
@@ -15,8 +18,8 @@ public class Money {
     private int value;
 
     public Money(int value) {
-        // TODO: 2022/08/09 exception
-        if(value < 0) throw new IllegalArgumentException();
+        if(value < 0)
+            throw new InvalidValueException(MONEY_VALUE);
         this.value = value;
     }
 

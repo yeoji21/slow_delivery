@@ -1,11 +1,14 @@
 package be.shop.slow_delivery.common.domain;
 
+import be.shop.slow_delivery.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+
+import static be.shop.slow_delivery.exception.ErrorCode.PHONE_NUMBER_VALUE;
 
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,9 +18,8 @@ public class PhoneNumber {
     private String value;
 
     public PhoneNumber(String phoneNumber) {
-        // TODO: 2022/08/09 exception
         if(!phoneNumber.matches("\\d{2,3}-\\d{3,4}-\\d{4}"))
-            throw new IllegalArgumentException("invalid phone number format");
+            throw new InvalidValueException(PHONE_NUMBER_VALUE);
         this.value = phoneNumber;
     }
 

@@ -24,14 +24,12 @@ public class ShopQueryService {
 
     @Transactional(readOnly = true)
     public ShopDetailInfo findDetailInfo(long shopId) {
-        // TODO: 2022/08/09 exception
         return shopQueryDao.findDetailInfo(shopId)
-                .orElseThrow(() -> new IllegalArgumentException("invalid shopId"));
+                .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public ShopListQueryResult findShopListByCategory(long categoryId, String order, String cursor, int size) {
-        // TODO: 2022/08/09 exception
         if(order.equals("newest"))
             return shopQueryDao.findByCategory(categoryId, cursor, size);
         else if(order.equals("delivery-fee"))
