@@ -69,6 +69,7 @@ public class Shop extends BaseTimeEntity {
         this.location = location;
         this.shopThumbnailFileId = shopThumbnailFileId;
         categories.forEach(category -> this.categories.add(new CategoryShop(this, category.getId())));
+        // TODO: 2022/08/09 exception
         if(this.categories.size() == 0) throw new IllegalArgumentException();
     }
 

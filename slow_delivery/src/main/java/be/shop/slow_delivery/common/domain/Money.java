@@ -15,6 +15,7 @@ public class Money {
     private int value;
 
     public Money(int value) {
+        // TODO: 2022/08/09 exception
         if(value < 0) throw new IllegalArgumentException();
         this.value = value;
     }

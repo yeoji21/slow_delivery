@@ -1,4 +1,4 @@
-package be.shop.slow_delivery.application.dto;
+package be.shop.slow_delivery.shop.application.dto;
 
 
 import com.querydsl.core.annotations.QueryProjection;

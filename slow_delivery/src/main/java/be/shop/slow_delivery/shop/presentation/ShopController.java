@@ -1,9 +1,9 @@
 package be.shop.slow_delivery.shop.presentation;
 
-import be.shop.slow_delivery.application.ShopQueryService;
-import be.shop.slow_delivery.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.application.ShopQueryService;
+import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
+import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
+import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

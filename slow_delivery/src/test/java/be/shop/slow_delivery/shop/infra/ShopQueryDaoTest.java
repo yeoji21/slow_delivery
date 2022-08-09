@@ -1,8 +1,8 @@
 package be.shop.slow_delivery.shop.infra;
 
-import be.shop.slow_delivery.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
+import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
+import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;

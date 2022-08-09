@@ -15,6 +15,7 @@ public class PhoneNumber {
     private String value;
 
     public PhoneNumber(String phoneNumber) {
+        // TODO: 2022/08/09 exception
         if(!phoneNumber.matches("\\d{2,3}-\\d{3,4}-\\d{4}"))
             throw new IllegalArgumentException("invalid phone number format");
         this.value = phoneNumber;
