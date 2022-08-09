@@ -3,13 +3,16 @@ package be.shop.slow_delivery.shop.presentation;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
+import be.shop.slow_delivery.shop.application.ShopCommandService;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
+import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
+import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +29,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +40,31 @@ class ShopControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private ShopQueryService shopQueryService;
+    @MockBean private ShopCommandService shopCommandService;
+
+    @Test
+    void 가게_생성() throws Exception{
+        ShopCreateDto shopCreateDto = ShopCreateDto.builder()
+                .shopName("가게 A")
+                .introduction("안녕하세요~!")
+                .phoneNumber("010-1234-5678")
+                .streetAddress("xxx시 yy구 zzz동 123-456")
+                .openingHours("오후 4시 ~ 익일 새벽 2시")
+                .dayOff("연중무휴")
+                .minOrderAmount(15_000)
+                .category("치킨")
+                .build();
+
+        given(shopCommandService.create(any(ShopCreateCommand.class))).willReturn(1L);
+
+        mockMvc.perform(post("/shop")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(shopCreateDto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(1L)));
+    }
+
 
     @Test
     void 단건_가게_간략정보_조회() throws Exception{

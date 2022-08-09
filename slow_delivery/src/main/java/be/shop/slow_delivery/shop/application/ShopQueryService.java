@@ -34,7 +34,7 @@ public class ShopQueryService {
             return shopQueryDao.findByCategory(categoryId, cursor, size);
         else if(order.equals("delivery-fee"))
             return shopQueryDao.findByCategoryOrderByDeliveryFee(categoryId, cursor, size);
-        else
+        else // 컨트롤러단에서 거르고 예외 발생시킬 수 있도록 변경 예정
             throw new IllegalArgumentException();
     }
 }

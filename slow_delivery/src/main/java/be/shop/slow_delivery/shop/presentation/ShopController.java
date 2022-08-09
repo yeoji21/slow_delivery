@@ -1,19 +1,27 @@
 package be.shop.slow_delivery.shop.presentation;
 
+import be.shop.slow_delivery.shop.application.ShopCommandService;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
+import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
 public class ShopController {
     private final ShopQueryService shopQueryService;
+    private final ShopCommandService shopCommandService;
+
+    @PostMapping("/shop")
+    public long createShop(@RequestBody @Valid ShopCreateDto shopCreateDto) {
+        return shopCommandService.create(new ShopCreateCommand(shopCreateDto));
+    }
 
     @GetMapping("/shop/{shopId}/simple")
     public ShopSimpleInfo getSimpleInfo(@PathVariable long shopId) {
