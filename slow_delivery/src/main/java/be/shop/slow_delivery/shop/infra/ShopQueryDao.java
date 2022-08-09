@@ -1,9 +1,6 @@
 package be.shop.slow_delivery.shop.infra;
 
-import be.shop.slow_delivery.application.dto.*;
-import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.application.dto.*;
 import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.StringExpressions;
@@ -157,6 +154,7 @@ public class ShopQueryDao {
     }
 
     private void hasDataCheck(List<ShopSimpleInfo> infoList) {
+        // TODO: 2022/08/09 exception
         if(infoList.size() == 0)
             throw new IllegalArgumentException("has no data");
     }
