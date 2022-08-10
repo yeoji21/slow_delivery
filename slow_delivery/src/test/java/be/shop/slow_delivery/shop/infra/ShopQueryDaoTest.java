@@ -1,16 +1,14 @@
 package be.shop.slow_delivery.shop.infra;
 
-import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.Money;
-import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.config.ApplicationAuditingConfig;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.file.domain.File;
 import be.shop.slow_delivery.file.domain.FileName;
-import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
+import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
+import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
+import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.domain.OrderAmountDeliveryFee;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
@@ -158,8 +156,9 @@ class ShopQueryDaoTest {
             Shop shop = Shop.builder()
                     .name(i + " shop")
                     .minOrderAmount(new Money(10_000))
-                    .phoneNumber(new PhoneNumber("010-1234-5678"))
-                    .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
+                    .phoneNumber("010-1234-5678")
+                    .openingHours("매일 15시 ~ 02시")
+                    .dayOff("연중무휴")
                     .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
                     .category(categories[i % categories.length])
                     .build();
@@ -192,8 +191,9 @@ class ShopQueryDaoTest {
         Shop shop = Shop.builder()
                 .name("A shop")
                 .minOrderAmount(new Money(10_000))
-                .phoneNumber(new PhoneNumber("010-1234-5678"))
-                .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
+                .phoneNumber("010-1234-5678")
+                .openingHours("매일 15시 ~ 02시")
+                .dayOff("연중무휴")
                 .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
                 .category(food)
                 .build();

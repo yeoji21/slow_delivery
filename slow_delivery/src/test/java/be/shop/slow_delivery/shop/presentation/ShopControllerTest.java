@@ -1,16 +1,10 @@
 package be.shop.slow_delivery.shop.presentation;
 
-import be.shop.slow_delivery.category.domain.Category;
-import be.shop.slow_delivery.common.domain.Money;
-import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.shop.application.ShopCommandService;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
-import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
-import be.shop.slow_delivery.shop.domain.Shop;
-import be.shop.slow_delivery.shop.domain.ShopLocation;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,17 +82,17 @@ class ShopControllerTest {
 
     @Test
     void 단건_가게_상세정보_조회() throws Exception{
-        Shop shop = Shop.builder()
-                .id(1L)
-                .name("A shop")
-                .minOrderAmount(new Money(10_000))
-                .phoneNumber(new PhoneNumber("010-1234-5678"))
-                .businessTimeInfo(new BusinessTimeInfo("매일 15시 ~ 02시", "연중무휴"))
-                .location(ShopLocation.builder().streetAddress("xxxx-xxxx").build())
-                .category(new Category("음식"))
+        ShopDetailInfo shopDetailInfo = ShopDetailInfo.builder()
+                .shopId(1L)
+                .shopName("A shop")
+                .thumbnailPath("thumbnail path")
+                .minOrderAmount(10_000)
+                .phoneNumber("010-1234-5678")
+                .openingHours("매일 15시 ~ 02시")
+                .dayOff("연중무휴")
+                .streetAddress("xxxx-xxxx")
+                .defaultDeliveryFees(List.of(3000, 2000))
                 .build();
-
-        ShopDetailInfo shopDetailInfo = new ShopDetailInfo(shop, "thumbnail path", List.of(3000, 2000));
 
         given(shopQueryService.findDetailInfo(any(Long.class))).willReturn(shopDetailInfo);
 

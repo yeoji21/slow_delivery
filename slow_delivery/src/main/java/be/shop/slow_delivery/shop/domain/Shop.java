@@ -10,7 +10,6 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static be.shop.slow_delivery.exception.ErrorCode.CATEGORY_COUNT;
 
@@ -52,26 +51,24 @@ public class Shop extends BaseTimeEntity {
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryShop> categories = new ArrayList<>();
 
-
     @Builder
-    public Shop(Long id,
-                String name,
+    public Shop(String name,
                 Money minOrderAmount,
-                PhoneNumber phoneNumber,
+                String phoneNumber,
                 String introduction,
-                BusinessTimeInfo businessTimeInfo,
+                String openingHours,
+                String dayOff,
                 ShopLocation location,
                 Long shopThumbnailFileId,
-                @Singular Set<Category> categories) {
-        this.id = id;
+                Category category) {
         this.name = name;
         this.minOrderAmount = minOrderAmount;
-        this.phoneNumber = phoneNumber;
+        this.phoneNumber = new PhoneNumber(phoneNumber);
         this.introduction = introduction;
-        this.businessTimeInfo = businessTimeInfo;
+        this.businessTimeInfo = new BusinessTimeInfo(openingHours, dayOff);
         this.location = location;
         this.shopThumbnailFileId = shopThumbnailFileId;
-        categories.forEach(category -> this.categories.add(new CategoryShop(this, category.getId())));
+        this.categories.add(new CategoryShop(this, category.getId()));
         if(this.categories.size() == 0)
             throw new InvalidValueException(CATEGORY_COUNT);
     }

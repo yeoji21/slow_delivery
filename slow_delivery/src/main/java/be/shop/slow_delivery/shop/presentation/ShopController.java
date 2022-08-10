@@ -2,7 +2,6 @@ package be.shop.slow_delivery.shop.presentation;
 
 import be.shop.slow_delivery.shop.application.ShopCommandService;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
-import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
@@ -22,8 +21,7 @@ public class ShopController {
 
     @PostMapping("/shop")
     public long createShop(@RequestBody @Valid ShopCreateDto shopCreateDto) {
-        ShopCreateCommand shopCreateCommand = mapper.toCreateCommand(shopCreateDto);
-        return shopCommandService.create(shopCreateCommand);
+        return shopCommandService.create(mapper.toCreateCommand(shopCreateDto));
     }
 
     @GetMapping("/shop/{shopId}/simple")

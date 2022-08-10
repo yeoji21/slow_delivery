@@ -2,6 +2,7 @@ package be.shop.slow_delivery.shop.application.dto;
 
 import be.shop.slow_delivery.shop.domain.Shop;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 @Getter
 public class ShopDetailInfo {
-    private long shopId;
+    private Long shopId;
     private String shopName;
     private int minOrderAmount;
     private String thumbnailPath;
@@ -37,5 +38,28 @@ public class ShopDetailInfo {
         this.openingHours = shop.getBusinessTimeInfo().getOpeningHours();
         this.dayOff = shop.getBusinessTimeInfo().getDayOff();
         this.streetAddress = shop.getLocation().getStreetAddress();
+    }
+
+    @Builder
+    public ShopDetailInfo(Long shopId,
+                          String shopName,
+                          int minOrderAmount,
+                          String thumbnailPath,
+                          String introduction,
+                          String phoneNumber,
+                          String openingHours,
+                          String dayOff,
+                          String streetAddress,
+                          List<Integer> defaultDeliveryFees) {
+        this.shopId = shopId;
+        this.shopName = shopName;
+        this.minOrderAmount = minOrderAmount;
+        this.thumbnailPath = thumbnailPath;
+        this.defaultDeliveryFees = defaultDeliveryFees;
+        this.introduction = introduction;
+        this.phoneNumber = phoneNumber;
+        this.openingHours = openingHours;
+        this.dayOff = dayOff;
+        this.streetAddress = streetAddress;
     }
 }
