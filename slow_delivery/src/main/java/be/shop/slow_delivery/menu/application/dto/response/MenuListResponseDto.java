@@ -11,8 +11,7 @@ public class MenuListResponseDto {
 
     private MenuListDto menuListDto;
 
-    // 수정 필요 shop - menulist 받아오기
-//    public MenuListResponseDto(Shop shop){
-//        menuListDto = new MenuListDto(shop.getMenuList());
-//    }
+    public MenuListResponseDto(Shop shop){
+        menuListDto = new MenuListDto(shop.getMenuList());
+    }
 }

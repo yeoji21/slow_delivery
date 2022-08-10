@@ -4,6 +4,6 @@ import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ShopJpaRepository extends JpaRepository<Shop, Long>, ShopRepository {
 
+public interface ShopJpaRepository extends JpaRepository<Shop, Long>, ShopRepository {
 }

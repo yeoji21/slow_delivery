@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.menu.domain;
 
+import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.DisplayInfo;
 import be.shop.slow_delivery.shop.domain.Shop;
 import lombok.*;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Table(name="menu")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Menu{
+public class Menu extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_id")

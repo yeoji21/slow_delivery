@@ -5,6 +5,9 @@ import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.exception.InvalidValueException;
+import be.shop.slow_delivery.menu.domain.Menu;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -50,6 +53,10 @@ public class Shop extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryShop> categories = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "shop")
+    private List<Menu> menuList;
 
     @Builder
     public Shop(String name,
