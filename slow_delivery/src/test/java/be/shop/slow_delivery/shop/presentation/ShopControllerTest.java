@@ -5,7 +5,6 @@ import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.shop.application.ShopCommandService;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
-import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
@@ -13,6 +12,7 @@ import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
+import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +41,7 @@ class ShopControllerTest {
     @Autowired private ObjectMapper objectMapper;
     @MockBean private ShopQueryService shopQueryService;
     @MockBean private ShopCommandService shopCommandService;
+    @MockBean private ShopDtoMapper mapper;
 
     @Test
     void 가게_생성() throws Exception{
@@ -55,7 +56,7 @@ class ShopControllerTest {
                 .category("치킨")
                 .build();
 
-        given(shopCommandService.create(any(ShopCreateCommand.class))).willReturn(1L);
+        given(shopCommandService.create(any())).willReturn(1L);
 
         mockMvc.perform(post("/shop")
                         .contentType(MediaType.APPLICATION_JSON)

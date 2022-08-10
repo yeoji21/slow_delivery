@@ -1,6 +1,6 @@
 package be.shop.slow_delivery.shop.application.dto;
 
-import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -14,14 +14,22 @@ public class ShopCreateCommand {
     private String openingHours;
     private String dayOff;
 
-    public ShopCreateCommand(ShopCreateDto shopCreateDto) {
-        this.shopName = shopCreateDto.getShopName();
-        this.minOrderAmount = shopCreateDto.getMinOrderAmount();
-        this.phoneNumber = shopCreateDto.getPhoneNumber();
-        this.streetAddress = shopCreateDto.getStreetAddress();
-        this.category = shopCreateDto.getCategory();
-        this.introduction = shopCreateDto.getIntroduction();
-        this.openingHours = shopCreateDto.getOpeningHours();
-        this.dayOff = shopCreateDto.getDayOff();
+    @Builder
+    public ShopCreateCommand(String shopName,
+                             int minOrderAmount,
+                             String phoneNumber,
+                             String streetAddress,
+                             String category,
+                             String introduction,
+                             String openingHours,
+                             String dayOff) {
+        this.shopName = shopName;
+        this.minOrderAmount = minOrderAmount;
+        this.phoneNumber = phoneNumber;
+        this.streetAddress = streetAddress;
+        this.category = category;
+        this.introduction = introduction;
+        this.openingHours = openingHours;
+        this.dayOff = dayOff;
     }
 }
