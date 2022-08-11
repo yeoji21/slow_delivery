@@ -31,17 +31,16 @@ public class Menu extends BaseTimeEntity {
     private Shop shop;
 
     @Builder
-    public Menu(Shop shop,String menuName, String introduction, DisplayInfo displayInfo){
+    public Menu(Shop shop,String menuName, String introduction){
         this.shop=shop;
         this.menuName=menuName;
         this.introduction=introduction;
-        this.displayInfo = displayInfo;
+        this.displayInfo = new DisplayInfo(true,shop.getMenuList().size()+1);
     }
 
-    public void updateMenu(String menuName,String introduction, DisplayInfo displayInfo){
+    public void updateMenu(String menuName,String introduction){
         this.menuName=menuName;
         this.introduction=introduction;
-        this.displayInfo=displayInfo;
     }
 
 }
