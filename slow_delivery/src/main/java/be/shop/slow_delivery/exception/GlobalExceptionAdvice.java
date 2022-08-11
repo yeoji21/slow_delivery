@@ -3,6 +3,7 @@ package be.shop.slow_delivery.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -29,6 +30,12 @@ public class GlobalExceptionAdvice {
     protected ResponseEntity<ErrorResponse> methodArgumentValidation(MethodArgumentNotValidException e) {
         log.warn("[exception - {}] -> {}", REQUEST_PARAMETER, e.getFieldErrors().stream()
                 .map(err-> err.getDefaultMessage()).collect(Collectors.joining(" and ")));
+        return ErrorResponse.toResponse(REQUEST_PARAMETER);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponse> emptyRequestParameterException(MissingServletRequestParameterException e) {
+        log.warn("[handleMissingServletRequestParameterException] : {}", e.getMessage());
         return ErrorResponse.toResponse(REQUEST_PARAMETER);
     }
 }

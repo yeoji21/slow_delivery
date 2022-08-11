@@ -5,6 +5,7 @@ import be.shop.slow_delivery.shop.application.ShopQueryService;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.presentation.dto.ShopOrderType;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +37,13 @@ public class ShopController {
 
     @GetMapping("/category/{categoryId}/shop")
     public ShopListQueryResult getShopListByCategory(@PathVariable long categoryId,
-                                                     @RequestParam(required = true) String order,
+                                                     @RequestParam(required = true) ShopOrderType order,
                                                      @RequestParam(required = false) String cursor,
                                                      @RequestParam(required = false, defaultValue = "10") int size) {
-        return shopQueryService.findShopListByCategory(categoryId, order, cursor, size);
+        if(order == ShopOrderType.NEWEST)
+            return shopQueryService.findShopsOrderByNewest(categoryId, cursor, size);
+        else if(order == ShopOrderType.DELIVERY_FEE)
+            return shopQueryService.findShopsOrderByDeliveryFee(categoryId, cursor, size);
+        throw new IllegalArgumentException();
     }
 }

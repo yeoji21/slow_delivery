@@ -6,7 +6,6 @@ import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.exception.InvalidValueException;
 import be.shop.slow_delivery.menu.domain.Menu;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 

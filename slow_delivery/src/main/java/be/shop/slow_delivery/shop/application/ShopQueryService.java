@@ -29,12 +29,12 @@ public class ShopQueryService {
     }
 
     @Transactional(readOnly = true)
-    public ShopListQueryResult findShopListByCategory(long categoryId, String order, String cursor, int size) {
-        if(order.equals("newest"))
-            return shopQueryDao.findByCategory(categoryId, cursor, size);
-        else if(order.equals("delivery-fee"))
-            return shopQueryDao.findByCategoryOrderByDeliveryFee(categoryId, cursor, size);
-        else // 컨트롤러단에서 거르고 예외 발생시킬 수 있도록 변경 예정
-            throw new IllegalArgumentException();
+    public ShopListQueryResult findShopsOrderByNewest(long categoryId, String cursor, int size) {
+        return shopQueryDao.findByCategoryOrderByNewest(categoryId, cursor, size);
+    }
+
+    @Transactional(readOnly = true)
+    public ShopListQueryResult findShopsOrderByDeliveryFee(long categoryId, String cursor, int size) {
+        return shopQueryDao.findByCategoryOrderByDeliveryFee(categoryId, cursor, size);
     }
 }

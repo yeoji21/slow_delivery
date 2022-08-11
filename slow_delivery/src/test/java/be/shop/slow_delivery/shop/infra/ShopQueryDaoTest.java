@@ -102,7 +102,7 @@ class ShopQueryDaoTest {
 
         //when
         int size = 10;
-        ShopListQueryResult fistResult = shopQueryDao.findByCategory(chicken.getId(), "null", size);
+        ShopListQueryResult fistResult = shopQueryDao.findByCategoryOrderByNewest(chicken.getId(), "null", size);
 
         //then
         List<ShopSimpleInfo> fistShopList = fistResult.getShopList();
@@ -110,7 +110,7 @@ class ShopQueryDaoTest {
         fistShopList.forEach(shopSimpleInfo -> assertThat(shopSimpleInfo.getDefaultDeliveryFees().size()).isEqualTo(2));
 
         long cursorId = fistShopList.get(fistShopList.size() - 1).getShopId();
-        ShopListQueryResult secondResult = shopQueryDao.findByCategory(chicken.getId(), fistResult.getNextCursor(), size);
+        ShopListQueryResult secondResult = shopQueryDao.findByCategoryOrderByNewest(chicken.getId(), fistResult.getNextCursor(), size);
 
         List<ShopSimpleInfo> secondShopList = secondResult.getShopList();
         assertThat(secondShopList.size()).isEqualTo(size);

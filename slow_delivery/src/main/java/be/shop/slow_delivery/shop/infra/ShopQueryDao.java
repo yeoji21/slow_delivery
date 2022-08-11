@@ -63,7 +63,7 @@ public class ShopQueryDao {
     }
 
     // 카테고리별 가게 목록 (간략 정보) -> 기본순 (shopId로 정렬)
-    public ShopListQueryResult findByCategory(long categoryId, String cursor, int size) {
+    public ShopListQueryResult findByCategoryOrderByNewest(long categoryId, String cursor, int size) {
         List<ShopSimpleInfo> infoList = queryFactory
                 .select(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath))
                 .from(shop)

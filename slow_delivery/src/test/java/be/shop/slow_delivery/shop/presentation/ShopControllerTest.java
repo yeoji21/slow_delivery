@@ -5,6 +5,7 @@ import be.shop.slow_delivery.shop.application.ShopQueryService;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.presentation.dto.ShopOrderType;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -106,9 +107,9 @@ class ShopControllerTest {
     void 카테고리별_가게_목록_조회() throws Exception{
         List<ShopSimpleInfo> shopList = getShopSimpleInfoList();
         ShopListQueryResult result = new ShopListQueryResult(shopList, true, "nextCursor");
-        String order = "newest";
+        ShopOrderType order = ShopOrderType.NEWEST;
 
-        given(shopQueryService.findShopListByCategory(1L, order, null, 10)).willReturn(result);
+        given(shopQueryService.findShopsOrderByNewest(1L, null, 10)).willReturn(result);
 
         mockMvc.perform(get("/category/{categoryId}/shop?order={order}", 1L, order)
                         .contentType(MediaType.APPLICATION_JSON))
