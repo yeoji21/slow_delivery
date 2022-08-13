@@ -35,12 +35,12 @@ public class Menu extends BaseTimeEntity {
         this.shop=shop;
         this.menuName=menuName;
         this.introduction=introduction;
-        this.displayInfo = new DisplayInfo(true,shop.getMenuList().size()+1);
     }
 
     public void updateMenu(String menuName,String introduction){
         this.menuName=menuName;
         this.introduction=introduction;
     }
+
 
 }

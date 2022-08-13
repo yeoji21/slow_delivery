@@ -53,10 +53,6 @@ public class Shop extends BaseTimeEntity {
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryShop> categories = new ArrayList<>();
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "shop")
-    private List<Menu> menuList;
-
     @Builder
     public Shop(String name,
                 Money minOrderAmount,

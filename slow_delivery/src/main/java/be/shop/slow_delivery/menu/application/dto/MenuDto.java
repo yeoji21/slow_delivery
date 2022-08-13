@@ -13,7 +13,4 @@ public class MenuDto {
     private String menuName;
 
     private String introduction;
-
-    private DisplayInfo displayInfo;
-
 }

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.List;
+
 import static be.shop.slow_delivery.exception.ErrorCode.*;
 
 @Slf4j
@@ -25,9 +27,8 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public MenuListResponseDto findShopMenuList(Long shopId){
-        Shop shop = shopRepository.findById(shopId)
-                .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
-        return new MenuListResponseDto(shop);
+        List<Menu> menus = menuRepository.findAllByShopId(shopId);
+        return new MenuListResponseDto(menus);
     }
 
     @Transactional
