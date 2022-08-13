@@ -15,7 +15,7 @@ public class MenuCreateRequestDto {
 
     private String introduction;
 
-    public Menu toEntity(Shop shop){
-        return new Menu(shop,menuName,introduction);
+    public Menu toEntity(Shop shop,int countMenu){
+        return new Menu(shop,menuName,introduction,countMenu);
     }
 }

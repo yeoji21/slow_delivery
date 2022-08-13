@@ -35,7 +35,8 @@ public class MenuService {
     public void createMenu(MenuCreateRequestDto menuCreateRequestDto, Long shopId){
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
-        Menu menu = makeMenuEntity(shop, menuCreateRequestDto);
+        int countMenu = getMenuCount(shop.getId());
+        Menu menu = makeMenuEntity(shop, menuCreateRequestDto,countMenu);
         menuRepository.save(menu);
     }
 
@@ -51,7 +52,12 @@ public class MenuService {
         menuRepository.deleteById(menuId);
     }
 
-    private Menu makeMenuEntity(Shop shop, MenuCreateRequestDto menuCreateRequestDto){
-        return menuCreateRequestDto.toEntity(shop);
+    private Menu makeMenuEntity(Shop shop, MenuCreateRequestDto menuCreateRequestDto, int countMenu){
+        return menuCreateRequestDto.toEntity(shop,countMenu);
+    }
+
+    private int getMenuCount(Long shopId){
+        List<Menu> menus = menuRepository.findAllByShopId(shopId);
+        return menus.size();
     }
 }
