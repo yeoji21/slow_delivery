@@ -4,6 +4,7 @@ package be.shop.slow_delivery.product.domain;
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
+import com.mysema.commons.lang.Assert;
 import lombok.*;
 
 import javax.persistence.*;
@@ -45,6 +46,11 @@ public class Product extends BaseTimeEntity {
                    String description,
                    Money price,
                    Quantity maxOrderQuantity) {
+        Assert.notNull(stockId, "재고는 필수입니다.");
+        Assert.hasText(name, "상품명은 필수입니다.");
+        Assert.notNull(price, "가격은 필수입니다.");
+        Assert.notNull(maxOrderQuantity, "최대 주문 수량은 필수입니다.");
+
         this.thumbnailFileId = thumbnailFileId;
         this.stockInfo = new StockInfo(stockId);
         this.name = name;

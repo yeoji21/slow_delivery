@@ -49,6 +49,7 @@ class ShopCommandServiceTest {
                 .category("치킨")
                 .build();
         Category category = new Category("치킨");
+        ReflectionTestUtils.setField(category, "id", 1L);
 
         given(categoryRepository.findByCategoryName(any(String.class))).willReturn(Optional.of(category));
         doAnswer(invocation -> {

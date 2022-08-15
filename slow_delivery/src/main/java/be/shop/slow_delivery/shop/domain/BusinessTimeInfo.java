@@ -11,10 +11,10 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class BusinessTimeInfo {
-    @Column(name = "opening_hours", nullable = false)
+    @Column(name = "opening_hours", nullable = true)
     private String openingHours;
 
-    @Column(name = "days_off", nullable = false)
+    @Column(name = "days_off", nullable = true)
     private String dayOff;
 
     public BusinessTimeInfo(String openingHours, String dayOff) {

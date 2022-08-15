@@ -1,14 +1,12 @@
 package be.shop.slow_delivery.common.domain;
 
 
-import be.shop.slow_delivery.exception.InvalidValueException;
+import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
-
-import static be.shop.slow_delivery.exception.ErrorCode.MONEY;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
@@ -18,8 +16,7 @@ public class Money {
     private int value;
 
     public Money(int value) {
-        if(value < 0)
-            throw new InvalidValueException(MONEY);
+        Assert.isTrue(value >= 0, "잘못된 금액입니다.");
         this.value = value;
     }
 

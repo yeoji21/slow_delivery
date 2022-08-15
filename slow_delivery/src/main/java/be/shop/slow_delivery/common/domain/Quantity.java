@@ -1,12 +1,10 @@
 package be.shop.slow_delivery.common.domain;
 
-import be.shop.slow_delivery.exception.InvalidValueException;
+import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
-
-import static be.shop.slow_delivery.exception.ErrorCode.QUANTITY;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
@@ -15,8 +13,7 @@ public class Quantity {
     private int quantity;
 
     public Quantity(int quantity) {
-        if(quantity < 0)
-            throw new InvalidValueException(QUANTITY);
+        Assert.isTrue(quantity >= 0, "잘못된 수량입니다.");
         this.quantity = quantity;
     }
 }

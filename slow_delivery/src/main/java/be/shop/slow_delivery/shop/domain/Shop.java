@@ -5,6 +5,7 @@ import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.exception.InvalidValueException;
+import com.mysema.commons.lang.Assert;
 import lombok.*;
 
 import javax.persistence.*;
@@ -61,6 +62,12 @@ public class Shop extends BaseTimeEntity {
                 ShopLocation location,
                 Long thumbnailFileId,
                 Category category) {
+        Assert.hasText(name, "가게명은 필수입니다.");
+        Assert.notNull(minOrderAmount, "최소 주문 금액은 필수입니다.");
+        Assert.hasText(phoneNumber, "전화번호는 필수입니다.");
+        Assert.notNull(location, "가게 위치는 필수입니다.");
+        Assert.notNull(category, "카테고리는 필수입니다.");
+
         this.name = name;
         this.minOrderAmount = minOrderAmount;
         this.phoneNumber = new PhoneNumber(phoneNumber);
