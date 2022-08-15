@@ -33,7 +33,7 @@ public class ShopDetailInfo {
         this.minOrderAmount = shop.getMinOrderAmount().toInt();
         this.thumbnailPath = thumbnailPath;
         this.defaultDeliveryFees = defaultDeliveryFees;
-        this.introduction = shop.getIntroduction();
+        this.introduction = shop.getDescription();
         this.phoneNumber = shop.getPhoneNumber().toString();
         this.openingHours = shop.getBusinessTimeInfo().getOpeningHours();
         this.dayOff = shop.getBusinessTimeInfo().getDayOff();

@@ -5,8 +5,6 @@ import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.PhoneNumber;
 import be.shop.slow_delivery.exception.InvalidValueException;
-import be.shop.slow_delivery.menu.domain.Menu;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -33,13 +31,13 @@ public class Shop extends BaseTimeEntity {
     private String name;
 
     @Column(name = "thumbnail_file_id", nullable = true)
-    private Long shopThumbnailFileId;
+    private Long thumbnailFileId;
 
     @Embedded @Column(name = "min_order_price", nullable = false)
     private Money minOrderAmount;
 
-    @Column(name = "introduction", nullable = true)
-    private String introduction;
+    @Column(name = "description", nullable = true)
+    private String description;
 
     @Embedded
     private PhoneNumber phoneNumber;
@@ -57,26 +55,26 @@ public class Shop extends BaseTimeEntity {
     public Shop(String name,
                 Money minOrderAmount,
                 String phoneNumber,
-                String introduction,
+                String description,
                 String openingHours,
                 String dayOff,
                 ShopLocation location,
-                Long shopThumbnailFileId,
+                Long thumbnailFileId,
                 Category category) {
         this.name = name;
         this.minOrderAmount = minOrderAmount;
         this.phoneNumber = new PhoneNumber(phoneNumber);
-        this.introduction = introduction;
+        this.description = description;
         this.businessTimeInfo = new BusinessTimeInfo(openingHours, dayOff);
         this.location = location;
-        this.shopThumbnailFileId = shopThumbnailFileId;
+        this.thumbnailFileId = thumbnailFileId;
         this.categories.add(new CategoryShop(this, category.getId()));
         if(this.categories.size() == 0)
             throw new InvalidValueException(CATEGORY_COUNT);
     }
 
     public void updateShopThumbnail(Long fileId) {
-        this.shopThumbnailFileId = fileId;
+        this.thumbnailFileId = fileId;
     }
 
     public void belongToCategory(Category category) {

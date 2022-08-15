@@ -13,8 +13,9 @@ public enum ErrorCode {
 
     // 400 BAD_REQUEST : 잘못된 요청
     REQUEST_PARAMETER(BAD_REQUEST, "잘못된 요청 형식입니다."),
-    MONEY_VALUE(BAD_REQUEST, "잘못된 금액입니다."),
-    PHONE_NUMBER_VALUE(BAD_REQUEST, "잘못된 전화번호 형식입니다."),
+    MONEY(BAD_REQUEST, "잘못된 금액입니다."),
+    QUANTITY(BAD_REQUEST, "잘못된 수량입니다."),
+    PHONE_NUMBER(BAD_REQUEST, "잘못된 전화번호 형식입니다."),
     CATEGORY_COUNT(BAD_REQUEST, "가게는 카테고리를 한 개 이상 가져야 합니다."),
 
 

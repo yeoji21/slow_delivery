@@ -17,11 +17,11 @@ public class Menu extends BaseTimeEntity {
     @Column(name = "menu_id")
     private Long id;
 
-    @Column(nullable = false, name="menu_name")
+    @Column(nullable = false, name = "menu_name")
     private String menuName;
 
-    @Column(nullable = true, name="introduction")
-    private String introduction;
+    @Column(nullable = true, name = "description")
+    private String description;
 
     @Embedded
     private DisplayInfo displayInfo;
@@ -31,23 +31,23 @@ public class Menu extends BaseTimeEntity {
     private Shop shop;
 
     @Builder
-    public Menu(Shop shop,String menuName, String introduction,int countMenu){
+    public Menu(Shop shop, String menuName, String description, int countMenu){
         this.shop=shop;
         this.menuName=menuName;
-        this.introduction=introduction;
+        this.description = description;
         this.displayInfo=new DisplayInfo(true,countMenu);
     }
 
     @Builder
-    public Menu(Shop shop,String menuName, String introduction){
+    public Menu(Shop shop,String menuName, String description){
         this.shop=shop;
         this.menuName=menuName;
-        this.introduction=introduction;
+        this.description = description;
     }
 
     public void updateMenu(String menuName, String introduction){
         this.menuName=menuName;
-        this.introduction=introduction;
+        this.description =introduction;
     }
 
 

@@ -35,7 +35,7 @@ public class ShopQueryDao {
                 queryFactory
                         .from(shop)
                         .where(shop.id.eq(shopId))
-                        .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
+                        .leftJoin(file).on(file.id.eq(shop.thumbnailFileId))
                         .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                         .transform(
                                 groupBy(shop.id).as(
@@ -52,7 +52,7 @@ public class ShopQueryDao {
                 queryFactory
                         .from(shop)
                         .where(shop.id.eq(shopId))
-                        .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
+                        .leftJoin(file).on(file.id.eq(shop.thumbnailFileId))
                         .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                         .transform(
                                 groupBy(shop.id).as(
@@ -68,7 +68,7 @@ public class ShopQueryDao {
                 .select(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath))
                 .from(shop)
                 .innerJoin(categoryShop).on(categoryShop.shop.eq(shop))
-                .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
+                .leftJoin(file).on(file.id.eq(shop.thumbnailFileId))
                 .where(categoryShop.categoryId.eq(categoryId), shopIdCursorCondition(cursor))
                 .limit(size + 1)
                 .orderBy(shop.id.desc())
@@ -100,7 +100,7 @@ public class ShopQueryDao {
         List<ShopSimpleInfo> infoList = queryFactory
                 .from(shop)
                 .innerJoin(categoryShop).on(categoryShop.shop.eq(shop))
-                .leftJoin(file).on(file.id.eq(shop.shopThumbnailFileId))
+                .leftJoin(file).on(file.id.eq(shop.thumbnailFileId))
                 .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                 .where(shop.id.in(shopIds))
                 .transform(

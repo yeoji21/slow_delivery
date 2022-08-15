@@ -8,18 +8,18 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 
-import static be.shop.slow_delivery.exception.ErrorCode.MONEY_VALUE;
+import static be.shop.slow_delivery.exception.ErrorCode.MONEY;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 @EqualsAndHashCode(of = "value")
 public class Money {
-    public static final Money EMPTY = new Money(0);
+    public static final Money ZERO = new Money(0);
     private int value;
 
     public Money(int value) {
         if(value < 0)
-            throw new InvalidValueException(MONEY_VALUE);
+            throw new InvalidValueException(MONEY);
         this.value = value;
     }
 

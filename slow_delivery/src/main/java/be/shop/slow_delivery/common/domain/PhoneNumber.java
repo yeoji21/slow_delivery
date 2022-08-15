@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-import static be.shop.slow_delivery.exception.ErrorCode.PHONE_NUMBER_VALUE;
+import static be.shop.slow_delivery.exception.ErrorCode.PHONE_NUMBER;
 
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,7 +19,7 @@ public class PhoneNumber {
 
     public PhoneNumber(String phoneNumber) {
         if(!phoneNumber.matches("\\d{2,3}-\\d{3,4}-\\d{4}"))
-            throw new InvalidValueException(PHONE_NUMBER_VALUE);
+            throw new InvalidValueException(PHONE_NUMBER);
         this.value = phoneNumber;
     }
 
