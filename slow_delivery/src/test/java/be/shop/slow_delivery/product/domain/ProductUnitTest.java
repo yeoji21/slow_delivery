@@ -4,6 +4,7 @@ import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProductUnitTest {
@@ -58,4 +59,26 @@ class ProductUnitTest {
                         .build());
     }
 
+    @Test
+    void 상품구성그룹_추가() throws Exception{
+        //given
+        Product product = Product.builder()
+                .stockId(1L)
+                .name("product A")
+                .description("~~~")
+                .price(new Money(10_000))
+                .maxOrderQuantity(new Quantity(5))
+                .build();
+
+        IngredientGroup ingredientGroup = IngredientGroup.builder()
+                .name("group A")
+                .selectCount(new SelectCount(1, 1))
+                .build();
+
+        //when
+        product.addIngredientGroup(ingredientGroup);
+
+        //then
+        assertThat(product.getIngredientGroups().size()).isEqualTo(1);
+    }
 }

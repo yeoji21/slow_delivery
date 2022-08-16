@@ -8,6 +8,8 @@ import com.mysema.commons.lang.Assert;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -39,6 +41,9 @@ public class Product extends BaseTimeEntity {
     @Column(name = "max_order_quantity", nullable = false)
     private Quantity maxOrderQuantity;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductIngredientGroup> ingredientGroups = new ArrayList<>();
+
     @Builder
     public Product(Long stockId,
                    Long thumbnailFileId,
@@ -46,10 +51,10 @@ public class Product extends BaseTimeEntity {
                    String description,
                    Money price,
                    Quantity maxOrderQuantity) {
-        Assert.notNull(stockId, "재고는 필수입니다.");
-        Assert.hasText(name, "상품명은 필수입니다.");
-        Assert.notNull(price, "가격은 필수입니다.");
-        Assert.notNull(maxOrderQuantity, "최대 주문 수량은 필수입니다.");
+        Assert.notNull(stockId, "stockId");
+        Assert.hasText(name, "name");
+        Assert.notNull(price, "price");
+        Assert.notNull(maxOrderQuantity, "maxOrderQuantity");
 
         this.thumbnailFileId = thumbnailFileId;
         this.stockInfo = new StockInfo(stockId);
@@ -57,5 +62,9 @@ public class Product extends BaseTimeEntity {
         this.description = description;
         this.price = price;
         this.maxOrderQuantity = maxOrderQuantity;
+    }
+
+    public void addIngredientGroup(IngredientGroup ingredientGroup) {
+        ingredientGroups.add(new ProductIngredientGroup(this, ingredientGroup));
     }
 }

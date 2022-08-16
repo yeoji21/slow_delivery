@@ -26,9 +26,9 @@ public class Ingredient extends BaseTimeEntity {
     public Ingredient(String name,
                       Money price,
                       Long stockId) {
-        Assert.hasText(name, "이름은 필수입니다.");
-        Assert.notNull(price, "가격은 필수입니다.");
-        Assert.notNull(stockId, "재고는 필수입니다.");
+        Assert.hasText(name, "name");
+        Assert.notNull(price, "price");
+        Assert.notNull(stockId, "stockId");
 
         this.name = name;
         this.price = price;
