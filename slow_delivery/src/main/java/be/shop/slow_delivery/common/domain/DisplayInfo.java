@@ -13,11 +13,16 @@ public class DisplayInfo {
     private boolean isDisplay;
 
     @Column(name ="display_order")
-    private int displayOrder;
+    private DisplayOrder displayOrder;
 
     @Builder
     public DisplayInfo(boolean isDisplay, int displayOrder) {
         this.isDisplay = isDisplay;
-        this.displayOrder = displayOrder;
+        this.displayOrder = new DisplayOrder(displayOrder);
+    }
+
+    public DisplayInfo(int displayOrder) {
+        this.isDisplay = true;
+        this.displayOrder = new DisplayOrder(displayOrder);
     }
 }

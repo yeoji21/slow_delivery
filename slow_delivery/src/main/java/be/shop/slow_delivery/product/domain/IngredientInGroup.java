@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.product.domain;
 
+import be.shop.slow_delivery.common.domain.DisplayInfo;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -21,11 +22,17 @@ public class IngredientInGroup {
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 
-    public IngredientInGroup(IngredientGroup ingredientGroup, Ingredient ingredient) {
+    @Embedded
+    private DisplayInfo displayInfo;
+
+    public IngredientInGroup(IngredientGroup ingredientGroup,
+                             Ingredient ingredient,
+                             int displayOrder) {
         Assert.notNull(ingredientGroup, "ingredientGroup");
         Assert.notNull(ingredient, "상품 구성");
 
         this.ingredientGroup = ingredientGroup;
         this.ingredient = ingredient;
+        this.displayInfo = new DisplayInfo(displayOrder);
     }
 }

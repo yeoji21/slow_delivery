@@ -26,6 +26,7 @@ public class IngredientGroup extends BaseTimeEntity {
     @Embedded
     private SelectCount selectCount;
 
+    @OrderBy("displayInfo.displayOrder")
     @OneToMany(mappedBy = "ingredientGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IngredientInGroup> ingredients = new ArrayList<>();
 
@@ -39,6 +40,8 @@ public class IngredientGroup extends BaseTimeEntity {
     }
 
     public void addIngredient(Ingredient ingredient) {
-        ingredients.add(new IngredientInGroup(this, ingredient));
+        ingredients.add(new IngredientInGroup(this, ingredient,
+                // LAZY loading 발생
+                ingredients.size()));
     }
 }

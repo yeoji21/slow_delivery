@@ -41,6 +41,7 @@ public class Product extends BaseTimeEntity {
     @Column(name = "max_order_quantity", nullable = false)
     private Quantity maxOrderQuantity;
 
+    @OrderBy("displayOrder")
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductIngredientGroup> ingredientGroups = new ArrayList<>();
 
@@ -65,6 +66,8 @@ public class Product extends BaseTimeEntity {
     }
 
     public void addIngredientGroup(IngredientGroup ingredientGroup) {
-        ingredientGroups.add(new ProductIngredientGroup(this, ingredientGroup));
+        ingredientGroups.add(new ProductIngredientGroup(this, ingredientGroup,
+                // LAZY loading 발생
+                ingredientGroups.size()));
     }
 }

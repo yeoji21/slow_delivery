@@ -28,7 +28,9 @@ public class Option extends BaseTimeEntity {
     private StockInfo stockInfo;
 
     @Builder
-    public Option(String name, Money price, Long stockId) {
+    public Option(String name,
+                  Money price,
+                  Long stockId) {
         Assert.hasText(name, "name");
         Assert.notNull(price, "price");
         Assert.notNull(stockId, "stockId");

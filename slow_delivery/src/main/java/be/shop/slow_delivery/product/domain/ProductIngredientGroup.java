@@ -1,6 +1,7 @@
 package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
+import be.shop.slow_delivery.common.domain.DisplayOrder;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,12 +24,19 @@ public class ProductIngredientGroup extends BaseTimeEntity {
     @JoinColumn(name = "ingredient_group_id")
     private IngredientGroup ingredientGroup;
 
+    @Embedded
+    private DisplayOrder displayOrder;
+
     @Builder
-    public ProductIngredientGroup(Product product, IngredientGroup ingredientGroup) {
+    public ProductIngredientGroup(Product product,
+                                  IngredientGroup ingredientGroup,
+                                  Integer displayOrder) {
         Assert.notNull(product, "product");
         Assert.notNull(product, "ingredientGroup");
+        Assert.notNull(displayOrder, "displayOrder");
 
         this.product = product;
         this.ingredientGroup = ingredientGroup;
+        this.displayOrder = new DisplayOrder(displayOrder);
     }
 }
