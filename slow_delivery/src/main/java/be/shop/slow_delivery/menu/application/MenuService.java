@@ -32,13 +32,12 @@ public class MenuService {
     }
 
     @Transactional
-    public long createMenu(MenuCreateRequestDto menuCreateRequestDto, Long shopId){
+    public void createMenu(MenuCreateRequestDto menuCreateRequestDto, Long shopId){
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
         int countMenu = getMenuCount(shop.getId());
         Menu menu = makeMenuEntity(shop, menuCreateRequestDto,countMenu);
         menuRepository.save(menu);
-        return menu.getId();
     }
 
     @Transactional
