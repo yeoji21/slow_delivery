@@ -18,14 +18,14 @@ import static be.shop.slow_delivery.exception.ErrorCode.CATEGORY_COUNT;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @SecondaryTable(
         name = "shop_location",
-        pkJoinColumns = @PrimaryKeyJoinColumn(name = "shop_id", referencedColumnName = "shop_id")
+        pkJoinColumns = @PrimaryKeyJoinColumn(name = "shop_id", referencedColumnName = "id")
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "shop")
 public class Shop extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "shop_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "name", nullable = false)

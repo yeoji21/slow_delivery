@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 public class ProductIngredientGroup extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_ingredient_group_id")
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

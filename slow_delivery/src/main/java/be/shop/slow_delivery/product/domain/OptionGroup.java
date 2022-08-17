@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Entity
 public class OptionGroup {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "option_group_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "name", nullable = false)

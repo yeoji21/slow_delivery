@@ -14,10 +14,10 @@ import javax.persistence.*;
 public class Menu extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "menu_id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, name = "menu_name")
+    @Column(nullable = false, name = "name")
     private String menuName;
 
     @Column(nullable = true, name = "description")

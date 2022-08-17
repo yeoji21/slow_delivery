@@ -17,7 +17,7 @@ import java.util.List;
 public class IngredientGroup extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ingredient_group_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "name", nullable = false)

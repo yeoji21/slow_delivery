@@ -18,7 +18,7 @@ import java.util.List;
 public class Product extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "thumbnail_file_id", nullable = true)

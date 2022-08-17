@@ -11,10 +11,10 @@ import javax.persistence.*;
 public class Category {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false, name = "category_name")
+    @Column(nullable = false, name = "name")
     private String categoryName;
 
     @Builder

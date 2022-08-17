@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Entity
 public class Option extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "option_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "name", nullable = false)
