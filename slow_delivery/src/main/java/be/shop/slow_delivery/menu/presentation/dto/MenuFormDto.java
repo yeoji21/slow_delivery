@@ -6,7 +6,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class MenuForm {
+public class MenuFormDto {
 
     @NotBlank(message = "메뉴명은 필수입니다.")
     private String menuName;
@@ -14,8 +14,8 @@ public class MenuForm {
     private String introduction;
 
     @Builder
-    public MenuForm(String menuName,
-                         String introduction) {
+    public MenuFormDto(String menuName,
+                    String introduction) {
         this.menuName = menuName;
         this.introduction = introduction;
     }

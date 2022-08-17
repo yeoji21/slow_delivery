@@ -9,5 +9,5 @@ public interface MenuDtoMapper {
 
     MenuDtoMapper INSTANCE = Mappers.getMapper(MenuDtoMapper.class);
 
-    MenuCreateRequestDto toCreateRequestDto(MenuForm menuForm);
+    MenuCreateRequestDto toCreateRequestDto(MenuFormDto menuForm);
 }

@@ -1,12 +1,10 @@
 package be.shop.slow_delivery.menu.presentation;
 
 import be.shop.slow_delivery.menu.application.MenuService;
-import be.shop.slow_delivery.menu.application.dto.request.MenuCreateRequestDto;
 import be.shop.slow_delivery.menu.application.dto.request.MenuUpdateRequestDto;
 import be.shop.slow_delivery.menu.application.dto.response.MenuListResponseDto;
 import be.shop.slow_delivery.menu.presentation.dto.MenuDtoMapper;
-import be.shop.slow_delivery.menu.presentation.dto.MenuForm;
-import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
+import be.shop.slow_delivery.menu.presentation.dto.MenuFormDto;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +34,7 @@ public class MenuController {
 
     @ApiOperation(value = "메뉴 등록")
     @PostMapping("/{shopId}/menu/new")
-    public String createMenu(@RequestBody @Valid MenuForm menuForm,
+    public String createMenu(@RequestBody @Valid MenuFormDto menuForm,
                            @PathVariable("shopId") long shopId){
         menuService.createMenu(mapper.toCreateRequestDto(menuForm),shopId);
         return "redirect:/{shopId}/menus";
