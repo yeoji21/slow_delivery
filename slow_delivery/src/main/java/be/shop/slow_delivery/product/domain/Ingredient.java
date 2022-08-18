@@ -5,10 +5,12 @@ import be.shop.slow_delivery.common.domain.Money;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Ingredient extends BaseTimeEntity {

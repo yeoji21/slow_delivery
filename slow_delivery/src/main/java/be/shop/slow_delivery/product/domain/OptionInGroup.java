@@ -4,36 +4,39 @@ import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.DisplayInfo;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class IngredientInGroup extends BaseTimeEntity {
+public class OptionInGroup extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredient_group_id")
-    private IngredientGroup ingredientGroup;
+    @JoinColumn(name = "option_group_id")
+    private OptionGroup optionGroup;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredient_id")
-    private Ingredient ingredient;
+    @JoinColumn(name = "option_id")
+    private Option option;
 
     @Embedded
     private DisplayInfo displayInfo;
 
-    public IngredientInGroup(IngredientGroup ingredientGroup,
-                             Ingredient ingredient,
-                             int displayOrder) {
-        Assert.notNull(ingredientGroup, "ingredientGroup");
-        Assert.notNull(ingredient, "상품 구성");
+    public OptionInGroup(OptionGroup optionGroup, Option option, int displayOrder) {
+        Assert.notNull(optionGroup, "optionGroup");
+        Assert.notNull(option, "option");
+        Assert.notNull(displayOrder, "displayOrder");
 
-        this.ingredientGroup = ingredientGroup;
-        this.ingredient = ingredient;
+        this.optionGroup = optionGroup;
+        this.option = option;
         this.displayInfo = new DisplayInfo(displayOrder);
     }
 }
