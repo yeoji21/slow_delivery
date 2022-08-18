@@ -39,9 +39,7 @@ public class IngredientGroup extends BaseTimeEntity {
         this.selectCount = selectCount;
     }
 
-    public void addIngredient(Ingredient ingredient) {
-        ingredients.add(new IngredientInGroup(this, ingredient,
-                // LAZY loading 발생
-                ingredients.size()));
+    public void addIngredient(Ingredient ingredient, int displayOrder) {
+        ingredients.add(new IngredientInGroup(this, ingredient, displayOrder));
     }
 }

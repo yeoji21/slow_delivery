@@ -49,7 +49,7 @@ class IngredientGroupUnitTest {
                 .build();
 
         //when
-        ingredientGroup.addIngredient(ingredient);
+        ingredientGroup.addIngredient(ingredient, 1);
 
         //then
         assertThat(ingredientGroup.getIngredients().size()).isEqualTo(1);

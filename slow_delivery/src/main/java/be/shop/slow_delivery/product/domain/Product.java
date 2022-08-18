@@ -65,9 +65,7 @@ public class Product extends BaseTimeEntity {
         this.maxOrderQuantity = maxOrderQuantity;
     }
 
-    public void addIngredientGroup(IngredientGroup ingredientGroup) {
-        ingredientGroups.add(new ProductIngredientGroup(this, ingredientGroup,
-                // LAZY loading 발생
-                ingredientGroups.size()));
+    public void addIngredientGroup(IngredientGroup ingredientGroup, int displayOrder) {
+        ingredientGroups.add(new ProductIngredientGroup(this, ingredientGroup, displayOrder));
     }
 }

@@ -76,7 +76,7 @@ class ProductUnitTest {
                 .build();
 
         //when
-        product.addIngredientGroup(ingredientGroup);
+        product.addIngredientGroup(ingredientGroup, 1);
 
         //then
         assertThat(product.getIngredientGroups().size()).isEqualTo(1);

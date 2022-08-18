@@ -30,9 +30,9 @@ public class ProductIngredientGroup extends BaseTimeEntity {
     @Builder
     public ProductIngredientGroup(Product product,
                                   IngredientGroup ingredientGroup,
-                                  Integer displayOrder) {
+                                  int displayOrder) {
         Assert.notNull(product, "product");
-        Assert.notNull(product, "ingredientGroup");
+        Assert.notNull(ingredientGroup, "ingredientGroup");
         Assert.notNull(displayOrder, "displayOrder");
 
         this.product = product;
