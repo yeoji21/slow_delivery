@@ -16,4 +16,8 @@ public class Quantity {
         Assert.isTrue(quantity >= 0, "잘못된 수량입니다.");
         this.quantity = quantity;
     }
+
+    public int toInt() {
+        return quantity;
+    }
 }

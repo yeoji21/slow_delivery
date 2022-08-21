@@ -1,0 +1,37 @@
+package be.shop.slow_delivery.product.domain;
+
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
+@Component
+public class ProductValidationService {
+    public void validateIngredients(Map<IngredientGroup, List<Ingredient>> ingredientsMap, List<Long> ingredientIds) {
+        boolean[] checkIds = new boolean[ingredientIds.size()];
+        for (Map.Entry<IngredientGroup, List<Ingredient>> entry : ingredientsMap.entrySet()) {
+            List<Ingredient> ingredients = entry.getValue();
+            entry.getKey().validate(ingredients);
+            ingredients.forEach(ingredient -> checkIds[ingredientIds.indexOf(ingredient.getId())] = true);
+        }
+
+        for (int i = 0; i < checkIds.length; i++) {
+            if(!checkIds[i])
+                throw new IllegalArgumentException("ingredient id " + ingredientIds.get(i));
+        }
+    }
+
+    public void validateOptions(Map<OptionGroup, List<Option>> optionsMap, List<Long> optionIds) {
+        boolean[] checkIds = new boolean[optionIds.size()];
+        for (Map.Entry<OptionGroup, List<Option>> entry : optionsMap.entrySet()) {
+            List<Option> options = entry.getValue();
+            entry.getKey().validate(options);
+            options.forEach(option -> checkIds[optionIds.indexOf(option.getId())] = true);
+        }
+
+        for (int i = 0; i < checkIds.length; i++) {
+            if(!checkIds[i])
+                throw new IllegalArgumentException("option id " + optionIds.get(i));
+        }
+    }
+}

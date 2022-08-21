@@ -26,4 +26,9 @@ public class SelectCount {
         this.minCount = new Quantity(minCount);
         this.maxCount = new Quantity(maxCount);
     }
+
+    public void selectedCountCheck(int count) {
+        if(minCount.toInt() > count || count > maxCount.toInt())
+            throw new IllegalArgumentException("invalid ingredients count");
+    }
 }

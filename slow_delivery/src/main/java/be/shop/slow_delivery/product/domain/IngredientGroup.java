@@ -37,6 +37,11 @@ public class IngredientGroup extends BaseTimeEntity {
         this.selectCount = selectCount;
     }
 
+    public void validate(List<Ingredient> ingredients) {
+        selectCount.selectedCountCheck(ingredients.size());
+    }
+
+
     public void addIngredient(Ingredient ingredient, int displayOrder) {
         ingredients.add(new IngredientInGroup(this, ingredient, displayOrder));
     }

@@ -38,6 +38,11 @@ public class OptionGroup extends BaseTimeEntity {
         this.maxSelectCount = maxSelectCount;
     }
 
+    public void validate(List<Option> options) {
+        if(options.size() > maxSelectCount.toInt())
+            throw new IllegalArgumentException("invalid option count");
+    }
+
     public void addOption(Option option, int displayOrder) {
         options.add(new OptionInGroup(this, option, displayOrder));
     }

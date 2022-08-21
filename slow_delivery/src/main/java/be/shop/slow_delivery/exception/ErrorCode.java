@@ -20,6 +20,7 @@ public enum ErrorCode {
     // 404 NOT_FOUND : Resource를 찾을 수 없음
     SHOP_NOT_FOUND(NOT_FOUND, "해당 가게를 찾을 수 없습니다."),
     CATEGORY_NOT_FOUND(NOT_FOUND, "해당 카테고리를 찾을 수 없습니다"),
+    PRODUCT_NOT_FOUND(NOT_FOUND, "해당 상품을 찾을 수 없습니다"),
     MENU_NOT_FOUND(NOT_FOUND, "해당 메뉴를 찾을 수 없습니다.");
 
 
