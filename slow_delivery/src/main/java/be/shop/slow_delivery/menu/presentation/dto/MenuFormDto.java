@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.menu.presentation.dto;
 
+import be.shop.slow_delivery.menu.domain.Menu;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,5 +22,11 @@ public class MenuFormDto {
                     String introduction) {
         this.menuName = menuName;
         this.introduction = introduction;
+    }
+
+    public Menu toEntity(){
+        return Menu.builder()
+                .menuName(menuName)
+                .build();
     }
 }
