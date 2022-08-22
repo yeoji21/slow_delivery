@@ -15,10 +15,11 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, name = "name")
-    private String categoryName;
+    @Enumerated(EnumType.STRING)
+    private CategoryType categoryName;
 
     @Builder
-    public Category(String categoryName) {
+    public Category(CategoryType categoryName) {
         this.categoryName = categoryName;
     }
 }

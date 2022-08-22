@@ -2,6 +2,7 @@ package be.shop.slow_delivery.shop.application;
 
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.category.domain.CategoryRepository;
+import be.shop.slow_delivery.category.domain.CategoryType;
 import be.shop.slow_delivery.shop.application.dto.ShopCommandMapper;
 import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
 import be.shop.slow_delivery.shop.domain.Shop;
@@ -48,7 +49,7 @@ class ShopCommandServiceTest {
                 .minOrderAmount(15_000)
                 .category("치킨")
                 .build();
-        Category category = new Category("치킨");
+        Category category = new Category(CategoryType.CHICKEN);
         ReflectionTestUtils.setField(category, "id", 1L);
 
         given(categoryRepository.findByCategoryName(any(String.class))).willReturn(Optional.of(category));

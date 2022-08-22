@@ -1,6 +1,7 @@
 package be.shop.slow_delivery.shop.domain;
 
 import be.shop.slow_delivery.category.domain.Category;
+import be.shop.slow_delivery.category.domain.CategoryType;
 import be.shop.slow_delivery.common.domain.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -11,7 +12,7 @@ class ShopUnitTest {
 
     @Test
     void 가게_생성() throws Exception{
-        Category category = new Category("치킨");
+        Category category = new Category(CategoryType.CHICKEN);
         ReflectionTestUtils.setField(category, "id", 1L);
 
         Shop.builder()
@@ -32,7 +33,7 @@ class ShopUnitTest {
 
     @Test
     void 가게_생성_예외발생() throws Exception{
-        Category category = new Category("치킨");
+        Category category = new Category(CategoryType.CHICKEN);
         ReflectionTestUtils.setField(category, "id", 1L);
 
         // 가게 이름이 없는 경우

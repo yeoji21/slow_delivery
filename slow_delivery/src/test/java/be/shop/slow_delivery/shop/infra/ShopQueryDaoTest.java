@@ -1,6 +1,7 @@
 package be.shop.slow_delivery.shop.infra;
 
 import be.shop.slow_delivery.category.domain.Category;
+import be.shop.slow_delivery.category.domain.CategoryType;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.config.ApplicationAuditingConfig;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
@@ -93,9 +94,9 @@ class ShopQueryDaoTest {
     @Test
     void 카테고리별_가게목록_조회() throws Exception{
         //given
-        Category chicken = new Category("치킨");
+        Category chicken = new Category(CategoryType.CHICKEN);
         em.persist(chicken);
-        Category pizza = new Category("피자");
+        Category pizza = new Category(CategoryType.PIZZA);
         em.persist(pizza);
 
         settingShopData(chicken, pizza);
@@ -120,9 +121,9 @@ class ShopQueryDaoTest {
     @Test
     void 배달비_낮은순_카테고리별_가게목록_조회() throws Exception{
         //given
-        Category chicken = new Category("치킨");
+        Category chicken = new Category(CategoryType.CHICKEN);
         em.persist(chicken);
-        Category pizza = new Category("피자");
+        Category pizza = new Category(CategoryType.PIZZA);
         em.persist(pizza);
 
         settingShopData(chicken, pizza);
@@ -185,7 +186,7 @@ class ShopQueryDaoTest {
 
 
     private Shop createShop() {
-        Category food = new Category("음식");
+        Category food = new Category(CategoryType.ASIAN);
         em.persist(food);
 
         Shop shop = Shop.builder()
