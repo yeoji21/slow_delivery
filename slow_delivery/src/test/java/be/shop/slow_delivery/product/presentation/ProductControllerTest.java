@@ -54,28 +54,28 @@ class ProductControllerTest {
     }
 
     private OptionGroupInfo getOptionGroupInfo() {
-        List<OptionInfo> options = List.of(new OptionInfo(1L, "optionA", 500),
-                new OptionInfo(2L, "optionB", 1000),
-                new OptionInfo(3L, "optionC", 1500));
+        List<OptionInfo> options = List.of(new OptionInfo(1L, "optionA", new Money(500)),
+                new OptionInfo(2L, "optionB", new Money(1000)),
+                new OptionInfo(3L, "optionC", new Money(1500)));
 
         return OptionGroupInfo.builder()
                 .optionGroupId(1L)
-                .maxSelectCount(5)
+                .maxSelectCount(new Quantity(5))
                 .name("optionGroupA")
                 .options(options)
                 .build();
     }
 
     private IngredientGroupInfo getIngredientGroupInfo() {
-        List<IngredientInfo> ingredients = List.of(new IngredientInfo(1L, "ingredientA", 1000),
-                        new IngredientInfo(2L, "ingredientB", 2000),
-                        new IngredientInfo(3L, "ingredientC", 3000));
+        List<IngredientInfo> ingredients = List.of(new IngredientInfo(1L, "ingredientA", new Money(1000)),
+                        new IngredientInfo(2L, "ingredientB", new Money(2000)),
+                        new IngredientInfo(3L, "ingredientC", new Money(3000)));
 
         return IngredientGroupInfo.builder()
                 .name("ingredientGroupA")
                 .ingredientGroupId(1L)
-                .minSelectCount(1)
-                .maxSelectCount(2)
+                .minSelectCount(new Quantity(1))
+                .maxSelectCount(new Quantity(2))
                 .ingredients(ingredients)
                 .build();
     }

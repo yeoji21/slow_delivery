@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.product.application.dto;
 
+import be.shop.slow_delivery.common.domain.Quantity;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,11 +17,11 @@ public class OptionGroupInfo {
     @Builder @QueryProjection
     public OptionGroupInfo(long optionGroupId,
                            String name,
-                           int maxSelectCount,
+                           Quantity maxSelectCount,
                            List<OptionInfo> options) {
         this.optionGroupId = optionGroupId;
         this.name = name;
-        this.maxSelectCount = maxSelectCount;
+        this.maxSelectCount = maxSelectCount.toInt();
         this.options = options;
     }
 }

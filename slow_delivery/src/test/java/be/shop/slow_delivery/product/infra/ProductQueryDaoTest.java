@@ -1,34 +1,33 @@
-package be.shop.slow_delivery.product.domain;
+package be.shop.slow_delivery.product.infra;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
-import be.shop.slow_delivery.product.infra.ProductJpaRepository;
+import be.shop.slow_delivery.product.application.dto.ProductDetailInfo;
+import be.shop.slow_delivery.product.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import({JpaQueryFactoryConfig.class, ProductJpaRepository.class})
+
+@Import({JpaQueryFactoryConfig.class, ProductQueryDao.class})
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-class ProductRepositoryTest {
-    @PersistenceContext private EntityManager em;
-    @Autowired private ProductRepository productRepository;
-
+class ProductQueryDaoTest {
+    @Autowired
+    private ProductQueryDao productQueryDao;
+    @Autowired
+    private EntityManager em;
 
     @Test
-    void findIngredientsMap() throws Exception{
+    void findProductDetailInfo() throws Exception{
         //given
         Product product = Product.builder()
                 .stockId(1L)
@@ -70,32 +69,6 @@ class ProductRepositoryTest {
         groupB.addIngredient(ingredientB, 1);
         groupB.addIngredient(ingredientC, 2);
 
-        em.flush();
-        em.clear();
-
-        //when
-        List<Long> ingredientIds = List.of(ingredientA.getId(), ingredientB.getId(), ingredientC.getId());
-        Map<IngredientGroup, List<Ingredient>> ingredientsMap =
-                productRepository.findIngredientsMap(product.getId(), ingredientIds);
-
-        //then
-        assertThat(ingredientsMap.size()).isEqualTo(2);
-        assertThat(ingredientsMap.get(groupA).size()).isEqualTo(1);
-        assertThat(ingredientsMap.get(groupB).size()).isEqualTo(2);
-    }
-
-    @Test
-    void findOptionsMap() throws Exception{
-        //given
-        Product product = Product.builder()
-                .stockId(1L)
-                .name("product A")
-                .description("~~~")
-                .price(new Money(10_000))
-                .maxOrderQuantity(new Quantity(5))
-                .build();
-        em.persist(product);
-
         OptionGroup group = new OptionGroup("groupB", new Quantity(10));
         em.persist(group);
 
@@ -128,39 +101,11 @@ class ProductRepositoryTest {
         em.clear();
 
         //when
-        List<Long> optionIds = List.of(optionA.getId(), optionB.getId(), optionC.getId());
-        Map<OptionGroup, List<Option>> optionsMap = productRepository.findOptionsMap(product.getId(), optionIds);
+        ProductDetailInfo productDetailInfo = productQueryDao.findProductDetailInfo(product.getId());
 
         //then
-        assertThat(optionsMap.size()).isEqualTo(1);
-        assertThat(optionsMap.get(group).size()).isEqualTo(3);
+        assertThat(productDetailInfo.getProductId()).isEqualTo(product.getId());
+        assertThat(productDetailInfo.getName()).isEqualTo(product.getName());
+        assertThat(productDetailInfo.getIngredientGroups().size()).isEqualTo(2);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

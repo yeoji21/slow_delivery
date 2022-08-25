@@ -15,16 +15,16 @@ import static be.shop.slow_delivery.exception.ErrorCode.PHONE_NUMBER;
 @Embeddable
 public class PhoneNumber {
     @Column(name = "phone_number", nullable = false)
-    private String value;
+    private String phoneNumber;
 
     public PhoneNumber(String phoneNumber) {
         if(!phoneNumber.matches("\\d{2,3}-\\d{3,4}-\\d{4}"))
             throw new InvalidValueException(PHONE_NUMBER);
-        this.value = phoneNumber;
+        this.phoneNumber = phoneNumber;
     }
 
     @Override
     public String toString() {
-        return value;
+        return phoneNumber;
     }
 }

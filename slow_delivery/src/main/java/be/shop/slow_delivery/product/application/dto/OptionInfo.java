@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.product.application.dto;
 
+import be.shop.slow_delivery.common.domain.Money;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,9 +14,9 @@ public class OptionInfo {
     @Builder @QueryProjection
     public OptionInfo(long optionId,
                       String name,
-                      int price) {
+                      Money price) {
         this.optionId = optionId;
         this.name = name;
-        this.price = price;
+        this.price = price.toInt();
     }
 }

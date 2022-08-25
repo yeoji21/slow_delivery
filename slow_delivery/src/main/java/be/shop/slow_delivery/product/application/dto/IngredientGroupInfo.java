@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.product.application.dto;
 
+import be.shop.slow_delivery.common.domain.Quantity;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,13 +18,13 @@ public class IngredientGroupInfo {
     @Builder @QueryProjection
     public IngredientGroupInfo(long ingredientGroupId,
                                String name,
-                               int minSelectCount,
-                               int maxSelectCount,
+                               Quantity minSelectCount,
+                               Quantity maxSelectCount,
                                List<IngredientInfo> ingredients) {
         this.ingredientGroupId = ingredientGroupId;
         this.name = name;
-        this.minSelectCount = minSelectCount;
-        this.maxSelectCount = maxSelectCount;
+        this.minSelectCount = minSelectCount.toInt();
+        this.maxSelectCount = maxSelectCount.toInt();
         this.ingredients = ingredients;
     }
 }

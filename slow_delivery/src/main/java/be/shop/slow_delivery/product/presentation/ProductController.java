@@ -13,7 +13,7 @@ public class ProductController {
     private final ProductQueryService productQueryService;
 
     @GetMapping("/product/{productId}")
-    public ProductDetailInfo findProductDetailInfo(@PathVariable long productId) {
+    public ProductDetailInfo productDetailInfo(@PathVariable long productId) {
         return productQueryService.findProductDetailInfo(productId);
     }
 }

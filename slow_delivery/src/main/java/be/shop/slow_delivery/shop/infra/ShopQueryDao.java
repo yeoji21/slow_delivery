@@ -39,8 +39,8 @@ public class ShopQueryDao {
                         .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                         .transform(
                                 groupBy(shop.id).as(
-                                        new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
-                                                list(orderAmountDeliveryFee.fee.value))
+                                        new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.amount, file.filePath,
+                                                list(orderAmountDeliveryFee.fee.amount))
                                 )
                         ).get(shopId)
         );
@@ -56,7 +56,7 @@ public class ShopQueryDao {
                         .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                         .transform(
                                 groupBy(shop.id).as(
-                                        new QShopDetailInfo(shop, file.filePath, list(orderAmountDeliveryFee.fee.value))
+                                        new QShopDetailInfo(shop, file.filePath, list(orderAmountDeliveryFee.fee.amount))
                                 )
                         ).get(shopId)
         );
@@ -65,7 +65,7 @@ public class ShopQueryDao {
     // 카테고리별 가게 목록 (간략 정보) -> 기본순 (shopId로 정렬)
     public ShopListQueryResult findByCategoryOrderByNewest(long categoryId, String cursor, int size) {
         List<ShopSimpleInfo> infoList = queryFactory
-                .select(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath))
+                .select(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.amount, file.filePath))
                 .from(shop)
                 .innerJoin(categoryShop).on(categoryShop.shop.eq(shop))
                 .leftJoin(file).on(file.id.eq(shop.thumbnailFileId))
@@ -84,13 +84,13 @@ public class ShopQueryDao {
     // 카테고리별 가게 목록 (간략 정보) -> 배달비 낮은 순 (가게별 기본 배달비 중 가장 낮은 배달비를 기준으로 정렬)
     public ShopListQueryResult findByCategoryOrderByDeliveryFee(long categoryId, String cursor, int size) {
         List<Long> shopIds = queryFactory
-                .select(orderAmountDeliveryFee.shop.id, orderAmountDeliveryFee.fee.value.min())
+                .select(orderAmountDeliveryFee.shop.id, orderAmountDeliveryFee.fee.amount.min())
                 .from(orderAmountDeliveryFee)
                 .join(categoryShop).on(categoryShop.shop.eq(orderAmountDeliveryFee.shop))
                 .groupBy(orderAmountDeliveryFee.shop)
                 .having(deliveryFeeCursorCondition(cursor))
                 .where(categoryShop.categoryId.eq(categoryId))
-                .orderBy(orderAmountDeliveryFee.fee.value.min().asc())
+                .orderBy(orderAmountDeliveryFee.fee.amount.min().asc())
                 .limit(size + 1)
                 .fetch()
                 .stream()
@@ -104,8 +104,8 @@ public class ShopQueryDao {
                 .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
                 .where(shop.id.in(shopIds))
                 .transform(
-                        groupBy(shop).list(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.value, file.filePath,
-                                list(orderAmountDeliveryFee.fee.value)))
+                        groupBy(shop).list(new QShopSimpleInfo(shop.id, shop.name, shop.minOrderAmount.amount, file.filePath,
+                                list(orderAmountDeliveryFee.fee.amount)))
                 );
 
         hasDataCheck(infoList);
@@ -182,7 +182,7 @@ public class ShopQueryDao {
 
     private BooleanExpression deliveryFeeCursorCondition(String cursor) {
         if(cursorValidate(cursor)) return null;
-        return StringExpressions.lpad(orderAmountDeliveryFee.fee.value.min().stringValue(), 10, '0')
+        return StringExpressions.lpad(orderAmountDeliveryFee.fee.amount.min().stringValue(), 10, '0')
                 .concat(StringExpressions.lpad(orderAmountDeliveryFee.shop.id.stringValue(), 10, '0'))
                 .gt(cursor);
     }
