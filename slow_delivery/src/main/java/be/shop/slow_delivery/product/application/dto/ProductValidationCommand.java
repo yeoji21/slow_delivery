@@ -1,20 +1,19 @@
 package be.shop.slow_delivery.product.application.dto;
 
+import be.shop.slow_delivery.common.domain.Quantity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@Builder
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class ProductValidationCommand {
     private final long productId;
+    private final Quantity orderQuantity;
     private final List<Long> ingredientIds;
     private final List<Long> optionIds;
-
-    @Builder
-    public ProductValidationCommand(long productId, List<Long> ingredientIds, List<Long> optionIds) {
-        this.productId = productId;
-        this.ingredientIds = ingredientIds;
-        this.optionIds = optionIds;
-    }
 }

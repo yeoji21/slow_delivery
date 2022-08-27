@@ -1,5 +1,7 @@
 package be.shop.slow_delivery.product.domain;
 
+import be.shop.slow_delivery.common.domain.Quantity;
+import com.mysema.commons.lang.Assert;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -7,6 +9,12 @@ import java.util.Map;
 
 @Component
 public class ProductValidationService {
+    public void validateProduct(Product product, Quantity orderQuantity) {
+        Assert.isTrue(product.isOnSale(), "isSale");
+        Assert.notNull(product.getMaxOrderQuantity().minus(orderQuantity), "orderQuantity");
+    }
+
+    // TODO: 2022/08/27 쿼리에서 판매중인지 확인하는 조건
     public void validateIngredients(Map<IngredientGroup, List<Ingredient>> ingredientsMap, List<Long> ingredientIds) {
         boolean[] checkIds = new boolean[ingredientIds.size()];
         for (Map.Entry<IngredientGroup, List<Ingredient>> entry : ingredientsMap.entrySet()) {

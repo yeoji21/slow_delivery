@@ -68,4 +68,8 @@ public class Product extends BaseTimeEntity {
     public void addIngredientGroup(IngredientGroup ingredientGroup, int displayOrder) {
         ingredientGroups.add(new ProductIngredientGroup(this, ingredientGroup, displayOrder));
     }
+
+    public boolean isOnSale() {
+        return this.stockInfo.isSale();
+    }
 }

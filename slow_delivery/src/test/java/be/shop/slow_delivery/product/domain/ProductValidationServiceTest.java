@@ -15,6 +15,60 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ProductValidationServiceTest {
     private final ProductValidationService validationService = new ProductValidationService();
 
+    @Test @DisplayName("상품 검증 성공 테스트")
+    void validateProduct_test_v1() throws Exception{
+        //given
+        Product product = Product.builder()
+                .stockId(1L)
+                .name("product A")
+                .description("~~~")
+                .price(new Money(10_000))
+                .maxOrderQuantity(new Quantity(5))
+                .build();
+
+        //when
+        validationService.validateProduct(product, new Quantity(3));
+
+        //then
+    }
+
+    @Test @DisplayName("판매 중이 아닌 상품")
+    void validateProduct_test_v2() throws Exception{
+        //given
+        Product product = Product.builder()
+                .stockId(1L)
+                .name("product A")
+                .description("~~~")
+                .price(new Money(10_000))
+                .maxOrderQuantity(new Quantity(5))
+                .build();
+        ReflectionTestUtils.setField(product.getStockInfo(), "isSale", false);
+
+        //when
+        assertThrows(IllegalArgumentException.class,
+                () -> validationService.validateProduct(product, new Quantity(3)));
+
+        //then
+    }
+
+    @Test @DisplayName("최대 주문 수량 이상")
+    void validateProduct_test_v3() throws Exception{
+        //given
+        Product product = Product.builder()
+                .stockId(1L)
+                .name("product A")
+                .description("~~~")
+                .price(new Money(10_000))
+                .maxOrderQuantity(new Quantity(5))
+                .build();
+
+        //when
+        assertThrows(IllegalArgumentException.class,
+                () -> validationService.validateProduct(product, new Quantity(10)));
+
+        //then
+    }
+
     @Test @DisplayName("필수 옵션 검증 성공 테스트")
     void validateIngredients_test_v1() throws Exception{
         //given

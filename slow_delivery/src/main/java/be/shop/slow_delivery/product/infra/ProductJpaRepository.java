@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static be.shop.slow_delivery.product.domain.QIngredient.ingredient;
 import static be.shop.slow_delivery.product.domain.QIngredientGroup.ingredientGroup;
@@ -26,6 +27,15 @@ import static com.querydsl.core.group.GroupBy.groupBy;
 public class ProductJpaRepository implements ProductRepository {
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
+
+    @Override
+    public Optional<Product> findById(long productId) {
+        return Optional.ofNullable(
+                queryFactory.selectFrom(product)
+                        .where(product.id.eq(productId))
+                        .fetchOne()
+        );
+    }
 
     @Override
     public Map<IngredientGroup, List<Ingredient>> findIngredientsMap(long productId, List<Long> ingredientIds) {
