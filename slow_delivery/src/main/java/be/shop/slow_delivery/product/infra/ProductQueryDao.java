@@ -30,7 +30,7 @@ public class ProductQueryDao {
                 .select(new QProductDetailInfo(product.id, product.name, product.description,
                         product.price, product.maxOrderQuantity, product.thumbnailFileId))
                 .from(product)
-                .where(product.id.eq(productId))
+                .where(product.id.eq(productId), product.stockInfo.isSale.isTrue())
                 .fetchOne();
         Assert.notNull(productDetailInfo, "productId " + productId + " is not found");
 

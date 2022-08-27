@@ -20,4 +20,12 @@ public class Quantity {
     public int toInt() {
         return quantity;
     }
+
+    public Quantity plus(Quantity quantity) {
+        return new Quantity(this.quantity + quantity.quantity);
+    }
+
+    public Quantity minus(Quantity quantity) {
+        return new Quantity(this.quantity - quantity.quantity);
+    }
 }
