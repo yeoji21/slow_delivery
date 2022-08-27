@@ -14,7 +14,6 @@ public class ProductValidationService {
         Assert.notNull(product.getMaxOrderQuantity().minus(orderQuantity), "orderQuantity");
     }
 
-    // TODO: 2022/08/27 쿼리에서 판매중인지 확인하는 조건
     public void validateIngredients(Map<IngredientGroup, List<Ingredient>> ingredientsMap, List<Long> ingredientIds) {
         boolean[] checkIds = new boolean[ingredientIds.size()];
         for (Map.Entry<IngredientGroup, List<Ingredient>> entry : ingredientsMap.entrySet()) {

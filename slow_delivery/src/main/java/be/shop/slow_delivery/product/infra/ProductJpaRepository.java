@@ -45,7 +45,9 @@ public class ProductJpaRepository implements ProductRepository {
                 .innerJoin(productIngredientGroup.ingredientGroup, ingredientGroup)
                 .leftJoin(ingredientInGroup).on(ingredientInGroup.ingredientGroup.eq(ingredientGroup))
                 .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIds))
-                .where(product.id.eq(productId))
+                .where(product.id.eq(productId),
+                        ingredientInGroup.displayInfo.isDisplay.isTrue(),
+                        ingredient.stockInfo.isSale.isTrue())
                 .transform(groupBy(ingredientGroup).as(GroupBy.list(ingredient)));
     }
 
@@ -57,7 +59,10 @@ public class ProductJpaRepository implements ProductRepository {
                 .innerJoin(productOptionGroup.optionGroup, optionGroup)
                 .leftJoin(optionInGroup).on(optionInGroup.optionGroup.eq(optionGroup))
                 .leftJoin(optionInGroup.option, option)
-                .where(product.id.eq(productId), option.id.in(optionIds))
+                .where(product.id.eq(productId), option.id.in(optionIds),
+                        productOptionGroup.displayInfo.isDisplay.isTrue(),
+                        optionInGroup.displayInfo.isDisplay.isTrue(),
+                        option.stockInfo.isSale.isTrue())
                 .transform(groupBy(optionGroup).as(GroupBy.list(option)));
     }
 }

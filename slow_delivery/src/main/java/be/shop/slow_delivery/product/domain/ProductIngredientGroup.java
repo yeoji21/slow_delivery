@@ -3,10 +3,7 @@ package be.shop.slow_delivery.product.domain;
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.DisplayOrder;
 import com.mysema.commons.lang.Assert;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
