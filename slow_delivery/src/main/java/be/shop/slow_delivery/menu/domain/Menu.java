@@ -50,5 +50,10 @@ public class Menu extends BaseTimeEntity {
         this.description =introduction;
     }
 
+    public void updateMenuDisplay(Boolean isDisplay, int displayOrder){
+        DisplayInfo newDisplayInfo = new DisplayInfo(isDisplay,displayOrder);
+        this.displayInfo = newDisplayInfo;
+    }
+
 
 }
