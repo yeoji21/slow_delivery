@@ -1,6 +1,8 @@
 package be.shop.slow_delivery.menu.presentation;
 
+import be.shop.slow_delivery.menu.application.MenuDisplayService;
 import be.shop.slow_delivery.menu.application.MenuService;
+import be.shop.slow_delivery.menu.application.dto.request.MenuDisplayUpdateRequestDto;
 import be.shop.slow_delivery.menu.application.dto.request.MenuUpdateRequestDto;
 import be.shop.slow_delivery.menu.application.dto.response.MenuListResponseDto;
 import be.shop.slow_delivery.menu.presentation.dto.MenuDtoMapper;
@@ -16,6 +18,7 @@ import javax.validation.Valid;
 public class MenuController {
 
     private final MenuService menuService;
+    private final MenuDisplayService menuDisplayService;
     private final MenuDtoMapper mapper;
 
     @ApiOperation(value = "메뉴 목록 보기")
@@ -44,5 +47,11 @@ public class MenuController {
         menuService.deleteMenu(menuId);
     }
 
+    @ApiOperation(value = "메뉴 전시정보 수정")
+    @PutMapping("/shop/{shopId}/menu/{menuId}/Display")
+    public void updateMenu(@RequestBody @Valid MenuDisplayUpdateRequestDto menuDisplayUpdateRequestDto,
+                           @PathVariable("menuId") long menuId){
+        menuDisplayService.updateDisplayInfo(menuId,menuDisplayUpdateRequestDto);
+    }
 
 }

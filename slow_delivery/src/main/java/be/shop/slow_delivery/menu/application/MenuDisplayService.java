@@ -17,7 +17,7 @@ public class MenuDisplayService {
     private final MenuRepository menuRepository;
 
     @Transactional
-    public void updateIsDisplay(Long menuId, MenuDisplayUpdateRequestDto menuDisplayUpdateRequestDto){
+    public void updateDisplayInfo(Long menuId, MenuDisplayUpdateRequestDto menuDisplayUpdateRequestDto){
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new NotFoundException(MENU_NOT_FOUND));
         menu.updateMenuDisplay(menuDisplayUpdateRequestDto.isDisplay(),menuDisplayUpdateRequestDto.getDisplayOrder());
