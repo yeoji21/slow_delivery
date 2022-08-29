@@ -2,7 +2,7 @@ package be.shop.slow_delivery.product.application;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
-import be.shop.slow_delivery.product.application.dto.ProductValidationCommand;
+import be.shop.slow_delivery.product.application.dto.ProductPlaceCommand;
 import be.shop.slow_delivery.product.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class ProductCommandServiceTest {
     @Mock private ProductRepository productRepository;
-    @Mock private ProductValidationService productValidationService;
+    @Mock private ProductPlaceOrderService productPlaceOrderService;
     @InjectMocks private ProductCommandService productCommandService;
 
     @Test
@@ -35,7 +35,7 @@ class ProductCommandServiceTest {
                 .maxOrderQuantity(new Quantity(5))
                 .build();
 
-        ProductValidationCommand command = ProductValidationCommand.builder()
+        ProductPlaceCommand command = ProductPlaceCommand.builder()
                 .productId(1L)
                 .orderQuantity(new Quantity(3))
                 .ingredientIds(List.of(1L, 2L, 3L))
@@ -49,11 +49,9 @@ class ProductCommandServiceTest {
         given(productRepository.findOptionsMap(command.getProductId(), command.getOptionIds())).willReturn(optionsMap);
 
         //when
-        productCommandService.validate(command);
+        productCommandService.placeOrder(command);
 
         //then
-        verify(productValidationService).validateProduct(product, command.getOrderQuantity());
-        verify(productValidationService).validateIngredients(ingredientsMap, command.getIngredientIds());
-        verify(productValidationService).validateOptions(optionsMap, command.getOptionIds());
+        verify(productPlaceOrderService).place(product, ingredientsMap, optionsMap, command);
     }
 }

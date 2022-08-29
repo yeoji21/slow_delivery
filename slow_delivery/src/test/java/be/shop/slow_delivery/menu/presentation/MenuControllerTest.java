@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.menu.presentation;
 
+import be.shop.slow_delivery.menu.application.MenuDisplayService;
 import be.shop.slow_delivery.menu.application.MenuService;
 import be.shop.slow_delivery.menu.application.dto.request.MenuCreateRequestDto;
 import be.shop.slow_delivery.menu.presentation.dto.MenuDtoMapper;
@@ -29,6 +30,7 @@ class MenuControllerTest {
     @Autowired private ObjectMapper objectMapper;
     @MockBean private MenuService menuService;
     @MockBean private MenuDtoMapper mapper;
+    @MockBean private MenuDisplayService menuDisplayService;
 
     @Test
     void MENU_생성() throws Exception{

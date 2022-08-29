@@ -28,6 +28,10 @@ public class Money {
         return new Money(this.amount - money.amount);
     }
 
+    public Money multiple(Quantity quantity) {
+        return new Money(amount * quantity.toInt());
+    }
+
     @Override
     public String toString() {
         return String.valueOf(amount);
