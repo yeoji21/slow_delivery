@@ -2,8 +2,11 @@ package be.shop.slow_delivery.product.presentation;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
+import be.shop.slow_delivery.product.application.ProductCommandService;
 import be.shop.slow_delivery.product.application.ProductQueryService;
 import be.shop.slow_delivery.product.application.dto.*;
+import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
+import be.shop.slow_delivery.product.presentation.dto.ProductPlaceDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,10 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,6 +34,28 @@ class ProductControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private ProductQueryService productQueryService;
+    @MockBean private ProductCommandService productCommandService;
+    @MockBean private ProductDtoMapper mapper;
+
+    @Test
+    void 상품_주문_검증() throws Exception{
+        ProductPlaceDto dto = ProductPlaceDto.builder()
+                .productId(1L)
+                .orderQuantity(new Quantity(1))
+                .ingredientIds(List.of(1L, 2L, 3L))
+                .optionIds(List.of(1L))
+                .build();
+        int totalAmount = 15_000;
+
+        given(mapper.toPlaceCommand(any(ProductPlaceDto.class))).willReturn(ProductDtoMapper.INSTANCE.toPlaceCommand(dto));
+        given(productCommandService.placeOrder(any(ProductPlaceCommand.class))).willReturn(new Money(totalAmount));
+
+        mockMvc.perform(post("/product/place")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(new Money(totalAmount))));
+    }
 
     @Test
     void 모든_옵션_포함_상품_조회() throws Exception{

@@ -1,6 +1,6 @@
 package be.shop.slow_delivery.common.domain;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -13,6 +13,7 @@ import javax.persistence.Embeddable;
 @EqualsAndHashCode(of = "amount")
 public class Money {
     public static final Money ZERO = new Money(0);
+    @JsonProperty("amount")
     private int amount;
 
     public Money(int amount) {
