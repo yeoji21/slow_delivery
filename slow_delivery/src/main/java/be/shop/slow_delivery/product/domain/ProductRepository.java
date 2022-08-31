@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface ProductRepository {
+    void save(Product product);
     Optional<Product> findById(long productId);
     Map<IngredientGroup, List<Ingredient>> findIngredientsMap(long productId, List<Long> ingredientIds);
     Map<OptionGroup, List<Option>> findOptionsMap(long productId, List<Long> optionIds);

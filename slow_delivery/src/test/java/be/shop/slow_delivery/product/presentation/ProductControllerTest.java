@@ -5,6 +5,7 @@ import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.product.application.ProductCommandService;
 import be.shop.slow_delivery.product.application.ProductQueryService;
 import be.shop.slow_delivery.product.application.dto.*;
+import be.shop.slow_delivery.product.presentation.dto.ProductCreateDto;
 import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
 import be.shop.slow_delivery.product.presentation.dto.ProductPlaceDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +37,26 @@ class ProductControllerTest {
     @MockBean private ProductQueryService productQueryService;
     @MockBean private ProductCommandService productCommandService;
     @MockBean private ProductDtoMapper mapper;
+
+    @Test
+    void 상품_생성() throws Exception{
+        ProductCreateDto dto = ProductCreateDto.builder()
+                .name("product")
+                .description("~~~")
+                .price(new Money(10_000))
+                .maxOrderQuantity(new Quantity(3))
+                .stock(new Quantity(500))
+                .build();
+        long productId = 1L;
+        given(mapper.toCreateCommand(any(ProductCreateDto.class))).willReturn(ProductDtoMapper.INSTANCE.toCreateCommand(dto));
+        given(productCommandService.create(any(ProductCreateCommand.class))).willReturn(productId);
+
+        mockMvc.perform(post("/product")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(productId)));
+    }
 
     @Test
     void 상품_주문_검증() throws Exception{

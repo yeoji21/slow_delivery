@@ -29,6 +29,11 @@ public class ProductJpaRepository implements ProductRepository {
     private final EntityManager entityManager;
 
     @Override
+    public void save(Product product) {
+        entityManager.persist(product);
+    }
+
+    @Override
     public Optional<Product> findById(long productId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(product)

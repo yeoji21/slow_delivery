@@ -3,8 +3,10 @@ package be.shop.slow_delivery.product.application;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.exception.ErrorCode;
 import be.shop.slow_delivery.exception.NotFoundException;
+import be.shop.slow_delivery.product.application.dto.ProductCreateCommand;
 import be.shop.slow_delivery.product.application.dto.ProductPlaceCommand;
 import be.shop.slow_delivery.product.domain.*;
+import be.shop.slow_delivery.stock.application.StockCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.util.Map;
 public class ProductCommandService {
     private final ProductRepository productRepository;
     private final ProductPlaceOrderService placeOrderService;
+    private final StockCommandService stockCommandService;
 
     @Transactional(readOnly = true)
     public Money placeOrder(ProductPlaceCommand command) {
@@ -28,6 +31,20 @@ public class ProductCommandService {
         return placeOrderService.place(product, ingredientsMap, optionsMap, command);
     }
 
+    @Transactional
+    public long create(ProductCreateCommand command) {
+        long stockId = stockCommandService.create(command.getStock());
+        Product product = Product.builder()
+                .name(command.getName())
+                .description(command.getDescription())
+                .price(command.getPrice())
+                .maxOrderQuantity(command.getMaxOrderQuantity())
+                .stockId(stockId)
+                .build();
+        productRepository.save(product);
+        return product.getId();
+    }
+
     private Map<IngredientGroup, List<Ingredient>> findIngredientsMap(ProductPlaceCommand command) {
         return productRepository.findIngredientsMap(command.getProductId(), command.getIngredientIds());
     }
@@ -35,5 +52,26 @@ public class ProductCommandService {
     private Map<OptionGroup, List<Option>> findOptionGroupListMap(ProductPlaceCommand command) {
         return productRepository.findOptionsMap(command.getProductId(), command.getOptionIds());
     }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

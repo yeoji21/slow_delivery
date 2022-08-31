@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
     가게 생성 DTO
     가게명, 최소 주문 금액, 전화 번호, 가게 주소, 카테고리명,
     소개글, 영업 시간, 휴무일
+
+    대표 이미지는 어떻게 저장할지?
  */
 @Getter
 @NoArgsConstructor
