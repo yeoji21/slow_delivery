@@ -25,6 +25,11 @@ public class ShopController {
         return shopCommandService.create(mapper.toCreateCommand(shopCreateDto));
     }
 
+    @PatchMapping("/shop/{shopId}/open")
+    public void updateOpenStatus(@PathVariable long shopId) {
+        shopCommandService.toggleOpenStatus(shopId);
+    }
+
     @GetMapping("/shop/{shopId}/simple")
     public ShopSimpleInfo getSimpleInfo(@PathVariable long shopId) {
         return shopQueryService.findSimpleInfo(shopId);

@@ -49,6 +49,9 @@ public class Shop extends BaseTimeEntity {
     @Embedded
     private ShopLocation location;
 
+    @Column(name = "is_open", nullable = false)
+    private boolean isOpen;
+
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryShop> categories = new ArrayList<>();
 
@@ -78,6 +81,7 @@ public class Shop extends BaseTimeEntity {
         this.categories.add(new CategoryShop(this, category.getId()));
         if(this.categories.size() == 0)
             throw new InvalidValueException(CATEGORY_COUNT);
+        this.isOpen = false;
     }
 
     public void updateShopThumbnail(Long fileId) {
@@ -86,5 +90,9 @@ public class Shop extends BaseTimeEntity {
 
     public void belongToCategory(Category category) {
         categories.add(new CategoryShop(this, category.getId()));
+    }
+
+    public void toggleOpen() {
+        isOpen = !isOpen;
     }
 }

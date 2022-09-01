@@ -3,9 +3,11 @@ package be.shop.slow_delivery.shop.application;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.category.domain.CategoryRepository;
 import be.shop.slow_delivery.category.domain.CategoryType;
+import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.shop.application.dto.ShopCommandMapper;
 import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
 import be.shop.slow_delivery.shop.domain.Shop;
+import be.shop.slow_delivery.shop.domain.ShopLocation;
 import be.shop.slow_delivery.shop.domain.ShopRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,5 +67,36 @@ class ShopCommandServiceTest {
         //then
         assertThat(shopId).isGreaterThan(0L);
         verify(mapper).toShop(any(ShopCreateCommand.class), any(Category.class));
+    }
+
+    @Test
+    void 영업_상태_변경() throws Exception{
+        //given
+        Shop shop = Shop.builder()
+                .name("shop A")
+                .minOrderAmount(new Money(15_000))
+                .phoneNumber("010-1234-5678")
+                .description("~~~")
+                .openingHours("오후 2시 ~ 익일 새벽 1시")
+                .dayOff("연중무휴")
+                .location(
+                        ShopLocation.builder()
+                                .streetAddress("xxx-xxxx")
+                                .build())
+                .thumbnailFileId(1L)
+                .category(new Category(CategoryType.CHICKEN))
+                .build();
+        boolean before = shop.isOpen();
+        long shopId = 1L;
+        given(shopRepository.findById(shopId)).willReturn(Optional.ofNullable(shop));
+
+        //when
+        shopCommandService.toggleOpenStatus(shopId);
+        boolean after = shop.isOpen();
+
+        //then
+        assertThat(before).isNotEqualTo(after);
+        assertThat(shop.isOpen()).isTrue();
+
     }
 }
