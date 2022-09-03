@@ -52,7 +52,7 @@ public class ProductJpaRepository implements ProductRepository {
                 .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIds))
                 .where(product.id.eq(productId),
                         ingredientInGroup.displayInfo.isDisplay.isTrue(),
-                        ingredient.stockInfo.isSale.isTrue())
+                        ingredient.isSale.isTrue())
                 .transform(groupBy(ingredientGroup).as(GroupBy.list(ingredient)));
     }
 
@@ -67,7 +67,7 @@ public class ProductJpaRepository implements ProductRepository {
                 .where(product.id.eq(productId), option.id.in(optionIds),
                         productOptionGroup.displayInfo.isDisplay.isTrue(),
                         optionInGroup.displayInfo.isDisplay.isTrue(),
-                        option.stockInfo.isSale.isTrue())
+                        option.isSale.isTrue())
                 .transform(groupBy(optionGroup).as(GroupBy.list(option)));
     }
 }

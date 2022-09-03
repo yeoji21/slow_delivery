@@ -24,8 +24,11 @@ public class Product extends BaseTimeEntity {
     @Column(name = "thumbnail_file_id", nullable = true)
     private Long thumbnailFileId;
 
-    @Embedded
-    private StockInfo stockInfo;
+    @Column(name = "stock_id", nullable = false)
+    private Long stockId;
+
+    @Column(name = "is_sale", nullable = false)
+    private boolean isSale;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -58,7 +61,8 @@ public class Product extends BaseTimeEntity {
         Assert.notNull(maxOrderQuantity, "maxOrderQuantity");
 
         this.thumbnailFileId = thumbnailFileId;
-        this.stockInfo = new StockInfo(stockId);
+        this.stockId = stockId;
+        this.isSale = true;
         this.name = name;
         this.description = description;
         this.price = price;
@@ -70,6 +74,6 @@ public class Product extends BaseTimeEntity {
     }
 
     public boolean isOnSale() {
-        return this.stockInfo.isSale();
+        return isSale;
     }
 }

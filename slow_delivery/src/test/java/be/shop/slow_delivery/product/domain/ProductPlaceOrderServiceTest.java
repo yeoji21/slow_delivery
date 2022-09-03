@@ -60,7 +60,7 @@ class ProductPlaceOrderServiceTest {
                 .price(new Money(10_000))
                 .maxOrderQuantity(new Quantity(5))
                 .build();
-        ReflectionTestUtils.setField(product.getStockInfo(), "isSale", false);
+        ReflectionTestUtils.setField(product, "isSale", false);
 
 
         //when //then

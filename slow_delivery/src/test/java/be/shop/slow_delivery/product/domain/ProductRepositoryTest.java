@@ -134,7 +134,7 @@ class ProductRepositoryTest {
                 .name("notSaleOption")
                 .price(new Money(500))
                 .build();
-        ReflectionTestUtils.setField(notSaleOption.getStockInfo(), "isSale", false);
+        ReflectionTestUtils.setField(notSaleOption, "isSale", false);
 
         em.persist(optionA);
         em.persist(optionB);

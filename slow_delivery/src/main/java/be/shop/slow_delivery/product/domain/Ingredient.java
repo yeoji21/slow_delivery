@@ -19,8 +19,10 @@ public class Ingredient extends BaseTimeEntity {
     private String name;
     @Embedded
     private Money price;
-    @Embedded
-    private StockInfo stockInfo;
+    @Column(name = "stock_id", nullable = false)
+    private Long stockId;
+    @Column(name = "is_sale", nullable = false)
+    private boolean isSale;
 
     @Builder
     public Ingredient(String name,
@@ -32,6 +34,7 @@ public class Ingredient extends BaseTimeEntity {
 
         this.name = name;
         this.price = price;
-        this.stockInfo = new StockInfo(stockId);
+        this.stockId = stockId;
+        this.isSale = true;
     }
 }
