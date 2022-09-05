@@ -11,8 +11,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doAnswer;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,5 +38,19 @@ class StockCommandServiceTest {
 
         //then
         assertThat(stockId).isGreaterThan(0L);
+    }
+
+    @Test @DisplayName("재고량 추가")
+    void add() throws Exception{
+        //given
+        Stock stock = new Stock(new Quantity(10));
+        ReflectionTestUtils.setField(stock, "id", 1L);
+        given(stockRepository.findByIdForUpdate(any(Long.class))).willReturn(Optional.of(stock));
+
+        //when
+        stockCommandService.add(stock.getId(), new Quantity(50));
+
+        //then
+        assertThat(stock.getQuantity().toInt()).isEqualTo(60);
     }
 }

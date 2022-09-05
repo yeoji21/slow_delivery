@@ -26,10 +26,10 @@ public class Stock {
     }
 
     public void addStock(Quantity quantity) {
-        this.quantity = quantity.plus(quantity);
+        this.quantity = this.quantity.plus(quantity);
     }
 
     public void reduceStock(Quantity quantity) {
-        this.quantity = quantity.minus(quantity);
+        this.quantity = this.quantity.minus(quantity);
     }
 }

@@ -16,6 +16,7 @@ public class ProductDetailInfo {
     private int price;
     private int maxOrderQuantity;
     private long thumbnailFileId;
+    private boolean isSale;
     private List<IngredientGroupInfo> ingredientGroups;
     private List<OptionGroupInfo> optionGroups;
 
@@ -25,13 +26,15 @@ public class ProductDetailInfo {
                              String description,
                              Money price,
                              Quantity maxOrderQuantity,
-                             long thumbnailFileId) {
+                             long thumbnailFileId,
+                             boolean isSale) {
         this.productId = productId;
         this.name = name;
         this.description = description;
         this.price = price.toInt();
         this.maxOrderQuantity = maxOrderQuantity.toInt();
         this.thumbnailFileId = thumbnailFileId;
+        this.isSale = isSale;
     }
 
     public void setIngredientGroups(List<IngredientGroupInfo> ingredientGroups) {

@@ -2,10 +2,12 @@ package be.shop.slow_delivery.common.domain;
 
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 
+@EqualsAndHashCode(of = "quantity", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class Quantity {
@@ -22,10 +24,10 @@ public class Quantity {
     }
 
     public Quantity plus(Quantity quantity) {
-        return new Quantity(this.quantity + quantity.quantity);
+        return new Quantity(this.quantity + quantity.toInt());
     }
 
     public Quantity minus(Quantity quantity) {
-        return new Quantity(this.quantity - quantity.quantity);
+        return new Quantity(this.quantity - quantity.toInt());
     }
 }

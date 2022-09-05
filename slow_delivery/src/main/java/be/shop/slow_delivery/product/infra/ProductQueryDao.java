@@ -28,7 +28,7 @@ public class ProductQueryDao {
     public ProductDetailInfo findProductDetailInfo(long productId) {
         ProductDetailInfo productDetailInfo = queryFactory
                 .select(new QProductDetailInfo(product.id, product.name, product.description,
-                        product.price, product.maxOrderQuantity, product.thumbnailFileId))
+                        product.price, product.maxOrderQuantity, product.thumbnailFileId, product.isSale))
                 .from(product)
                 .where(product.id.eq(productId), product.isSale.isTrue())
                 .fetchOne();

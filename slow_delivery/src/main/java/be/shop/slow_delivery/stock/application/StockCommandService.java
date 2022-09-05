@@ -1,6 +1,8 @@
 package be.shop.slow_delivery.stock.application;
 
 import be.shop.slow_delivery.common.domain.Quantity;
+import be.shop.slow_delivery.exception.ErrorCode;
+import be.shop.slow_delivery.exception.NotFoundException;
 import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +19,12 @@ public class StockCommandService {
         Stock stock = new Stock(quantity);
         stockRepository.save(stock);
         return stock.getId();
+    }
+
+    // TODO: 2022/09/05 TEST
+    public void add(long stockId, Quantity quantity) {
+        Stock stock = stockRepository.findByIdForUpdate(stockId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.STOCK_NOT_FOUND));
+        stock.addStock(quantity);
     }
 }

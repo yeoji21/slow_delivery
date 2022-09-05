@@ -21,6 +21,7 @@ public enum ErrorCode {
     SHOP_NOT_FOUND(NOT_FOUND, "해당 가게를 찾을 수 없습니다."),
     CATEGORY_NOT_FOUND(NOT_FOUND, "해당 카테고리를 찾을 수 없습니다"),
     PRODUCT_NOT_FOUND(NOT_FOUND, "해당 상품을 찾을 수 없습니다"),
+    STOCK_NOT_FOUND(NOT_FOUND, "해당 재고를 찾을 수 없습니다."),
     MENU_NOT_FOUND(NOT_FOUND, "해당 메뉴를 찾을 수 없습니다.");
 
 
