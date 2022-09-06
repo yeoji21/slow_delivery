@@ -9,6 +9,7 @@ import be.shop.slow_delivery.product.presentation.dto.ProductCreateDto;
 import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
 import be.shop.slow_delivery.product.presentation.dto.ProductPlaceDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,27 +17,45 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, RestDocumentationExtension.class})
 @WebMvcTest(ProductController.class)
 @AutoConfigureMockMvc
 class ProductControllerTest {
-    @Autowired private MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private ProductQueryService productQueryService;
     @MockBean private ProductCommandService productCommandService;
     @MockBean private ProductDtoMapper mapper;
+
+    @BeforeEach
+    void setUp(WebApplicationContext context, RestDocumentationContextProvider contextProvider) {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(documentationConfiguration(contextProvider))
+                .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                .alwaysDo(print()).build();
+    }
 
     @Test
     void 상품_생성() throws Exception{
@@ -55,7 +74,15 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(productId)));
+                .andExpect(content().json(objectMapper.writeValueAsString(productId)))
+                .andDo(document("create-product",
+                        requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("상품명"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("상품 소개"),
+                                fieldWithPath("price.amount").type(JsonFieldType.NUMBER).description("가격"),
+                                fieldWithPath("maxOrderQuantity.quantity").type(JsonFieldType.NUMBER).description("최대 주문 수량"),
+                                fieldWithPath("stock.quantity").type(JsonFieldType.NUMBER).description("초기 재고"))
+                ));
     }
 
     @Test

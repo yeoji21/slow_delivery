@@ -1,0 +1,11 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+= BE 가게 API
+
+== 새로운 상품 저장
+operation::create-product[snippets='curl-request,http-request,http-response,request-fields']
