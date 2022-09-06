@@ -2,7 +2,7 @@ package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
-import be.shop.slow_delivery.product.application.dto.ProductPlaceCommand;
+import be.shop.slow_delivery.product.application.dto.ProductValidateCommand;
 import com.mysema.commons.lang.Assert;
 import org.springframework.stereotype.Component;
 
@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ProductPlaceOrderService {
-    public Money place(Product product,
-                       Map<IngredientGroup, List<Ingredient>> ingredientsMap,
-                       Map<OptionGroup, List<Option>> optionsMap,
-                       ProductPlaceCommand command) {
+public class ProductValidationService {
+    public Money validate(Product product,
+                          Map<IngredientGroup, List<Ingredient>> ingredientsMap,
+                          Map<OptionGroup, List<Option>> optionsMap,
+                          ProductValidateCommand command) {
         return validateProduct(product, command.getOrderQuantity())
                 .add(validateIngredients(ingredientsMap, command.getIngredientIds()))
                 .add(validateOptions(optionsMap, command.getOptionIds()))

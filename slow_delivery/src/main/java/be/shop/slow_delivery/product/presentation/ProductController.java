@@ -6,7 +6,7 @@ import be.shop.slow_delivery.product.application.ProductQueryService;
 import be.shop.slow_delivery.product.application.dto.ProductDetailInfo;
 import be.shop.slow_delivery.product.presentation.dto.ProductCreateDto;
 import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
-import be.shop.slow_delivery.product.presentation.dto.ProductPlaceDto;
+import be.shop.slow_delivery.product.presentation.dto.ProductValidateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +29,9 @@ public class ProductController {
         return productQueryService.findProductDetailInfo(productId);
     }
 
-    @PostMapping("/product/place")
-    public Money placeAnOrder(@RequestBody ProductPlaceDto productPlaceDto) {
-        return productCommandService.placeOrder(productDtoMapper.toPlaceCommand(productPlaceDto));
+    @PostMapping("/product/validate")
+    public Money validateProductOrder(@RequestBody ProductValidateDto productValidateDto) {
+        return productCommandService.validateOrder(productDtoMapper.toValidateCommand(productValidateDto));
     }
 
 }

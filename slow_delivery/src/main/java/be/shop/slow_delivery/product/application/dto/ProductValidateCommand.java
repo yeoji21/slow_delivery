@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ProductPlaceCommand {
+public class ProductValidateCommand {
     private final long productId;
     private final Quantity orderQuantity;
     private final List<Long> ingredientIds;

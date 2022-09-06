@@ -1,7 +1,5 @@
 package be.shop.slow_delivery.product.presentation.dto;
 
-import be.shop.slow_delivery.common.domain.Money;
-import be.shop.slow_delivery.common.domain.Quantity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,18 +15,18 @@ public class ProductCreateDto {
     private String name;
     private String description;
     @NotNull
-    private Money price;
+    private int price;
     @NotNull
-    private Quantity maxOrderQuantity;
+    private int maxOrderQuantity;
     @NotNull
-    private Quantity stock;
+    private int stock;
 
     @Builder
     public ProductCreateDto(String name,
                             String description,
-                            Money price,
-                            Quantity maxOrderQuantity,
-                            Quantity stock) {
+                            int price,
+                            int maxOrderQuantity,
+                            int stock) {
         this.name = name;
         this.description = description;
         this.price = price;

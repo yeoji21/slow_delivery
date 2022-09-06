@@ -7,7 +7,7 @@ import be.shop.slow_delivery.product.application.ProductQueryService;
 import be.shop.slow_delivery.product.application.dto.*;
 import be.shop.slow_delivery.product.presentation.dto.ProductCreateDto;
 import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
-import be.shop.slow_delivery.product.presentation.dto.ProductPlaceDto;
+import be.shop.slow_delivery.product.presentation.dto.ProductValidateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,10 +62,11 @@ class ProductControllerTest {
         ProductCreateDto dto = ProductCreateDto.builder()
                 .name("product")
                 .description("~~~")
-                .price(new Money(10_000))
-                .maxOrderQuantity(new Quantity(3))
-                .stock(new Quantity(500))
+                .price(10_000)
+                .maxOrderQuantity(3)
+                .stock(500)
                 .build();
+
         long productId = 1L;
         given(mapper.toCreateCommand(any(ProductCreateDto.class))).willReturn(ProductDtoMapper.INSTANCE.toCreateCommand(dto));
         given(productCommandService.create(any(ProductCreateCommand.class))).willReturn(productId);
@@ -79,15 +80,15 @@ class ProductControllerTest {
                         requestFields(
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("상품명"),
                                 fieldWithPath("description").type(JsonFieldType.STRING).description("상품 소개"),
-                                fieldWithPath("price.amount").type(JsonFieldType.NUMBER).description("가격"),
-                                fieldWithPath("maxOrderQuantity.quantity").type(JsonFieldType.NUMBER).description("최대 주문 수량"),
-                                fieldWithPath("stock.quantity").type(JsonFieldType.NUMBER).description("초기 재고"))
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("가격"),
+                                fieldWithPath("maxOrderQuantity").type(JsonFieldType.NUMBER).description("최대 주문 수량"),
+                                fieldWithPath("stock").type(JsonFieldType.NUMBER).description("초기 재고"))
                 ));
     }
 
     @Test
     void 상품_주문_검증() throws Exception{
-        ProductPlaceDto dto = ProductPlaceDto.builder()
+        ProductValidateDto dto = ProductValidateDto.builder()
                 .productId(1L)
                 .orderQuantity(new Quantity(1))
                 .ingredientIds(List.of(1L, 2L, 3L))
@@ -95,10 +96,10 @@ class ProductControllerTest {
                 .build();
         int totalAmount = 15_000;
 
-        given(mapper.toPlaceCommand(any(ProductPlaceDto.class))).willReturn(ProductDtoMapper.INSTANCE.toPlaceCommand(dto));
-        given(productCommandService.placeOrder(any(ProductPlaceCommand.class))).willReturn(new Money(totalAmount));
+        given(mapper.toValidateCommand(any(ProductValidateDto.class))).willReturn(ProductDtoMapper.INSTANCE.toValidateCommand(dto));
+        given(productCommandService.validateOrder(any(ProductValidateCommand.class))).willReturn(new Money(totalAmount));
 
-        mockMvc.perform(post("/product/place")
+        mockMvc.perform(post("/product/validate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())

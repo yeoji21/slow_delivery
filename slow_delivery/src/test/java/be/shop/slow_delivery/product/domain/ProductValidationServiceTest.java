@@ -2,7 +2,7 @@ package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
-import be.shop.slow_delivery.product.application.dto.ProductPlaceCommand;
+import be.shop.slow_delivery.product.application.dto.ProductValidateCommand;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -15,13 +15,13 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class ProductPlaceOrderServiceTest {
-    private final ProductPlaceOrderService placeOrderService = new ProductPlaceOrderService();
+class ProductValidationServiceTest {
+    private final ProductValidationService placeOrderService = new ProductValidationService();
 
     @Test @DisplayName("상품 주문 검증 성공 테스트")
     void validateProduct_test_v1() throws Exception{
         //given
-        ProductPlaceCommand command = ProductPlaceCommand.builder()
+        ProductValidateCommand command = ProductValidateCommand.builder()
                 .productId(1L)
                 .ingredientIds(List.of(1L, 2L, 3L))
                 .optionIds(List.of(1L, 2L, 3L))
@@ -39,7 +39,7 @@ class ProductPlaceOrderServiceTest {
         Map<OptionGroup, List<Option>> optionsMap = getOptionsMap();
 
         //when
-        Money totalAmount = placeOrderService.place(product, ingredientsMap, optionsMap, command);
+        Money totalAmount = placeOrderService.validate(product, ingredientsMap, optionsMap, command);
 
         //then
         assertThat(totalAmount).isEqualTo(getExpectedAmount(command, product, ingredientsMap, optionsMap));
@@ -48,7 +48,7 @@ class ProductPlaceOrderServiceTest {
     @Test @DisplayName("판매 중이 아닌 상품")
     void validateProduct_test_v2() throws Exception{
         //given
-        ProductPlaceCommand command = ProductPlaceCommand.builder()
+        ProductValidateCommand command = ProductValidateCommand.builder()
                 .productId(1L)
                 .orderQuantity(new Quantity(1))
                 .build();
@@ -65,13 +65,13 @@ class ProductPlaceOrderServiceTest {
 
         //when //then
         assertThrows(IllegalArgumentException.class,
-                () -> placeOrderService.place(product, null, null, command));
+                () -> placeOrderService.validate(product, null, null, command));
     }
 
     @Test @DisplayName("최대 주문 수량 이상")
     void validateProduct_test_v3() throws Exception{
         //given
-        ProductPlaceCommand command = ProductPlaceCommand.builder()
+        ProductValidateCommand command = ProductValidateCommand.builder()
                 .productId(1L)
                 .orderQuantity(new Quantity(10))
                 .build();
@@ -85,7 +85,7 @@ class ProductPlaceOrderServiceTest {
 
         //when //then
         assertThrows(IllegalArgumentException.class,
-                () -> placeOrderService.place(product, null, null, command));
+                () -> placeOrderService.validate(product, null, null, command));
     }
 
     @Test @DisplayName("필수 옵션을 찾지 못한 경우 예외 발생")
@@ -99,7 +99,7 @@ class ProductPlaceOrderServiceTest {
                 .maxOrderQuantity(new Quantity(5))
                 .build();
         // 4L은 map에 담겨있지 않은 ingredient의 id
-        ProductPlaceCommand command = ProductPlaceCommand.builder()
+        ProductValidateCommand command = ProductValidateCommand.builder()
                 .productId(1L)
                 .ingredientIds(List.of(1L, 2L, 3L, 4L))
                 .optionIds(List.of(1L, 2L, 3L))
@@ -109,7 +109,7 @@ class ProductPlaceOrderServiceTest {
 
         //when //then
         assertThrows(IllegalArgumentException.class,
-                () -> placeOrderService.place(product, ingredientsMap, null, command));
+                () -> placeOrderService.validate(product, ingredientsMap, null, command));
     }
 
     @Test
@@ -125,7 +125,7 @@ class ProductPlaceOrderServiceTest {
         Map<IngredientGroup, List<Ingredient>> ingredientsMap = getIngredientsMap();
         Map<OptionGroup, List<Option>> optionsMap = getOptionsMap();
         // 4L은 map에 담겨있지 않은 option의 id
-        ProductPlaceCommand command = ProductPlaceCommand.builder()
+        ProductValidateCommand command = ProductValidateCommand.builder()
                 .productId(1L)
                 .ingredientIds(List.of(1L, 2L, 3L))
                 .optionIds(List.of(1L, 2L, 3L, 4L))
@@ -134,7 +134,7 @@ class ProductPlaceOrderServiceTest {
 
         //when //then
         assertThrows(IllegalArgumentException.class,
-                () -> placeOrderService.place(product, ingredientsMap, optionsMap, command));
+                () -> placeOrderService.validate(product, ingredientsMap, optionsMap, command));
     }
 
     private Map<OptionGroup, List<Option>> getOptionsMap() {
@@ -173,7 +173,7 @@ class ProductPlaceOrderServiceTest {
         return ingredientsMap;
     }
 
-    private Money getExpectedAmount(ProductPlaceCommand command,
+    private Money getExpectedAmount(ProductValidateCommand command,
                                     Product product,
                                     Map<IngredientGroup, List<Ingredient>> ingredientsMap,
                                     Map<OptionGroup, List<Option>> optionsMap) {

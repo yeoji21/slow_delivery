@@ -10,17 +10,17 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductPlaceDto {
+public class ProductValidateDto {
     private long productId;
     private Quantity orderQuantity;
     private List<Long> ingredientIds;
     private List<Long> optionIds;
 
     @Builder
-    public ProductPlaceDto(long productId,
-                           Quantity orderQuantity,
-                           List<Long> ingredientIds,
-                           List<Long> optionIds) {
+    public ProductValidateDto(long productId,
+                              Quantity orderQuantity,
+                              List<Long> ingredientIds,
+                              List<Long> optionIds) {
         this.productId = productId;
         this.orderQuantity = orderQuantity;
         this.ingredientIds = ingredientIds;
