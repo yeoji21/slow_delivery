@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,7 +53,10 @@ class ProductControllerTest {
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider contextProvider) {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(documentationConfiguration(contextProvider))
+                .apply(documentationConfiguration(contextProvider)
+                        .operationPreprocessors()
+                        .withRequestDefaults(prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .alwaysDo(print()).build();
     }
@@ -90,9 +94,9 @@ class ProductControllerTest {
     void 상품_주문_검증() throws Exception{
         ProductValidateDto dto = ProductValidateDto.builder()
                 .productId(1L)
-                .orderQuantity(new Quantity(1))
+                .orderQuantity(1)
                 .ingredientIds(List.of(1L, 2L, 3L))
-                .optionIds(List.of(1L))
+                .optionIds(List.of(1L, 5L))
                 .build();
         int totalAmount = 15_000;
 
@@ -103,7 +107,18 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Money(totalAmount))));
+                .andExpect(content().json(objectMapper.writeValueAsString(new Money(totalAmount))))
+                .andDo(document("validate-product",
+                        requestFields(
+                                fieldWithPath("productId").type(JsonFieldType.NUMBER).description("주문할 상품의 ID"),
+                                fieldWithPath("orderQuantity").type(JsonFieldType.NUMBER).description("주문 수량"),
+                                fieldWithPath("ingredientIds").type(JsonFieldType.ARRAY).description("필수 옵션 ID 리스트"),
+                                fieldWithPath("optionIds").type(JsonFieldType.ARRAY).description("선택 옵션 ID 리스트")
+                        ),
+                        responseFields(
+                                fieldWithPath("amount").type(JsonFieldType.NUMBER).description("옵션을 포함한 상품의 총 주문 가격")
+                        )
+                ));
     }
 
     @Test

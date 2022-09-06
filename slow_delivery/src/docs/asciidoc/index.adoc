@@ -9,3 +9,6 @@
 
 == 새로운 상품 저장
 operation::create-product[snippets='curl-request,http-request,http-response,request-fields']
+
+== 옵션을 포함한 상품 검증
+operation::validate-product[snippets='curl-request,http-request,http-response,request-fields,response-fields']
