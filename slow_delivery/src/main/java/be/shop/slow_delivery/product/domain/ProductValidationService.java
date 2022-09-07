@@ -2,7 +2,7 @@ package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
-import be.shop.slow_delivery.product.application.dto.ProductValidateCommand;
+import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
 import com.mysema.commons.lang.Assert;
 import org.springframework.stereotype.Component;
 

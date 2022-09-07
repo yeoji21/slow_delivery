@@ -3,15 +3,13 @@ package be.shop.slow_delivery.product.infra;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
-import be.shop.slow_delivery.product.application.dto.ProductDetailInfo;
+import be.shop.slow_delivery.product.application.query.ProductDetailInfo;
 import be.shop.slow_delivery.product.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
@@ -19,7 +17,6 @@ import javax.persistence.EntityManager;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({JpaQueryFactoryConfig.class, ProductQueryDao.class})
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -29,7 +26,7 @@ class ProductQueryDaoTest {
     @Autowired
     private EntityManager em;
 
-    @Test @Rollback(value = false)
+    @Test
     void findProductDetailInfo() throws Exception{
         //given
         Product product = Product.builder()

@@ -1,6 +1,6 @@
 package be.shop.slow_delivery.product.infra;
 
-import be.shop.slow_delivery.product.application.dto.*;
+import be.shop.slow_delivery.product.application.query.*;
 import com.mysema.commons.lang.Assert;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

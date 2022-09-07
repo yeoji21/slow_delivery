@@ -4,10 +4,10 @@ import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.product.application.ProductCommandService;
 import be.shop.slow_delivery.product.application.ProductQueryService;
-import be.shop.slow_delivery.product.application.dto.*;
-import be.shop.slow_delivery.product.presentation.dto.ProductCreateDto;
-import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
-import be.shop.slow_delivery.product.presentation.dto.ProductValidateDto;
+import be.shop.slow_delivery.product.application.command.ProductCreateCommand;
+import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
+import be.shop.slow_delivery.product.application.query.*;
+import be.shop.slow_delivery.product.presentation.dto.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,9 +94,11 @@ class ProductControllerTest {
     void 상품_주문_검증() throws Exception{
         ProductValidateDto dto = ProductValidateDto.builder()
                 .productId(1L)
+                .productName("productA")
+                .productPrice(15_000)
                 .orderQuantity(1)
-                .ingredientIds(List.of(1L, 2L, 3L))
-                .optionIds(List.of(1L, 5L))
+                .ingredients(getIngredientValidateDtos())
+                .options(getOptionValidateDtos())
                 .build();
         int totalAmount = 15_000;
 
@@ -107,18 +109,53 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(new Money(totalAmount))))
                 .andDo(document("validate-product",
                         requestFields(
                                 fieldWithPath("productId").type(JsonFieldType.NUMBER).description("주문할 상품의 ID"),
+                                fieldWithPath("productName").type(JsonFieldType.STRING).description("주문할 상품의 이름"),
+                                fieldWithPath("productPrice").type(JsonFieldType.NUMBER).description("주문할 상품의 가격"),
                                 fieldWithPath("orderQuantity").type(JsonFieldType.NUMBER).description("주문 수량"),
-                                fieldWithPath("ingredientIds").type(JsonFieldType.ARRAY).description("필수 옵션 ID 리스트"),
-                                fieldWithPath("optionIds").type(JsonFieldType.ARRAY).description("선택 옵션 ID 리스트")
-                        ),
-                        responseFields(
-                                fieldWithPath("amount").type(JsonFieldType.NUMBER).description("옵션을 포함한 상품의 총 주문 가격")
+                                fieldWithPath("ingredients[].id").type(JsonFieldType.NUMBER).description("필수 옵션 ID 리스트"),
+                                fieldWithPath("ingredients[].name").type(JsonFieldType.STRING).description("필수 옵션 ID 리스트"),
+                                fieldWithPath("ingredients[].price").type(JsonFieldType.NUMBER).description("필수 옵션 ID 리스트"),
+                                fieldWithPath("options[].id").type(JsonFieldType.NUMBER).description("필수 옵션 ID 리스트"),
+                                fieldWithPath("options[].name").type(JsonFieldType.STRING).description("필수 옵션 ID 리스트"),
+                                fieldWithPath("options[].price").type(JsonFieldType.NUMBER).description("필수 옵션 ID 리스트")
                         )
                 ));
+    }
+
+    private List<OptionValidateDto> getOptionValidateDtos() {
+        OptionValidateDto optionA = OptionValidateDto.builder()
+                .id(1L)
+                .name("optionA")
+                .price(500)
+                .build();
+        OptionValidateDto optionB = OptionValidateDto.builder()
+                .id(5L)
+                .name("optionB")
+                .price(1000)
+                .build();
+        return List.of(optionA, optionB);
+    }
+
+    private List<IngredientValidateDto> getIngredientValidateDtos() {
+        IngredientValidateDto ingredientA = IngredientValidateDto.builder()
+                .id(1L)
+                .name("ingredientA")
+                .price(1000)
+                .build();
+        IngredientValidateDto ingredientB = IngredientValidateDto.builder()
+                .id(2L)
+                .name("ingredientB")
+                .price(2000)
+                .build();
+        IngredientValidateDto ingredientC = IngredientValidateDto.builder()
+                .id(3L)
+                .name("ingredientC")
+                .price(3000)
+                .build();
+        return List.of(ingredientA, ingredientB, ingredientC);
     }
 
     @Test

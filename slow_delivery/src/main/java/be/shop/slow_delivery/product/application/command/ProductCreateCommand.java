@@ -1,4 +1,4 @@
-package be.shop.slow_delivery.product.application.dto;
+package be.shop.slow_delivery.product.application.command;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;

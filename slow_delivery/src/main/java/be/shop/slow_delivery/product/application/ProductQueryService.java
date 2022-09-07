@@ -1,6 +1,6 @@
 package be.shop.slow_delivery.product.application;
 
-import be.shop.slow_delivery.product.application.dto.ProductDetailInfo;
+import be.shop.slow_delivery.product.application.query.ProductDetailInfo;
 import be.shop.slow_delivery.product.infra.ProductQueryDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

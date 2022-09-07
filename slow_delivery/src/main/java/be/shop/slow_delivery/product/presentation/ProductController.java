@@ -1,9 +1,8 @@
 package be.shop.slow_delivery.product.presentation;
 
-import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.product.application.ProductCommandService;
 import be.shop.slow_delivery.product.application.ProductQueryService;
-import be.shop.slow_delivery.product.application.dto.ProductDetailInfo;
+import be.shop.slow_delivery.product.application.query.ProductDetailInfo;
 import be.shop.slow_delivery.product.presentation.dto.ProductCreateDto;
 import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
 import be.shop.slow_delivery.product.presentation.dto.ProductValidateDto;
@@ -30,8 +29,8 @@ public class ProductController {
     }
 
     @PostMapping("/product/validate")
-    public Money validateProductOrder(@RequestBody ProductValidateDto productValidateDto) {
-        return productCommandService.validateOrder(productDtoMapper.toValidateCommand(productValidateDto));
+    public void validateProductOrder(@RequestBody ProductValidateDto productValidateDto) {
+        productCommandService.validateOrder(productDtoMapper.toValidateCommand(productValidateDto));
     }
 
 }

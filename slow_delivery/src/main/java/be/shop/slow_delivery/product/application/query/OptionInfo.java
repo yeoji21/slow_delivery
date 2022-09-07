@@ -1,4 +1,4 @@
-package be.shop.slow_delivery.product.application.dto;
+package be.shop.slow_delivery.product.application.query;
 
 import be.shop.slow_delivery.common.domain.Money;
 import com.querydsl.core.annotations.QueryProjection;
