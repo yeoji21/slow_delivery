@@ -7,9 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static be.shop.slow_delivery.product.domain.QIngredient.ingredient;
 import static be.shop.slow_delivery.product.domain.QIngredientGroup.ingredientGroup;
@@ -57,6 +56,40 @@ public class ProductJpaRepository implements ProductRepository {
     }
 
     @Override
+    public Map<IngredientGroup, List<Ingredient>> findIngredientsMap(long productId, Map<Long, List<Long>> ingredientIdMap) {
+        // TODO: 2022/09/09 productIngredientGroup
+
+        List<IngredientGroup> groups = queryFactory
+                .select(ingredientGroup)
+                .from(productIngredientGroup)
+                .innerJoin(productIngredientGroup.product, product)
+                .innerJoin(productIngredientGroup.ingredientGroup, ingredientGroup)
+                .where(product.id.eq(productId))
+                .fetch();
+
+        List<Long> ingredientIds = ingredientIdMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        List<Ingredient> ingredients = queryFactory
+                .select(ingredient).distinct()
+                .from(ingredientInGroup)
+                .leftJoin(ingredientInGroup).on(ingredientInGroup.ingredientGroup.in(groups))
+                .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIds))
+                .where(
+                        ingredientInGroup.displayInfo.isDisplay.isTrue(),
+                        ingredient.isSale.isTrue())
+                .fetch();
+
+        Map<IngredientGroup, List<Ingredient>> result = new HashMap<>();
+        for (IngredientGroup group : groups) {
+            List<Ingredient> value = ingredients.stream()
+                    .filter(i -> ingredientIdMap.get(group.getId()).contains(i.getId()))
+                    .collect(Collectors.toList());
+            result.put(group, value);
+        }
+
+        return result;
+    }
+
+    @Override
     public Map<OptionGroup, List<Option>> findOptionsMap(long productId, List<Long> optionIds) {
         return queryFactory
                 .from(productOptionGroup)
@@ -70,6 +103,7 @@ public class ProductJpaRepository implements ProductRepository {
                         option.isSale.isTrue())
                 .transform(groupBy(optionGroup).as(GroupBy.list(option)));
     }
+
 }
 
 

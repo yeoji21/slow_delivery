@@ -18,20 +18,19 @@ public class ProductValidateCommand {
     private final String productName;
     private final Money productPrice;
     private final Quantity orderQuantity;
-    private final List<IngredientValidateCommand> ingredients;
-    private final List<OptionValidateCommand> options;
-
+    private final List<IngredientGroupValidateCommand> ingredientGroups;
+    private final List<OptionGroupValidateCommand> optionGroups;
 
     public List<Long> getIngredientIds() {
-        return ingredients
-                .stream()
+        return ingredientGroups.stream()
+                .flatMap(g -> g.getIngredients().stream())
                 .map(IngredientValidateCommand::getIngredientId)
                 .collect(Collectors.toList());
     }
 
     public List<Long> getOptionIds() {
-        return options
-                .stream()
+        return optionGroups.stream()
+                .flatMap(g -> g.getOptions().stream())
                 .map(OptionValidateCommand::getOptionId)
                 .collect(Collectors.toList());
     }

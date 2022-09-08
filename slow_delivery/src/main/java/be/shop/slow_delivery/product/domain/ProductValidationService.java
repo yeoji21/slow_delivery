@@ -15,6 +15,7 @@ public class ProductValidationService {
                           Map<OptionGroup, List<Option>> optionsMap,
                           ProductValidateCommand command) {
         validateProduct(product, command);
+
         return validateIngredients(ingredientsMap, command.getIngredientIds())
                 .add(validateOptions(optionsMap, command.getOptionIds()))
                 .multiple(command.getOrderQuantity());

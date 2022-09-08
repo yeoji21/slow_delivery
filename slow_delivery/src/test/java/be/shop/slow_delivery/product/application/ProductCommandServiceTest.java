@@ -2,7 +2,10 @@ package be.shop.slow_delivery.product.application;
 
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
+import be.shop.slow_delivery.product.application.command.IngredientGroupValidateCommand;
+import be.shop.slow_delivery.product.application.command.IngredientValidateCommand;
 import be.shop.slow_delivery.product.application.command.ProductCreateCommand;
+import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
 import be.shop.slow_delivery.product.domain.Product;
 import be.shop.slow_delivery.product.domain.ProductRepository;
 import be.shop.slow_delivery.product.domain.ProductValidationService;
@@ -14,6 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -48,6 +55,68 @@ class ProductCommandServiceTest {
 
         //then
         assertThat(productId).isEqualTo(1L);
+    }
+
+    @Test
+    void test() throws Exception{
+        //given
+        IngredientValidateCommand ingredientA = IngredientValidateCommand.builder()
+                .ingredientId(1L)
+                .ingredientName("ingredientA")
+                .ingredientPrice(0)
+                .build();
+        IngredientValidateCommand ingredientB = IngredientValidateCommand.builder()
+                .ingredientId(2L)
+                .ingredientName("ingredientB")
+                .ingredientPrice(1000)
+                .build();
+        IngredientValidateCommand ingredientC = IngredientValidateCommand.builder()
+                .ingredientId(3L)
+                .ingredientName("ingredientC")
+                .ingredientPrice(2000)
+                .build();
+
+        IngredientGroupValidateCommand groupA = IngredientGroupValidateCommand.builder()
+                .id(1L)
+                .name("I-groupA")
+                .ingredients(List.of(ingredientA, ingredientB))
+                .build();
+
+        IngredientGroupValidateCommand groupB = IngredientGroupValidateCommand.builder()
+                .id(2L)
+                .name("I-groupB")
+                .ingredients(List.of(ingredientA, ingredientC))
+                .build();
+
+
+        ProductValidateCommand command = ProductValidateCommand.builder()
+                .productId(1L)
+                .productName("productA")
+                .productPrice(new Money(15_000))
+                .orderQuantity(new Quantity(1))
+                .ingredientGroups(List.of(groupA, groupB))
+                .optionGroups(null)
+                .build();
+
+        //when
+        Map<Long, List<Long>> ingredientOptionIds = command.getIngredientGroups()
+                .stream()
+                .collect(groupingBy(IngredientGroupValidateCommand::getId,
+                                flatMapping(group -> group
+                                        .getIngredients()
+                                        .stream()
+                                        .map(IngredientValidateCommand::getIngredientId), toList())
+                        )
+                );
+
+        //then
+        for (Map.Entry<Long, List<Long>> es : ingredientOptionIds.entrySet()) {
+            System.out.println("key : " + es.getKey());
+            ingredientOptionIds.get(es.getKey()).forEach(i -> {
+                System.out.print(i + " ");
+                System.out.println();
+            });
+        }
     }
 
 //    @Test
