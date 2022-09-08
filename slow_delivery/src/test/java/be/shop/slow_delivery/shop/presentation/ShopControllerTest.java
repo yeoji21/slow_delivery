@@ -1,23 +1,14 @@
 package be.shop.slow_delivery.shop.presentation;
 
-import be.shop.slow_delivery.shop.application.ShopCommandService;
-import be.shop.slow_delivery.shop.application.ShopQueryService;
+import be.shop.slow_delivery.ControllerTest;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
-import be.shop.slow_delivery.shop.presentation.dto.ShopOrderType;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import be.shop.slow_delivery.shop.presentation.dto.ShopOrderType;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -28,16 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(ShopController.class)
-@AutoConfigureMockMvc
-class ShopControllerTest {
-    @Autowired private MockMvc mockMvc;
-    @Autowired private ObjectMapper objectMapper;
-    @MockBean private ShopQueryService shopQueryService;
-    @MockBean private ShopCommandService shopCommandService;
-    @MockBean private ShopDtoMapper mapper;
-
+class ShopControllerTest extends ControllerTest {
     @Test
     void 가게_생성() throws Exception{
         ShopCreateDto shopCreateDto = ShopCreateDto.builder()
@@ -51,6 +33,8 @@ class ShopControllerTest {
                 .category("치킨")
                 .build();
 
+        given(shopDtoMapper.toCreateCommand(any(ShopCreateDto.class)))
+                .willReturn(ShopDtoMapper.INSTANCE.toCreateCommand(shopCreateDto));
         given(shopCommandService.create(any())).willReturn(1L);
 
         mockMvc.perform(post("/shop")
