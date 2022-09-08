@@ -61,14 +61,13 @@ class ProductControllerTest extends ControllerTest {
                 .productName("productA")
                 .productPrice(15_000)
                 .orderQuantity(1)
-                .ingredients(getIngredientValidateDtos())
-                .options(getOptionValidateDtos())
+                .ingredientGroups(getIngredientGroups())
+                .optionGroups(getOptionGroups())
                 .build();
-        int totalAmount = 15_000;
 
         given(productDtoMapper.toValidateCommand(any(ProductValidateDto.class)))
                 .willReturn(ProductDtoMapper.INSTANCE.toValidateCommand(dto));
-        given(productCommandService.validateOrder(any(ProductValidateCommand.class))).willReturn(new Money(totalAmount));
+        given(productCommandService.validateOrder(any(ProductValidateCommand.class))).willReturn(new Money(15_000));
 
         mockMvc.perform(post("/product/validate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -80,31 +79,40 @@ class ProductControllerTest extends ControllerTest {
                                 fieldWithPath("productName").type(JsonFieldType.STRING).description("상품명"),
                                 fieldWithPath("productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
                                 fieldWithPath("orderQuantity").type(JsonFieldType.NUMBER).description("주문 수량"),
-                                fieldWithPath("ingredients[].id").type(JsonFieldType.NUMBER).description("필수 옵션 ID"),
-                                fieldWithPath("ingredients[].name").type(JsonFieldType.STRING).description("필수 옵션명"),
-                                fieldWithPath("ingredients[].price").type(JsonFieldType.NUMBER).description("필수 옵션 가격"),
-                                fieldWithPath("options[].id").type(JsonFieldType.NUMBER).description("선택 옵션 ID"),
-                                fieldWithPath("options[].name").type(JsonFieldType.STRING).description("선택 옵션명"),
-                                fieldWithPath("options[].price").type(JsonFieldType.NUMBER).description("선택 옵션 가격")
+                                fieldWithPath("ingredientGroups[].id").type(JsonFieldType.NUMBER).description("필수 옵션 그룹 ID"),
+                                fieldWithPath("ingredientGroups[].name").type(JsonFieldType.STRING).description("필수 옵션 그룹명"),
+                                fieldWithPath("ingredientGroups[].ingredients[].id").type(JsonFieldType.NUMBER).description("필수 옵션 ID"),
+                                fieldWithPath("ingredientGroups[].ingredients[].name").type(JsonFieldType.STRING).description("필수 옵션명"),
+                                fieldWithPath("ingredientGroups[].ingredients[].price").type(JsonFieldType.NUMBER).description("필수 옵션 가격"),
+                                fieldWithPath("optionGroups[].id").type(JsonFieldType.NUMBER).description("선택 옵션 그룹 ID"),
+                                fieldWithPath("optionGroups[].name").type(JsonFieldType.STRING).description("선택 옵션 그룹명"),
+                                fieldWithPath("optionGroups[].options[].id").type(JsonFieldType.NUMBER).description("선택 옵션 ID"),
+                                fieldWithPath("optionGroups[].options[].name").type(JsonFieldType.STRING).description("선택 옵션명"),
+                                fieldWithPath("optionGroups[].options[].price").type(JsonFieldType.NUMBER).description("선택 옵션 가격")
                         )
                 ));
     }
 
-    private List<OptionValidateDto> getOptionValidateDtos() {
-        OptionValidateDto optionA = OptionValidateDto.builder()
+    private List<OptionGroupValidateDto> getOptionGroups() {
+        OptionGroupValidateDto optionGroupA = OptionGroupValidateDto.builder()
                 .id(1L)
-                .name("optionA")
-                .price(500)
+                .name("O-groupA")
+                .options(List.of(OptionValidateDto.builder()
+                                .id(1L)
+                                .name("optionA")
+                                .price(500)
+                                .build(),
+                        OptionValidateDto.builder()
+                                .id(5L)
+                                .name("optionB")
+                                .price(1000)
+                                .build()))
                 .build();
-        OptionValidateDto optionB = OptionValidateDto.builder()
-                .id(5L)
-                .name("optionB")
-                .price(1000)
-                .build();
-        return List.of(optionA, optionB);
+        List<OptionGroupValidateDto> optionGroups = List.of(optionGroupA);
+        return optionGroups;
     }
 
-    private List<IngredientValidateDto> getIngredientValidateDtos() {
+    private List<IngredientGroupValidateDto> getIngredientGroups() {
         IngredientValidateDto ingredientA = IngredientValidateDto.builder()
                 .id(1L)
                 .name("ingredientA")
@@ -120,7 +128,20 @@ class ProductControllerTest extends ControllerTest {
                 .name("ingredientC")
                 .price(3000)
                 .build();
-        return List.of(ingredientA, ingredientB, ingredientC);
+
+        IngredientGroupValidateDto groupA = IngredientGroupValidateDto.builder()
+                .id(1L)
+                .name("I-groupA")
+                .ingredients(List.of(ingredientA, ingredientB))
+                .build();
+
+        IngredientGroupValidateDto groupB = IngredientGroupValidateDto.builder()
+                .id(2L)
+                .name("I-groupB")
+                .ingredients(List.of(ingredientA, ingredientC))
+                .build();
+        List<IngredientGroupValidateDto> groups = List.of(groupA, groupB);
+        return groups;
     }
 
     @Test

@@ -14,21 +14,21 @@ public class ProductValidateDto {
     private String productName;
     private int productPrice;
     private int orderQuantity;
-    private List<IngredientValidateDto> ingredients;
-    private List<OptionValidateDto> options;
+    private List<IngredientGroupValidateDto> ingredientGroups;
+    private List<OptionGroupValidateDto> optionGroups;
 
     @Builder
     public ProductValidateDto(long productId,
                               String productName,
                               int productPrice,
                               int orderQuantity,
-                              List<IngredientValidateDto> ingredients,
-                              List<OptionValidateDto> options) {
+                              List<IngredientGroupValidateDto> ingredientGroups,
+                              List<OptionGroupValidateDto> optionGroups) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
         this.orderQuantity = orderQuantity;
-        this.ingredients = ingredients;
-        this.options = options;
+        this.ingredientGroups = ingredientGroups;
+        this.optionGroups = optionGroups;
     }
 }

@@ -1,7 +1,6 @@
 package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.Money;
-import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
 import com.mysema.commons.lang.Assert;
 import org.springframework.stereotype.Component;
@@ -15,16 +14,17 @@ public class ProductValidationService {
                           Map<IngredientGroup, List<Ingredient>> ingredientsMap,
                           Map<OptionGroup, List<Option>> optionsMap,
                           ProductValidateCommand command) {
-        return validateProduct(product, command.getOrderQuantity())
-                .add(validateIngredients(ingredientsMap, command.getIngredientIds()))
+        validateProduct(product, command);
+        return validateIngredients(ingredientsMap, command.getIngredientIds())
                 .add(validateOptions(optionsMap, command.getOptionIds()))
                 .multiple(command.getOrderQuantity());
     }
 
-    private Money validateProduct(Product product, Quantity orderQuantity) {
+    private void validateProduct(Product product, ProductValidateCommand command) {
         Assert.isTrue(product.isOnSale(), "isSale");
-        Assert.notNull(product.getMaxOrderQuantity().minus(orderQuantity), "orderQuantity");
-        return product.getPrice();
+        Assert.isTrue(product.getMaxOrderQuantity().minus(command.getOrderQuantity()).toInt() > 0, "orderQuantity");
+        Assert.isTrue(product.getName().equals(command.getProductName()), "productName");
+        Assert.isTrue(product.getPrice().equals(command.getProductPrice()), "productPrice");
     }
 
     private Money validateIngredients(Map<IngredientGroup, List<Ingredient>> ingredientsMap, List<Long> ingredientIds) {

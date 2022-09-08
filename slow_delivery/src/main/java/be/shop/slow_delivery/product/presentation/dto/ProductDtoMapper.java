@@ -9,6 +9,9 @@ import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Mapper(componentModel = "spring")
 public interface ProductDtoMapper {
     ProductDtoMapper INSTANCE = Mappers.getMapper(ProductDtoMapper.class);
@@ -23,6 +26,20 @@ public interface ProductDtoMapper {
 
     default Quantity toQuantity(int quantity) {
         return new Quantity(quantity);
+    }
+
+    default List<IngredientValidateDto> toIngredientList(ProductValidateDto dto) {
+        return dto.getIngredientGroups()
+                .stream()
+                .flatMap(group -> group.getIngredients().stream())
+                .collect(Collectors.toList());
+    }
+
+    default List<OptionValidateDto> toOptionList(ProductValidateDto dto) {
+        return dto.getOptionGroups()
+                .stream()
+                .flatMap(group -> group.getOptions().stream())
+                .collect(Collectors.toList());
     }
 
     default IngredientValidateCommand toValidateCommand(IngredientValidateDto dto) {
