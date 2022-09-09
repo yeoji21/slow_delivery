@@ -44,17 +44,17 @@ public interface ProductDtoMapper {
 
     default IngredientValidateCommand toValidateCommand(IngredientValidateDto dto) {
         return IngredientValidateCommand.builder()
-                .ingredientId(dto.getId())
-                .ingredientName(dto.getName())
-                .ingredientPrice(dto.getPrice())
+                .id(dto.getId())
+                .name(dto.getName())
+                .price(dto.getPrice())
                 .build();
     }
 
     default OptionValidateCommand toValidateCommand(OptionValidateDto dto) {
         return OptionValidateCommand.builder()
-                .optionId(dto.getId())
-                .optionName(dto.getName())
-                .optionPrice(dto.getPrice())
+                .id(dto.getId())
+                .name(dto.getName())
+                .price(dto.getPrice())
                 .build();
     }
 }

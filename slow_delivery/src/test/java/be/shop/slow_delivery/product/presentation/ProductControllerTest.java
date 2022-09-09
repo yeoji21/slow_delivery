@@ -57,9 +57,9 @@ class ProductControllerTest extends ControllerTest {
     @Test
     void 상품_주문_검증() throws Exception{
         ProductValidateDto dto = ProductValidateDto.builder()
-                .productId(1L)
-                .productName("productA")
-                .productPrice(15_000)
+                .id(1L)
+                .name("productA")
+                .price(15_000)
                 .orderQuantity(1)
                 .ingredientGroups(getIngredientGroups())
                 .optionGroups(getOptionGroups())
@@ -75,9 +75,9 @@ class ProductControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andDo(document("validate-product",
                         requestFields(
-                                fieldWithPath("productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                                fieldWithPath("productName").type(JsonFieldType.STRING).description("상품명"),
-                                fieldWithPath("productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("상품 ID"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("상품명"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("상품 가격"),
                                 fieldWithPath("orderQuantity").type(JsonFieldType.NUMBER).description("주문 수량"),
                                 fieldWithPath("ingredientGroups[].id").type(JsonFieldType.NUMBER).description("필수 옵션 그룹 ID"),
                                 fieldWithPath("ingredientGroups[].name").type(JsonFieldType.STRING).description("필수 옵션 그룹명"),

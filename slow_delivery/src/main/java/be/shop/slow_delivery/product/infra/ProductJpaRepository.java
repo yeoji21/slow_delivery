@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static be.shop.slow_delivery.product.domain.QIngredient.ingredient;
 import static be.shop.slow_delivery.product.domain.QIngredientGroup.ingredientGroup;
@@ -42,7 +44,7 @@ public class ProductJpaRepository implements ProductRepository {
     }
 
     @Override
-    public Map<IngredientGroup, List<Ingredient>> findIngredientsMap(long productId, List<Long> ingredientIds) {
+    public Map<IngredientGroup, List<Ingredient>> findIngredientMap(long productId, List<Long> ingredientIds) {
         return queryFactory
                 .from(productIngredientGroup)
                 .innerJoin(productIngredientGroup.product, product)
@@ -56,9 +58,8 @@ public class ProductJpaRepository implements ProductRepository {
     }
 
     @Override
-    public Map<IngredientGroup, List<Ingredient>> findIngredientsMap(long productId, Map<Long, List<Long>> ingredientIdMap) {
+    public Map<IngredientGroup, List<Ingredient>> findIngredientMap(long productId, Map<Long, List<Long>> ingredientIdMap) {
         // TODO: 2022/09/09 productIngredientGroup
-
         List<IngredientGroup> groups = queryFactory
                 .select(ingredientGroup)
                 .from(productIngredientGroup)
@@ -67,30 +68,30 @@ public class ProductJpaRepository implements ProductRepository {
                 .where(product.id.eq(productId))
                 .fetch();
 
-        List<Long> ingredientIds = ingredientIdMap.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-        List<Ingredient> ingredients = queryFactory
-                .select(ingredient).distinct()
-                .from(ingredientInGroup)
-                .leftJoin(ingredientInGroup).on(ingredientInGroup.ingredientGroup.in(groups))
-                .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIds))
-                .where(
-                        ingredientInGroup.displayInfo.isDisplay.isTrue(),
-                        ingredient.isSale.isTrue())
-                .fetch();
-
         Map<IngredientGroup, List<Ingredient>> result = new HashMap<>();
         for (IngredientGroup group : groups) {
-            List<Ingredient> value = ingredients.stream()
-                    .filter(i -> ingredientIdMap.get(group.getId()).contains(i.getId()))
-                    .collect(Collectors.toList());
-            result.put(group, value);
+            List<Ingredient> ingredients = queryFactory
+                    .select(ingredient).distinct()
+                    .from(ingredientInGroup)
+                    .leftJoin(ingredientInGroup).on(ingredientInGroup.ingredientGroup.eq(group))
+                    .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIdMap.get(group.getId())))
+                    .where(
+                            ingredientInGroup.displayInfo.isDisplay.isTrue(),
+                            ingredient.isSale.isTrue())
+                    .fetch();
+            result.put(group, ingredients);
         }
 
         return result;
     }
 
     @Override
-    public Map<OptionGroup, List<Option>> findOptionsMap(long productId, List<Long> optionIds) {
+    public Map<OptionGroup, List<Option>> findOptionMap(Long productId, Map<Long, List<Long>> optionIdMap) {
+        return null;
+    }
+
+    @Override
+    public Map<OptionGroup, List<Option>> findOptionMap(long productId, List<Long> optionIds) {
         return queryFactory
                 .from(productOptionGroup)
                 .innerJoin(productOptionGroup.product, product)

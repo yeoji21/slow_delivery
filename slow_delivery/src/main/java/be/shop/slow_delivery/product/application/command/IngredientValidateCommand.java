@@ -6,16 +6,16 @@ import lombok.Getter;
 
 @Getter
 public class IngredientValidateCommand {
-    private long ingredientId;
-    private String ingredientName;
-    private Money ingredientPrice;
+    private long id;
+    private String name;
+    private Money price;
 
     @Builder
-    public IngredientValidateCommand(long ingredientId,
-                                     String ingredientName,
-                                     int ingredientPrice) {
-        this.ingredientId = ingredientId;
-        this.ingredientName = ingredientName;
-        this.ingredientPrice = new Money(ingredientPrice);
+    public IngredientValidateCommand(long id,
+                                     String name,
+                                     int price) {
+        this.id = id;
+        this.name = name;
+        this.price = new Money(price);
     }
 }

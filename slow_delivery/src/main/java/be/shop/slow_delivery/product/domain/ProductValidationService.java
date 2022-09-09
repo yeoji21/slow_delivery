@@ -5,8 +5,10 @@ import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
 import com.mysema.commons.lang.Assert;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ProductValidationService {
@@ -16,16 +18,18 @@ public class ProductValidationService {
                           ProductValidateCommand command) {
         validateProduct(product, command);
 
-        return validateIngredients(ingredientsMap, command.getIngredientIds())
-                .add(validateOptions(optionsMap, command.getOptionIds()))
+        List<Long> ingredientIds = command.getIngredientIdMap().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        List<Long> optionIds = command.getOptionIdMap().values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        return validateIngredients(ingredientsMap, ingredientIds)
+                .add(validateOptions(optionsMap, optionIds))
                 .multiple(command.getOrderQuantity());
     }
 
     private void validateProduct(Product product, ProductValidateCommand command) {
         Assert.isTrue(product.isOnSale(), "isSale");
         Assert.isTrue(product.getMaxOrderQuantity().minus(command.getOrderQuantity()).toInt() > 0, "orderQuantity");
-        Assert.isTrue(product.getName().equals(command.getProductName()), "productName");
-        Assert.isTrue(product.getPrice().equals(command.getProductPrice()), "productPrice");
+        Assert.isTrue(product.getName().equals(command.getName()), "productName");
+        Assert.isTrue(product.getPrice().equals(command.getPrice()), "productPrice");
     }
 
     private Money validateIngredients(Map<IngredientGroup, List<Ingredient>> ingredientsMap, List<Long> ingredientIds) {

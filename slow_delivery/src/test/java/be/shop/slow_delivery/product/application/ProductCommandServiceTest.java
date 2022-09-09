@@ -61,19 +61,19 @@ class ProductCommandServiceTest {
     void test() throws Exception{
         //given
         IngredientValidateCommand ingredientA = IngredientValidateCommand.builder()
-                .ingredientId(1L)
-                .ingredientName("ingredientA")
-                .ingredientPrice(0)
+                .id(1L)
+                .name("ingredientA")
+                .price(0)
                 .build();
         IngredientValidateCommand ingredientB = IngredientValidateCommand.builder()
-                .ingredientId(2L)
-                .ingredientName("ingredientB")
-                .ingredientPrice(1000)
+                .id(2L)
+                .name("ingredientB")
+                .price(1000)
                 .build();
         IngredientValidateCommand ingredientC = IngredientValidateCommand.builder()
-                .ingredientId(3L)
-                .ingredientName("ingredientC")
-                .ingredientPrice(2000)
+                .id(3L)
+                .name("ingredientC")
+                .price(2000)
                 .build();
 
         IngredientGroupValidateCommand groupA = IngredientGroupValidateCommand.builder()
@@ -90,9 +90,9 @@ class ProductCommandServiceTest {
 
 
         ProductValidateCommand command = ProductValidateCommand.builder()
-                .productId(1L)
-                .productName("productA")
-                .productPrice(new Money(15_000))
+                .id(1L)
+                .name("productA")
+                .price(new Money(15_000))
                 .orderQuantity(new Quantity(1))
                 .ingredientGroups(List.of(groupA, groupB))
                 .optionGroups(null)
@@ -105,7 +105,7 @@ class ProductCommandServiceTest {
                                 flatMapping(group -> group
                                         .getIngredients()
                                         .stream()
-                                        .map(IngredientValidateCommand::getIngredientId), toList())
+                                        .map(IngredientValidateCommand::getId), toList())
                         )
                 );
 
@@ -140,8 +140,8 @@ class ProductCommandServiceTest {
 //        Map<OptionGroup, List<Option>> optionsMap = new HashMap<>();
 //
 //        given(productRepository.findById(command.getProductId())).willReturn(Optional.ofNullable(product));
-//        given(productRepository.findIngredientsMap(command.getProductId(), command.getIngredients())).willReturn(ingredientsMap);
-//        given(productRepository.findOptionsMap(command.getProductId(), command.getOptions())).willReturn(optionsMap);
+//        given(productRepository.findIngredientMap(command.getProductId(), command.getIngredients())).willReturn(ingredientsMap);
+//        given(productRepository.findOptionMap(command.getProductId(), command.getOptions())).willReturn(optionsMap);
 //
 //        //when
 //        productCommandService.validateOrder(command);

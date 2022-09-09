@@ -20,7 +20,6 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({JpaQueryFactoryConfig.class, ProductJpaRepository.class})
@@ -65,25 +64,31 @@ class ProductRepositoryTest {
                 .name("ingredientC")
                 .price(new Money(3000))
                 .build();
+        Ingredient notShownIngredient = Ingredient.builder()
+                .stockId(0L)
+                .name("nowShownIngredient")
+                .price(new Money(500))
+                .build();
 
         em.persist(ingredientA);
         em.persist(ingredientB);
         em.persist(ingredientC);
+        em.persist(notShownIngredient);
 
         groupA.addIngredient(ingredientA, 1);
-        groupB.addIngredient(ingredientA, 3);
 
         groupB.addIngredient(ingredientB, 1);
         groupB.addIngredient(ingredientC, 2);
+        groupB.addIngredient(ingredientA, 3);
 
         em.flush();
         em.clear();
 
         //when
-        Map<Long, List<Long>> ingredientOptionIds = getIngredientOptionIds(product, groupA, groupB, ingredientA, ingredientB, ingredientC);
+        Map<Long, List<Long>> ingredientIdMap = getIngredientOptionIds(product, groupA, groupB, ingredientA, ingredientB, ingredientC);
 
         Map<IngredientGroup, List<Ingredient>> ingredientsMap =
-                productRepository.findIngredientsMap(product.getId(), ingredientOptionIds);
+                productRepository.findIngredientMap(product.getId(), ingredientIdMap);
 
         for (IngredientGroup key : ingredientsMap.keySet()) {
             System.out.println("key : " + key.getId());
@@ -95,7 +100,7 @@ class ProductRepositoryTest {
 
         //then
         assertThat(ingredientsMap.size()).isEqualTo(2);
-        assertThat(ingredientsMap.get(groupA).size()).isEqualTo(2);
+        assertThat(ingredientsMap.get(groupA).size()).isEqualTo(1);
         assertThat(ingredientsMap.get(groupB).size()).isEqualTo(2);
 
     }
@@ -107,19 +112,19 @@ class ProductRepositoryTest {
                                                          Ingredient ingredientB,
                                                          Ingredient ingredientC) {
         IngredientValidateCommand commandA = IngredientValidateCommand.builder()
-                .ingredientId(ingredientA.getId())
-                .ingredientName(ingredientA.getName())
-                .ingredientPrice(ingredientA.getPrice().toInt())
+                .id(ingredientA.getId())
+                .name(ingredientA.getName())
+                .price(ingredientA.getPrice().toInt())
                 .build();
         IngredientValidateCommand commandB = IngredientValidateCommand.builder()
-                .ingredientId(ingredientB.getId())
-                .ingredientName(ingredientB.getName())
-                .ingredientPrice(ingredientB.getPrice().toInt())
+                .id(ingredientB.getId())
+                .name(ingredientB.getName())
+                .price(ingredientB.getPrice().toInt())
                 .build();
         IngredientValidateCommand commandC = IngredientValidateCommand.builder()
-                .ingredientId(ingredientC.getId())
-                .ingredientName(ingredientC.getName())
-                .ingredientPrice(ingredientC.getPrice().toInt())
+                .id(ingredientC.getId())
+                .name(ingredientC.getName())
+                .price(ingredientC.getPrice().toInt())
                 .build();
 
         IngredientGroupValidateCommand commandGroupA = IngredientGroupValidateCommand.builder()
@@ -135,23 +140,15 @@ class ProductRepositoryTest {
                 .build();
 
         ProductValidateCommand command = ProductValidateCommand.builder()
-                .productId(product.getId())
-                .productName(product.getName())
-                .productPrice(product.getPrice())
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
                 .orderQuantity(new Quantity(1))
                 .ingredientGroups(List.of(commandGroupA, commandGroupB))
                 .optionGroups(null)
                 .build();
 
-        return command.getIngredientGroups()
-                .stream()
-                .collect(groupingBy(IngredientGroupValidateCommand::getId,
-                                flatMapping(group -> group
-                                        .getIngredients()
-                                        .stream()
-                                        .map(IngredientValidateCommand::getIngredientId), toList())
-                        )
-                );
+        return command.getIngredientIdMap();
     }
 
     @Test
@@ -217,7 +214,7 @@ class ProductRepositoryTest {
         //when
         List<Long> ingredientIds = List.of(ingredientA.getId(), ingredientB.getId(), ingredientC.getId(), notShownIngredient.getId());
         Map<IngredientGroup, List<Ingredient>> ingredientsMap =
-                productRepository.findIngredientsMap(product.getId(), ingredientIds);
+                productRepository.findIngredientMap(product.getId(), ingredientIds);
 
         //then
         assertThat(ingredientsMap.size()).isEqualTo(2);
@@ -279,7 +276,7 @@ class ProductRepositoryTest {
 
         //when
         List<Long> optionIds = List.of(optionA.getId(), optionB.getId(), optionC.getId(), notSaleOption.getId());
-        Map<OptionGroup, List<Option>> optionsMap = productRepository.findOptionsMap(product.getId(), optionIds);
+        Map<OptionGroup, List<Option>> optionsMap = productRepository.findOptionMap(product.getId(), optionIds);
 
         //then
         assertThat(optionsMap.size()).isEqualTo(1);
