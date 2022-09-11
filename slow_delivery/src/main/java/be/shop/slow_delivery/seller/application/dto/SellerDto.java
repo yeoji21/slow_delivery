@@ -9,7 +9,10 @@ import javax.validation.constraints.NotEmpty;
 public class SellerDto {
 
     @NotEmpty
-    private String sellerId;
+    private String username;
+
+    @NotEmpty
+    private String loginId;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotEmpty
@@ -17,4 +20,9 @@ public class SellerDto {
 
     @NotEmpty
     private String email;
+
+    @NotEmpty
+    private String phoneNumber;
+
+
 }
