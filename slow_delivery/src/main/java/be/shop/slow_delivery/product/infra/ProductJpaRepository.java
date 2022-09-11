@@ -45,6 +45,11 @@ public class ProductJpaRepository implements ProductRepository {
 
     @Override
     public Map<IngredientGroup, List<Ingredient>> findIngredientMap(long productId, List<Long> ingredientIds) {
+        // 이렇게 하면 안됨
+        // ingredientA가 그룹 1과 그룹 2에 모두 속한다면
+        // ingredientA를 조회했을 때 이게 그룹 1껀지 2껀지 모르고
+        // ingredientInGroup이 true인지 false인지도 제대로 확인할 수 없음
+
         return queryFactory
                 .from(productIngredientGroup)
                 .innerJoin(productIngredientGroup.product, product)
@@ -59,7 +64,6 @@ public class ProductJpaRepository implements ProductRepository {
 
     @Override
     public Map<IngredientGroup, List<Ingredient>> findIngredientMap(long productId, Map<Long, List<Long>> ingredientIdMap) {
-        // TODO: 2022/09/09 productIngredientGroup
         List<IngredientGroup> groups = queryFactory
                 .select(ingredientGroup)
                 .from(productIngredientGroup)
@@ -69,9 +73,27 @@ public class ProductJpaRepository implements ProductRepository {
                 .fetch();
 
         Map<IngredientGroup, List<Ingredient>> result = new HashMap<>();
+
+//        for (Long key : ingredientIdMap.keySet()) {
+//            List<Tuple> tuples = queryFactory
+//                    .select(ingredientGroup, ingredient)
+//                    .from(productIngredientGroup)
+//                    .innerJoin(productIngredientGroup.product, product).on(product.id.eq(productId))
+//                    .innerJoin(productIngredientGroup.ingredientGroup, ingredientGroup).on(ingredientGroup.id.eq(key))
+//                    .leftJoin(ingredientInGroup).on(ingredientInGroup.ingredientGroup.eq(ingredientGroup))
+//                    .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIdMap.get(key)))
+//                    .where(ingredientInGroup.displayInfo.isDisplay.isTrue(),
+//                            ingredient.isSale.isTrue())
+//                    .fetch();
+//            List<Ingredient> ingredients = tuples.stream()
+//                    .map(t -> t.get(ingredient))
+//                    .collect(Collectors.toList());
+//            result.put(tuples.get(0).get(ingredientGroup), ingredients);
+//        }
+
         for (IngredientGroup group : groups) {
             List<Ingredient> ingredients = queryFactory
-                    .select(ingredient).distinct()
+                    .select(ingredient)
                     .from(ingredientInGroup)
                     .leftJoin(ingredientInGroup).on(ingredientInGroup.ingredientGroup.eq(group))
                     .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIdMap.get(group.getId())))

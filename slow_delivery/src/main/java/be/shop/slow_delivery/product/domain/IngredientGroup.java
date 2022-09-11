@@ -1,7 +1,7 @@
 package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
-import be.shop.slow_delivery.common.domain.Money;
+import be.shop.slow_delivery.product.domain.validate.IngredientGroupValidate;
 import com.mysema.commons.lang.Assert;
 import lombok.*;
 
@@ -38,13 +38,10 @@ public class IngredientGroup extends BaseTimeEntity {
         this.selectCount = selectCount;
     }
 
-    public Money getIngredientsAmount(List<Ingredient> ingredients) {
-        selectCount.selectedCountCheck(ingredients.size());
-        return ingredients.stream()
-                .map(Ingredient::getPrice)
-                .reduce(Money.ZERO, Money::add);
+    public void validate(IngredientGroupValidate validate) {
+        Assert.isTrue(this.id == validate.getId(), "id");
+        Assert.isTrue(this.name.equals(validate.getName()), "name");
     }
-
 
     public void addIngredient(Ingredient ingredient, int displayOrder) {
         ingredients.add(new IngredientInGroup(this, ingredient, displayOrder));

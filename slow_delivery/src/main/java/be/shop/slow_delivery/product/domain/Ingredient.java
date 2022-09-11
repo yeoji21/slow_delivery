@@ -2,6 +2,7 @@ package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
 import be.shop.slow_delivery.common.domain.Money;
+import be.shop.slow_delivery.product.domain.validate.IngredientValidate;
 import com.mysema.commons.lang.Assert;
 import lombok.*;
 
@@ -36,5 +37,12 @@ public class Ingredient extends BaseTimeEntity {
         this.price = price;
         this.stockId = stockId;
         this.isSale = true;
+    }
+
+    public void validate(IngredientValidate validate) {
+        Assert.isTrue(isSale, "isSale");
+        Assert.isTrue(id == validate.getId(), "id");
+        Assert.isTrue(name.equals(validate.getName()), "name");
+        Assert.isTrue(price.equals(validate.getPrice()), "price");
     }
 }

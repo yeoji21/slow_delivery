@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -67,7 +68,6 @@ class ProductControllerTest extends ControllerTest {
 
         given(productDtoMapper.toValidateCommand(any(ProductValidateDto.class)))
                 .willReturn(ProductDtoMapper.INSTANCE.toValidateCommand(dto));
-        given(productCommandService.validateOrder(any(ProductValidateCommand.class))).willReturn(new Money(15_000));
 
         mockMvc.perform(post("/product/validate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,6 +91,8 @@ class ProductControllerTest extends ControllerTest {
                                 fieldWithPath("optionGroups[].options[].price").type(JsonFieldType.NUMBER).description("선택 옵션 가격")
                         )
                 ));
+
+        verify(productCommandService).validateOrder(any(ProductValidateCommand.class));
     }
 
     private List<OptionGroupValidateDto> getOptionGroups() {
