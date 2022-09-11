@@ -17,5 +17,4 @@ public interface SellerRepository extends JpaRepository<Seller,Integer> {
 
     Optional<Seller> findByLoginId(String loginId);
 
-
 }

@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Slf4j
 @Service
@@ -36,5 +38,13 @@ public class SellerService {
     public void changePassword(Seller seller, String password){
         seller.changePassword(passwordEncoder.encode(password));
         sellerRepository.save(seller);
+    }
+
+    public Optional<Seller> findSellerByEmail(String email){
+        return sellerRepository.findByEmail(email);
+    }
+
+    public Optional<Seller> findSellerById(String loginId){
+        return sellerRepository.findByLoginId(loginId);
     }
 }
