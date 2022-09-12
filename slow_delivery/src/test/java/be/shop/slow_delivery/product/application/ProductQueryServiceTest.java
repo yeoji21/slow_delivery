@@ -42,6 +42,7 @@ class ProductQueryServiceTest {
 
         given(productQueryDao.findProductValidate(any(Long.class))).willReturn(Optional.ofNullable(command.toProductValidate()));
         given(productQueryDao.findIngredientValidate(any(Long.class), anyMap())).willReturn(validates);
+        given(productQueryDao.findOptionValidate(any(Long.class), anyMap())).willReturn(command.toOptionGroupValidate());
 
         //when
         productQueryService.validateOrder(command);

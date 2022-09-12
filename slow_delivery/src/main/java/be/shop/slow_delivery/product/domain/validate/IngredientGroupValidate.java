@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@EqualsAndHashCode
 @Getter
 public class IngredientGroupValidate {
     private long id;
@@ -50,9 +49,9 @@ public class IngredientGroupValidate {
     }
 
     public void isEqualTo(IngredientGroupValidate validate) {
-        Assert.isTrue(id == validate.getId(), "id");
-        Assert.isTrue(name.equals(validate.getName()), "name");
-        selectCount.selectedCountCheck(validate.getSelectCount().getMinCount());
+        Assert.isTrue(id == validate.id, "id");
+        Assert.isTrue(name.equals(validate.name), "name");
+        selectCount.selectedCountCheck(validate.selectCount.getMinCount());
         validate.getSelectCount().selectedCountCheck(selectCount.getMinCount());
         Assert.isTrue(isEqualTo(ingredients, validate.ingredients), "ingredients");
     }

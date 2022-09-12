@@ -3,6 +3,7 @@ package be.shop.slow_delivery.product.application;
 import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
 import be.shop.slow_delivery.product.application.query.ProductDetailInfo;
 import be.shop.slow_delivery.product.domain.validate.IngredientGroupValidate;
+import be.shop.slow_delivery.product.domain.validate.OptionGroupValidate;
 import be.shop.slow_delivery.product.domain.validate.ProductValidate;
 import be.shop.slow_delivery.product.infra.ProductQueryDao;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +33,22 @@ public class ProductQueryService {
         for (IngredientGroupValidate group : command.toIngredientGroupValidate()) {
             IngredientGroupValidate findOne = ingredientGroups
                     .stream()
-                    .filter(r -> r.getId() == group.getId())
+                    .filter(g -> g.getId() == group.getId())
                     .findAny()
                     .orElseThrow();
             group.isEqualTo(findOne);
         }
 
+        List<OptionGroupValidate> optionGroups = productQueryDao
+                .findOptionValidate(command.getId(), command.getOptionIdMap());
+        for (OptionGroupValidate group : command.toOptionGroupValidate()) {
+            OptionGroupValidate findOne = optionGroups
+                    .stream()
+                    .filter(g -> g.getId() == group.getId())
+                    .findAny()
+                    .orElseThrow();
+            group.isEqualTo(findOne);
+        }
     }
 
 }

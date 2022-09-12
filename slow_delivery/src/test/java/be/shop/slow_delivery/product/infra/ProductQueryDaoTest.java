@@ -3,12 +3,11 @@ package be.shop.slow_delivery.product.infra;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
-import be.shop.slow_delivery.product.application.command.IngredientGroupValidateCommand;
-import be.shop.slow_delivery.product.application.command.IngredientValidateCommand;
-import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
+import be.shop.slow_delivery.product.application.command.*;
 import be.shop.slow_delivery.product.application.query.ProductDetailInfo;
 import be.shop.slow_delivery.product.domain.*;
 import be.shop.slow_delivery.product.domain.validate.IngredientGroupValidate;
+import be.shop.slow_delivery.product.domain.validate.OptionGroupValidate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +46,99 @@ class ProductQueryDaoTest {
         assertThat(ingredientValidate.size()).isEqualTo(2);
         assertThat(ingredientValidate.get(0).getIngredients().size()).isEqualTo(1);
         assertThat(ingredientValidate.get(1).getIngredients().size()).isEqualTo(2);
+    }
+
+    @Test
+    void findOptionValidate() throws Exception{
+        //given
+        Product product = Product.builder()
+                .stockId(1L)
+                .name("product A")
+                .description("~~~")
+                .price(new Money(10_000))
+                .maxOrderQuantity(new Quantity(5))
+                .build();
+        em.persist(product);
+
+        OptionGroup groupA = new OptionGroup("groupA", new Quantity(3));
+        OptionGroup groupB = new OptionGroup("groupB", new Quantity(5));
+        em.persist(groupA);
+        em.persist(groupB);
+
+        em.persist(new ProductOptionGroup(product, groupA, 1));
+        em.persist(new ProductOptionGroup(product, groupB, 2));
+
+        Option optionA = Option.builder()
+                .stockId(0L)
+                .name("optionA")
+                .price(new Money(100))
+                .build();
+
+        Option optionB = Option.builder()
+                .stockId(0L)
+                .name("optionB")
+                .price(new Money(500))
+                .build();
+
+        Option optionC = Option.builder()
+                .stockId(0L)
+                .name("optionC")
+                .price(new Money(1000))
+                .build();
+
+        em.persist(optionA);
+        em.persist(optionB);
+        em.persist(optionC);
+
+        groupA.addOption(optionA, 1);
+        groupA.addOption(optionB, 2);
+        groupA.addOption(optionC, 3);
+
+        groupB.addOption(optionA, 1);
+
+        OptionValidateCommand ocA = OptionValidateCommand.builder()
+                .id(optionA.getId())
+                .name(optionA.getName())
+                .price(optionA.getPrice().toInt())
+                .build();
+        OptionValidateCommand ocB = OptionValidateCommand.builder()
+                .id(optionB.getId())
+                .name(optionB.getName())
+                .price(optionB.getPrice().toInt())
+                .build();
+        OptionValidateCommand ocC = OptionValidateCommand.builder()
+                .id(optionC.getId())
+                .name(optionC.getName())
+                .price(optionC.getPrice().toInt())
+                .build();
+
+        OptionGroupValidateCommand gcA = OptionGroupValidateCommand.builder()
+                .id(groupA.getId())
+                .name(groupA.getName())
+                .options(List.of(ocA, ocB, ocC))
+                .build();
+        OptionGroupValidateCommand gcB = OptionGroupValidateCommand.builder()
+                .id(groupB.getId())
+                .name(groupB.getName())
+                .options(Collections.EMPTY_LIST)
+                .build();
+
+        ProductValidateCommand command = ProductValidateCommand.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .price(product.getPrice())
+                .orderQuantity(new Quantity(1))
+                .ingredientGroups(null)
+                .optionGroups(List.of(gcA, gcB))
+                .build();
+
+        //when
+        List<OptionGroupValidate> validate = productQueryDao.findOptionValidate(product.getId(), command.getOptionIdMap());
+
+        //then
+        assertThat(validate.size()).isEqualTo(2);
+        assertThat(validate.get(0).getOptions().size()).isEqualTo(3);
+        assertThat(validate.get(1).getOptions().size()).isEqualTo(0);
     }
 
 

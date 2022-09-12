@@ -4,6 +4,7 @@ import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.product.domain.SelectCount;
 import be.shop.slow_delivery.product.domain.validate.IngredientGroupValidate;
+import be.shop.slow_delivery.product.domain.validate.OptionGroupValidate;
 import be.shop.slow_delivery.product.domain.validate.ProductValidate;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -57,6 +58,30 @@ public class ProductValidateCommand {
                             .name(g.getName())
                             .selectCount(new SelectCount(ingredients.size(), 100))
                             .ingredients(ingredients)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<OptionGroupValidate> toOptionGroupValidate() {
+        return optionGroups
+                .stream()
+                .map(g -> {
+                    List<OptionGroupValidate.OptionValidate> options = g.getOptions()
+                            .stream()
+                            .map(i -> OptionGroupValidate.OptionValidate.builder()
+                                    .id(i.getId())
+                                    .name(i.getName())
+                                    .price(i.getPrice())
+                                    .build()
+                            )
+                            .collect(toList());
+
+                    return OptionGroupValidate.builder()
+                            .id(g.getId())
+                            .name(g.getName())
+                            .maxSelectCount(new Quantity(options.size()))
+                            .options(options)
                             .build();
                 })
                 .collect(Collectors.toList());

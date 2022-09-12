@@ -67,6 +67,34 @@ public class ProductQueryDao {
         return list;
     }
 
+    public List<OptionGroupValidate> findOptionValidate(long productId, Map<Long, List<Long>> optionIdMap) {
+        List<Long> optionIds = optionIdMap.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        List<OptionGroupValidate> list = queryFactory
+                .from(productOptionGroup)
+                .innerJoin(productOptionGroup.optionGroup, optionGroup)
+                .innerJoin(optionGroup.options, optionInGroup)
+                .innerJoin(optionInGroup.option, option)
+                .where(productOptionGroup.product.id.eq(productId),
+                        optionGroup.id.in(optionIdMap.keySet()),
+                        option.id.in(optionIds),
+                        productOptionGroup.displayInfo.isDisplay.isTrue(),
+                        optionInGroup.displayInfo.isDisplay.isTrue(),
+                        option.isSale.isTrue())
+                .transform(groupBy(optionGroup)
+                        .list(new QOptionGroupValidate(optionGroup.id, optionGroup.name, optionGroup.maxSelectCount,
+                                list(new QOptionGroupValidate_OptionValidate(option.id, option.name, option.price))))
+                );
+
+        list.forEach(group -> group.getOptions()
+                .removeIf(i -> !optionIdMap.get(group.getId()).contains(i.getId())));
+
+        return list;
+    }
+
     public ProductDetailInfo findProductDetailInfo(long productId) {
         ProductDetailInfo productDetailInfo = queryFactory
                 .select(new QProductDetailInfo(product.id, product.name, product.description,
