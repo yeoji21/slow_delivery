@@ -1,12 +1,17 @@
 package be.shop.slow_delivery.product.infra;
 
 import be.shop.slow_delivery.product.application.query.*;
+import be.shop.slow_delivery.product.domain.validate.*;
 import com.mysema.commons.lang.Assert;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static be.shop.slow_delivery.product.domain.QIngredient.ingredient;
 import static be.shop.slow_delivery.product.domain.QIngredientGroup.ingredientGroup;
@@ -24,6 +29,43 @@ import static com.querydsl.core.group.GroupBy.list;
 @Repository
 public class ProductQueryDao {
     private final JPAQueryFactory queryFactory;
+
+    public Optional<ProductValidate> findProductValidate(long productId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(new QProductValidate(product.id, product.name, product.price, product.maxOrderQuantity))
+                        .from(product)
+                        .where(product.id.eq(productId),
+                                product.isSale.isTrue())
+                        .fetchOne()
+        );
+    }
+
+    public List<IngredientGroupValidate> findIngredientValidate(long productId, Map<Long, List<Long>> ingredientIdMap) {
+        List<Long> ingredientIds = ingredientIdMap.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        List<IngredientGroupValidate> list = queryFactory
+                .from(productIngredientGroup)
+                .innerJoin(productIngredientGroup.ingredientGroup, ingredientGroup)
+                .innerJoin(ingredientGroup.ingredients, ingredientInGroup)
+                .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIds))
+                .where(productIngredientGroup.product.id.eq(productId),
+                        ingredientInGroup.displayInfo.isDisplay.isTrue(),
+                        ingredient.isSale.isTrue())
+                .transform(groupBy(ingredientGroup)
+                        .list(new QIngredientGroupValidate(ingredientGroup.id, ingredientGroup.name, ingredientGroup.selectCount,
+                                list(new QIngredientGroupValidate_IngredientValidate(ingredient.id, ingredient.name, ingredient.price))
+                        ))
+                );
+
+        list.forEach(group -> group.getIngredients()
+                .removeIf(i -> !ingredientIdMap.get(group.getId()).contains(i.getId())));
+
+        return list;
+    }
 
     public ProductDetailInfo findProductDetailInfo(long productId) {
         ProductDetailInfo productDetailInfo = queryFactory

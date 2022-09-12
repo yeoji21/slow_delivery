@@ -92,7 +92,7 @@ class ProductControllerTest extends ControllerTest {
                         )
                 ));
 
-        verify(productCommandService).validateOrder(any(ProductValidateCommand.class));
+        verify(productQueryService).validateOrder(any(ProductValidateCommand.class));
     }
 
     private List<OptionGroupValidateDto> getOptionGroups() {

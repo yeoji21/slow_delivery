@@ -1,7 +1,6 @@
 package be.shop.slow_delivery.product.domain;
 
 import be.shop.slow_delivery.common.domain.BaseTimeEntity;
-import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
@@ -37,14 +36,6 @@ public class OptionGroup extends BaseTimeEntity {
 
         this.name = name;
         this.maxSelectCount = maxSelectCount;
-    }
-
-    public Money getOptionsAmount(List<Option> options) {
-        if(options.size() > maxSelectCount.toInt())
-            throw new IllegalArgumentException("invalid option count");
-        return options.stream()
-                .map(Option::getPrice)
-                .reduce(Money.ZERO, Money::add);
     }
 
     public void addOption(Option option, int displayOrder) {

@@ -3,6 +3,7 @@ package be.shop.slow_delivery.product.domain;
 import be.shop.slow_delivery.common.domain.Quantity;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.AttributeOverride;
@@ -10,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class SelectCount {
@@ -27,8 +29,8 @@ public class SelectCount {
         this.maxCount = new Quantity(maxCount);
     }
 
-    public void selectedCountCheck(int count) {
-        if(minCount.toInt() > count || count > maxCount.toInt())
+    public void selectedCountCheck(Quantity quantity) {
+        if(minCount.toInt() > quantity.toInt() || quantity.toInt() > maxCount.toInt())
             throw new IllegalArgumentException("invalid ingredients count");
     }
 }

@@ -30,7 +30,7 @@ public class ProductController {
 
     @PostMapping("/product/validate")
     public void validateProductOrder(@RequestBody ProductValidateDto productValidateDto) {
-        productCommandService.validateOrder(productDtoMapper.toValidateCommand(productValidateDto));
+        productQueryService.validateOrder(productDtoMapper.toValidateCommand(productValidateDto));
     }
 
 }
