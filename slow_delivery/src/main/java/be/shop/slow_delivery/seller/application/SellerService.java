@@ -47,4 +47,5 @@ public class SellerService {
     public Optional<Seller> findSellerById(String loginId){
         return sellerRepository.findByLoginId(loginId);
     }
+
 }
