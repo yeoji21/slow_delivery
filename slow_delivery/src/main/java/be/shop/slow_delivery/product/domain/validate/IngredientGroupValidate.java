@@ -48,15 +48,14 @@ public class IngredientGroupValidate {
         this.ingredients = ingredients;
     }
 
-    public void isEqualTo(IngredientGroupValidate validate) {
-        Assert.isTrue(id == validate.id, "id");
-        Assert.isTrue(name.equals(validate.name), "name");
-        selectCount.selectedCountCheck(validate.selectCount.getMinCount());
-        validate.getSelectCount().selectedCountCheck(selectCount.getMinCount());
-        Assert.isTrue(isEqualTo(ingredients, validate.ingredients), "ingredients");
+    public void isSatisfy(IngredientGroupValidate opponent) {
+        Assert.isTrue(id == opponent.id, "id");
+        Assert.isTrue(name.equals(opponent.name), "name");
+        selectCount.selectedCountCheck(opponent.selectCount.getMinCount());
+        Assert.isTrue(isEqualList(ingredients, opponent.ingredients), "ingredients");
     }
 
-    private <T> boolean isEqualTo(final List<T> a, final List<T> b) {
+    private <T> boolean isEqualList(final List<T> a, final List<T> b) {
         final Set<T> set = new HashSet<>(a);
         return a.size() == b.size() && set.containsAll(b);
     }

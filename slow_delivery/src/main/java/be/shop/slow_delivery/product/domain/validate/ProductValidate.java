@@ -25,10 +25,10 @@ public class ProductValidate {
         this.orderQuantity = orderQuantity;
     }
 
-    public void isEqualTo(ProductValidate validate) {
+    public void isSatisfy(ProductValidate validate) {
         Assert.isTrue(id == validate.getId(), "id");
         Assert.isTrue(name.equals(validate.getName()), "name");
         Assert.isTrue(price.equals(validate.price), "price");
-        Assert.isTrue(orderQuantity.minus(validate.getOrderQuantity()).toInt() >= 0, "orderQuantity");
+        Assert.isTrue(orderQuantity.toInt() >= validate.getOrderQuantity().toInt(), "orderQuantity");
     }
 }

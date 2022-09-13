@@ -30,18 +30,6 @@ public class OptionGroupValidate {
         this.options = options;
     }
 
-    public void isEqualTo(OptionGroupValidate validate) {
-        Assert.isTrue(id == validate.id, "id");
-        Assert.isTrue(name.equals(validate.name), "name");
-        Assert.isTrue(maxSelectCount.toInt() >= validate.maxSelectCount.toInt(), "maxSelectCount");
-        Assert.isTrue(isEqualTo(options, validate.options), "options");
-    }
-
-    private <T> boolean isEqualTo(final List<T> a, final List<T> b) {
-        final Set<T> set = new HashSet<>(a);
-        return a.size() == b.size() && set.containsAll(b);
-    }
-
     @Getter @EqualsAndHashCode
     public static class OptionValidate {
         private long id;
@@ -56,5 +44,17 @@ public class OptionGroupValidate {
             this.name = name;
             this.price = price;
         }
+    }
+
+    public void isSatisfy(OptionGroupValidate validate) {
+        Assert.isTrue(id == validate.id, "id");
+        Assert.isTrue(name.equals(validate.name), "name");
+        Assert.isTrue(maxSelectCount.toInt() >= validate.maxSelectCount.toInt(), "maxSelectCount");
+        Assert.isTrue(isEqualList(options, validate.options), "options");
+    }
+
+    private <T> boolean isEqualList(final List<T> a, final List<T> b) {
+        final Set<T> set = new HashSet<>(a);
+        return a.size() == b.size() && set.containsAll(b);
     }
 }

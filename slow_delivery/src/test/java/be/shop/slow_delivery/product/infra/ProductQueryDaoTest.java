@@ -3,7 +3,7 @@ package be.shop.slow_delivery.product.infra;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
-import be.shop.slow_delivery.product.application.command.*;
+import be.shop.slow_delivery.product.application.criteria.*;
 import be.shop.slow_delivery.product.application.query.ProductDetailInfo;
 import be.shop.slow_delivery.product.domain.*;
 import be.shop.slow_delivery.product.domain.validate.IngredientGroupValidate;
@@ -36,7 +36,7 @@ class ProductQueryDaoTest {
     @Test
     void findIngredientValidate() throws Exception{
         //given
-        ProductValidateCommand command = getProductValidateCommand();
+        ProductValidateCriteria command = getProductValidateCommand();
         Map<Long, List<Long>> ingredientIdMap = command.getIngredientIdMap();
 
         //when
@@ -96,34 +96,34 @@ class ProductQueryDaoTest {
 
         groupB.addOption(optionA, 1);
 
-        OptionValidateCommand ocA = OptionValidateCommand.builder()
+        OptionValidateCriteria ocA = OptionValidateCriteria.builder()
                 .id(optionA.getId())
                 .name(optionA.getName())
                 .price(optionA.getPrice().toInt())
                 .build();
-        OptionValidateCommand ocB = OptionValidateCommand.builder()
+        OptionValidateCriteria ocB = OptionValidateCriteria.builder()
                 .id(optionB.getId())
                 .name(optionB.getName())
                 .price(optionB.getPrice().toInt())
                 .build();
-        OptionValidateCommand ocC = OptionValidateCommand.builder()
+        OptionValidateCriteria ocC = OptionValidateCriteria.builder()
                 .id(optionC.getId())
                 .name(optionC.getName())
                 .price(optionC.getPrice().toInt())
                 .build();
 
-        OptionGroupValidateCommand gcA = OptionGroupValidateCommand.builder()
+        OptionGroupValidateCriteria gcA = OptionGroupValidateCriteria.builder()
                 .id(groupA.getId())
                 .name(groupA.getName())
                 .options(List.of(ocA, ocB, ocC))
                 .build();
-        OptionGroupValidateCommand gcB = OptionGroupValidateCommand.builder()
+        OptionGroupValidateCriteria gcB = OptionGroupValidateCriteria.builder()
                 .id(groupB.getId())
                 .name(groupB.getName())
                 .options(Collections.EMPTY_LIST)
                 .build();
 
-        ProductValidateCommand command = ProductValidateCommand.builder()
+        ProductValidateCriteria command = ProductValidateCriteria.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
@@ -142,7 +142,7 @@ class ProductQueryDaoTest {
     }
 
 
-    private ProductValidateCommand getProductValidateCommand() {
+    private ProductValidateCriteria getProductValidateCommand() {
         Product product = Product.builder()
                 .stockId(1L)
                 .name("product A")
@@ -202,40 +202,40 @@ class ProductQueryDaoTest {
         em.flush();
         em.clear();
 
-        IngredientValidateCommand commandA = IngredientValidateCommand.builder()
+        IngredientValidateCriteria commandA = IngredientValidateCriteria.builder()
                 .id(ingredientA.getId())
                 .name(ingredientA.getName())
                 .price(ingredientA.getPrice().toInt())
                 .build();
-        IngredientValidateCommand commandB = IngredientValidateCommand.builder()
+        IngredientValidateCriteria commandB = IngredientValidateCriteria.builder()
                 .id(ingredientB.getId())
                 .name(ingredientB.getName())
                 .price(ingredientB.getPrice().toInt())
                 .build();
-        IngredientValidateCommand commandC = IngredientValidateCommand.builder()
+        IngredientValidateCriteria commandC = IngredientValidateCriteria.builder()
                 .id(ingredientC.getId())
                 .name(ingredientC.getName())
                 .price(ingredientC.getPrice().toInt())
                 .build();
-        IngredientValidateCommand notShownCommand = IngredientValidateCommand.builder()
+        IngredientValidateCriteria notShownCommand = IngredientValidateCriteria.builder()
                 .id(notShownIngredient.getId())
                 .name(notShownIngredient.getName())
                 .price(notShownIngredient.getPrice().toInt())
                 .build();
 
-        IngredientGroupValidateCommand commandGroupA = IngredientGroupValidateCommand.builder()
+        IngredientGroupValidateCriteria commandGroupA = IngredientGroupValidateCriteria.builder()
                 .id(groupA.getId())
                 .name(groupA.getName())
                 .ingredients(List.of(commandA, commandB, notShownCommand))
                 .build();
 
-        IngredientGroupValidateCommand commandGroupB = IngredientGroupValidateCommand.builder()
+        IngredientGroupValidateCriteria commandGroupB = IngredientGroupValidateCriteria.builder()
                 .id(groupB.getId())
                 .name(groupB.getName())
                 .ingredients(List.of(commandA, commandC))
                 .build();
 
-        return ProductValidateCommand.builder()
+        return ProductValidateCriteria.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())

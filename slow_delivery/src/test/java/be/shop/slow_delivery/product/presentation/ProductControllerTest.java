@@ -4,7 +4,7 @@ import be.shop.slow_delivery.ControllerTest;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.product.application.command.ProductCreateCommand;
-import be.shop.slow_delivery.product.application.command.ProductValidateCommand;
+import be.shop.slow_delivery.product.application.criteria.ProductValidateCriteria;
 import be.shop.slow_delivery.product.application.query.*;
 import be.shop.slow_delivery.product.presentation.dto.*;
 import org.junit.jupiter.api.Test;
@@ -92,7 +92,7 @@ class ProductControllerTest extends ControllerTest {
                         )
                 ));
 
-        verify(productQueryService).validateOrder(any(ProductValidateCommand.class));
+        verify(productQueryService).validateOrder(any(ProductValidateCriteria.class));
     }
 
     private List<OptionGroupValidateDto> getOptionGroups() {
