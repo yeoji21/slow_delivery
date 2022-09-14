@@ -30,8 +30,9 @@ public class OptionGroupValidate {
         this.options = options;
     }
 
-    @Getter @EqualsAndHashCode
+    @EqualsAndHashCode
     public static class OptionValidate {
+        @Getter
         private long id;
         private String name;
         private Money price;
@@ -47,9 +48,9 @@ public class OptionGroupValidate {
     }
 
     public void isSatisfy(OptionGroupValidate validate) {
-        Assert.isTrue(id == validate.id, "id");
-        Assert.isTrue(name.equals(validate.name), "name");
-        Assert.isTrue(maxSelectCount.toInt() >= validate.maxSelectCount.toInt(), "maxSelectCount");
+        Assert.isTrue(id == validate.id, "option group id");
+        Assert.isTrue(name.equals(validate.name), "option group name");
+        Assert.isTrue(maxSelectCount.toInt() >= validate.maxSelectCount.toInt(), "option group maxSelectCount");
         Assert.isTrue(isEqualList(options, validate.options), "options");
     }
 

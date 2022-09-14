@@ -9,11 +9,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.Collections;
 import java.util.List;
 
 @Disabled
@@ -24,7 +22,7 @@ public class ProductValidationTest {
     @Autowired
     private EntityManager em;
 
-    @Test @Transactional @Rollback(value = false)
+    @Test @Transactional
     void 상품_검증_통합_테스트() throws Exception{
         //given
         Product product = Product.builder()
@@ -93,12 +91,6 @@ public class ProductValidationTest {
                 .name(optionGroupA.getName())
                 .options(List.of(ocA, ocB, ocC))
                 .build();
-        OptionGroupValidateCriteria gcB = OptionGroupValidateCriteria.builder()
-                .id(optionGroupB.getId())
-                .name(optionGroupB.getName())
-                .options(Collections.EMPTY_LIST)
-                .build();
-
 
         Ingredient ingredientA = Ingredient.builder()
                 .stockId(0L)
@@ -171,7 +163,7 @@ public class ProductValidationTest {
                 .price(product.getPrice())
                 .orderQuantity(new Quantity(1))
                 .ingredientGroups(List.of(commandGroupA, commandGroupB))
-                .optionGroups(List.of(gcA, gcB))
+                .optionGroups(List.of(gcA))
                 .build();
 
         //when

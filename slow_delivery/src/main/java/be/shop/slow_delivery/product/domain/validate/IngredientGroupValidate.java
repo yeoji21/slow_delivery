@@ -20,8 +20,8 @@ public class IngredientGroupValidate {
     private List<IngredientValidate> ingredients;
 
     @EqualsAndHashCode
-    @Getter
     public static class IngredientValidate {
+        @Getter
         private long id;
         private String name;
         private Money price;
@@ -49,8 +49,8 @@ public class IngredientGroupValidate {
     }
 
     public void isSatisfy(IngredientGroupValidate opponent) {
-        Assert.isTrue(id == opponent.id, "id");
-        Assert.isTrue(name.equals(opponent.name), "name");
+        Assert.isTrue(id == opponent.id, "ingredient group id");
+        Assert.isTrue(name.equals(opponent.name), "ingredient group name");
         selectCount.selectedCountCheck(opponent.selectCount.getMinCount());
         Assert.isTrue(isEqualList(ingredients, opponent.ingredients), "ingredients");
     }
@@ -59,5 +59,4 @@ public class IngredientGroupValidate {
         final Set<T> set = new HashSet<>(a);
         return a.size() == b.size() && set.containsAll(b);
     }
-
 }

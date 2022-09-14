@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static be.shop.slow_delivery.product.domain.QIngredient.ingredient;
@@ -30,18 +29,22 @@ import static com.querydsl.core.group.GroupBy.list;
 public class ProductQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    public Optional<ProductValidate> findProductValidate(long productId) {
-        return Optional.ofNullable(
-                queryFactory
-                        .select(new QProductValidate(product.id, product.name, product.price, product.maxOrderQuantity))
-                        .from(product)
-                        .where(product.id.eq(productId),
-                                product.isSale.isTrue())
-                        .fetchOne()
-        );
+    public ProductValidate findProductValidate(long productId,
+                                               Map<Long, List<Long>> ingredientIdMap,
+                                               Map<Long, List<Long>> optionIdMap) {
+        ProductValidate productValidate = queryFactory
+                .select(new QProductValidate(product.id, product.name, product.price, product.maxOrderQuantity))
+                .from(product)
+                .where(product.id.eq(productId),
+                        product.isSale.isTrue())
+                .fetchOne();
+        Assert.notNull(productValidate, "productId " + productId + " is not found");
+        productValidate.setIngredientGroupValidates(findIngredientValidate(productId, ingredientIdMap));
+        productValidate.setOptionGroupValidates(findOptionValidate(productId, optionIdMap));
+        return productValidate;
     }
 
-    public List<IngredientGroupValidate> findIngredientValidate(long productId, Map<Long, List<Long>> ingredientIdMap) {
+    private List<IngredientGroupValidate> findIngredientValidate(long productId, Map<Long, List<Long>> ingredientIdMap) {
         List<Long> ingredientIds = ingredientIdMap.values()
                 .stream()
                 .flatMap(Collection::stream)
@@ -67,7 +70,7 @@ public class ProductQueryDao {
         return list;
     }
 
-    public List<OptionGroupValidate> findOptionValidate(long productId, Map<Long, List<Long>> optionIdMap) {
+    private List<OptionGroupValidate> findOptionValidate(long productId, Map<Long, List<Long>> optionIdMap) {
         List<Long> optionIds = optionIdMap.values()
                 .stream()
                 .flatMap(Collection::stream)

@@ -6,8 +6,7 @@ import be.shop.slow_delivery.config.JpaQueryFactoryConfig;
 import be.shop.slow_delivery.product.application.criteria.*;
 import be.shop.slow_delivery.product.application.query.ProductDetailInfo;
 import be.shop.slow_delivery.product.domain.*;
-import be.shop.slow_delivery.product.domain.validate.IngredientGroupValidate;
-import be.shop.slow_delivery.product.domain.validate.OptionGroupValidate;
+import be.shop.slow_delivery.product.domain.validate.ProductValidate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
-
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,22 +30,7 @@ class ProductQueryDaoTest {
     private EntityManager em;
 
     @Test
-    void findIngredientValidate() throws Exception{
-        //given
-        ProductValidateCriteria command = getProductValidateCommand();
-        Map<Long, List<Long>> ingredientIdMap = command.getIngredientIdMap();
-
-        //when
-        List<IngredientGroupValidate> ingredientValidate = productQueryDao.findIngredientValidate(command.getId(), ingredientIdMap);
-
-        //then
-        assertThat(ingredientValidate.size()).isEqualTo(2);
-        assertThat(ingredientValidate.get(0).getIngredients().size()).isEqualTo(1);
-        assertThat(ingredientValidate.get(1).getIngredients().size()).isEqualTo(2);
-    }
-
-    @Test
-    void findOptionValidate() throws Exception{
+    void 상품_검증_데이터_조회() throws Exception{
         //given
         Product product = Product.builder()
                 .stockId(1L)
@@ -60,13 +41,13 @@ class ProductQueryDaoTest {
                 .build();
         em.persist(product);
 
-        OptionGroup groupA = new OptionGroup("groupA", new Quantity(3));
-        OptionGroup groupB = new OptionGroup("groupB", new Quantity(5));
-        em.persist(groupA);
-        em.persist(groupB);
+        OptionGroup optionGroupA = new OptionGroup("groupA", new Quantity(3));
+        OptionGroup optionGroupB = new OptionGroup("groupB", new Quantity(5));
+        em.persist(optionGroupA);
+        em.persist(optionGroupB);
 
-        em.persist(new ProductOptionGroup(product, groupA, 1));
-        em.persist(new ProductOptionGroup(product, groupB, 2));
+        em.persist(new ProductOptionGroup(product, optionGroupA, 1));
+        em.persist(new ProductOptionGroup(product, optionGroupB, 2));
 
         Option optionA = Option.builder()
                 .stockId(0L)
@@ -90,11 +71,11 @@ class ProductQueryDaoTest {
         em.persist(optionB);
         em.persist(optionC);
 
-        groupA.addOption(optionA, 1);
-        groupA.addOption(optionB, 2);
-        groupA.addOption(optionC, 3);
+        optionGroupA.addOption(optionA, 1);
+        optionGroupA.addOption(optionB, 2);
+        optionGroupA.addOption(optionC, 3);
 
-        groupB.addOption(optionA, 1);
+        optionGroupB.addOption(optionA, 1);
 
         OptionValidateCriteria ocA = OptionValidateCriteria.builder()
                 .id(optionA.getId())
@@ -113,52 +94,10 @@ class ProductQueryDaoTest {
                 .build();
 
         OptionGroupValidateCriteria gcA = OptionGroupValidateCriteria.builder()
-                .id(groupA.getId())
-                .name(groupA.getName())
+                .id(optionGroupA.getId())
+                .name(optionGroupA.getName())
                 .options(List.of(ocA, ocB, ocC))
                 .build();
-        OptionGroupValidateCriteria gcB = OptionGroupValidateCriteria.builder()
-                .id(groupB.getId())
-                .name(groupB.getName())
-                .options(Collections.EMPTY_LIST)
-                .build();
-
-        ProductValidateCriteria command = ProductValidateCriteria.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .price(product.getPrice())
-                .orderQuantity(new Quantity(1))
-                .ingredientGroups(null)
-                .optionGroups(List.of(gcA, gcB))
-                .build();
-
-        //when
-        List<OptionGroupValidate> validate = productQueryDao.findOptionValidate(product.getId(), command.getOptionIdMap());
-
-        //then
-        assertThat(validate.size()).isEqualTo(2);
-        assertThat(validate.get(0).getOptions().size()).isEqualTo(3);
-        assertThat(validate.get(1).getOptions().size()).isEqualTo(0);
-    }
-
-
-    private ProductValidateCriteria getProductValidateCommand() {
-        Product product = Product.builder()
-                .stockId(1L)
-                .name("product A")
-                .description("~~~")
-                .price(new Money(10_000))
-                .maxOrderQuantity(new Quantity(5))
-                .build();
-        em.persist(product);
-
-        IngredientGroup groupA = new IngredientGroup("groupA", new SelectCount(1, 1));
-        IngredientGroup groupB = new IngredientGroup("groupB", new SelectCount(1, 2));
-        em.persist(groupA);
-        em.persist(groupB);
-
-        product.addIngredientGroup(groupA, 1);
-        product.addIngredientGroup(groupB, 2);
 
         Ingredient ingredientA = Ingredient.builder()
                 .stockId(0L)
@@ -175,29 +114,24 @@ class ProductQueryDaoTest {
                 .name("ingredientC")
                 .price(new Money(3000))
                 .build();
-        Ingredient notShownIngredient = Ingredient.builder()
-                .stockId(0L)
-                .name("nowShownIngredient")
-                .price(new Money(500))
-                .build();
 
         em.persist(ingredientA);
         em.persist(ingredientB);
         em.persist(ingredientC);
-        em.persist(notShownIngredient);
 
-        groupA.addIngredient(ingredientA, 1);
-        groupA.addIngredient(notShownIngredient, 2);
+        IngredientGroup ingredientGroupA = new IngredientGroup("groupA", new SelectCount(1, 2));
+        IngredientGroup ingredientGroupB = new IngredientGroup("groupB", new SelectCount(1, 2));
+        em.persist(ingredientGroupA);
+        em.persist(ingredientGroupB);
 
-        groupB.addIngredient(ingredientB, 1);
-        groupB.addIngredient(ingredientC, 2);
-        groupB.addIngredient(ingredientA, 3);
+        product.addIngredientGroup(ingredientGroupA, 1);
+        product.addIngredientGroup(ingredientGroupB, 2);
 
-        em.createQuery("update IngredientInGroup ig set ig.displayInfo.isDisplay = false " +
-                        "where ig.ingredientGroup.id =: groupId and ig.ingredient.id =: ingredientId")
-                .setParameter("groupId", groupA.getId())
-                .setParameter("ingredientId", notShownIngredient.getId())
-                .executeUpdate();
+        ingredientGroupA.addIngredient(ingredientA, 1);
+        ingredientGroupA.addIngredient(ingredientB, 2);
+
+        ingredientGroupB.addIngredient(ingredientA, 1);
+        ingredientGroupB.addIngredient(ingredientC, 2);
 
         em.flush();
         em.clear();
@@ -217,32 +151,56 @@ class ProductQueryDaoTest {
                 .name(ingredientC.getName())
                 .price(ingredientC.getPrice().toInt())
                 .build();
-        IngredientValidateCriteria notShownCommand = IngredientValidateCriteria.builder()
-                .id(notShownIngredient.getId())
-                .name(notShownIngredient.getName())
-                .price(notShownIngredient.getPrice().toInt())
-                .build();
 
         IngredientGroupValidateCriteria commandGroupA = IngredientGroupValidateCriteria.builder()
-                .id(groupA.getId())
-                .name(groupA.getName())
-                .ingredients(List.of(commandA, commandB, notShownCommand))
+                .id(ingredientGroupA.getId())
+                .name(ingredientGroupA.getName())
+                .ingredients(List.of(commandA, commandB))
                 .build();
 
         IngredientGroupValidateCriteria commandGroupB = IngredientGroupValidateCriteria.builder()
-                .id(groupB.getId())
-                .name(groupB.getName())
+                .id(ingredientGroupB.getId())
+                .name(ingredientGroupB.getName())
                 .ingredients(List.of(commandA, commandC))
                 .build();
 
-        return ProductValidateCriteria.builder()
+        ProductValidateCriteria criteria = ProductValidateCriteria.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .orderQuantity(new Quantity(1))
                 .ingredientGroups(List.of(commandGroupA, commandGroupB))
-                .optionGroups(null)
+                .optionGroups(List.of(gcA))
                 .build();
+
+        //when
+        ProductValidate productValidate = productQueryDao.findProductValidate(criteria.getId(),
+                criteria.getIngredientIdMap(), criteria.getOptionIdMap());
+
+        //then
+        assertThat(productValidate.getId()).isGreaterThan(0L);
+        assertThat(productValidate.getName()).isNotBlank();
+        assertThat(productValidate.getPrice()).isNotNull();
+        assertThat(productValidate.getIngredientGroupValidates().size()).isGreaterThan(0);
+        assertThat(productValidate.getOptionGroupValidates().size()).isGreaterThan(0);
+
+        productValidate.getIngredientGroupValidates()
+                .forEach(group -> {
+                    assertThat(group.getId()).isGreaterThan(0L);
+                    assertThat(group.getName()).isNotBlank();
+                    assertThat(group.getSelectCount()).isNotNull();
+                    assertThat(group.getIngredients().size()).isGreaterThan(0);
+                    group.getIngredients().forEach(i -> assertThat(i.getId()).isGreaterThan(0L));
+                });
+
+        productValidate.getOptionGroupValidates()
+                .forEach(group -> {
+                    assertThat(group.getId()).isGreaterThan(0L);
+                    assertThat(group.getName()).isNotBlank();
+                    assertThat(group.getMaxSelectCount()).isNotNull();
+                    assertThat(group.getOptions().size()).isGreaterThan(0);
+                    group.getOptions().forEach(o -> assertThat(o.getId()).isGreaterThan(0L));
+                });
     }
 
     @Test

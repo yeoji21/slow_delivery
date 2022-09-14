@@ -7,6 +7,7 @@ import be.shop.slow_delivery.product.domain.validate.OptionGroupValidate;
 import be.shop.slow_delivery.product.domain.validate.ProductValidate;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -16,6 +17,10 @@ import java.util.stream.Collectors;
 public interface ProductCriteriaMapper {
     ProductCriteriaMapper INSTANCE = Mappers.getMapper(ProductCriteriaMapper.class);
 
+    @Mappings({
+            @Mapping(target = "ingredientGroupValidates", source = "ingredientGroups"),
+            @Mapping(target = "optionGroupValidates", source = "optionGroups")
+    })
     ProductValidate toProductValidate(ProductValidateCriteria criteria);
 
     @Mapping(target = "IngredientGroupValidate", source = "ingredientGroups", qualifiedByName = "toIngredientGroupValidate")

@@ -3,17 +3,14 @@ package be.shop.slow_delivery.product.application;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.product.application.criteria.*;
-import be.shop.slow_delivery.product.domain.validate.IngredientGroupValidate;
 import be.shop.slow_delivery.product.infra.ProductQueryDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -42,15 +39,17 @@ class ProductQueryServiceTest {
                 .optionGroups(List.of(getOptionGroupValidateCommand()))
                 .build();
 
-        List<IngredientGroupValidate> validates = mapper.toIngredientValidate(criteria.getIngredientGroups());
-        ReflectionTestUtils.setField(validates.get(0).getSelectCount().getMaxCount(), "quantity", 2);
+        given(productQueryDao.findProductValidate(any(Long.class), anyMap(), anyMap()))
+                .willReturn(mapper.toProductValidate(criteria));
 
-        given(productQueryDao.findProductValidate(any(Long.class)))
-                .willReturn(Optional.ofNullable(mapper.toProductValidate(criteria)));
-        given(productQueryDao.findIngredientValidate(any(Long.class), anyMap()))
-                .willReturn(validates);
-        given(productQueryDao.findOptionValidate(any(Long.class), anyMap()))
-                .willReturn(mapper.toOptionValidate(criteria.getOptionGroups()));
+//        List<IngredientGroupValidate> validates = mapper.toIngredientValidate(criteria.getIngredientGroups());
+//        ReflectionTestUtils.setField(validates.get(0).getSelectCount().getMaxCount(), "quantity", 2);
+//        given(productQueryDao.findProductValidate(any(Long.class)))
+//                .willReturn(Optional.ofNullable(mapper.toProductValidate(criteria)));
+//        given(productQueryDao.findIngredientValidate(any(Long.class), anyMap()))
+//                .willReturn(validates);
+//        given(productQueryDao.findOptionValidate(any(Long.class), anyMap()))
+//                .willReturn(mapper.toOptionValidate(criteria.getOptionGroups()));
 
         //when
         productQueryService.validateOrder(criteria);
