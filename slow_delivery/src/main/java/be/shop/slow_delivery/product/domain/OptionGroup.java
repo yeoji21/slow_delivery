@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -27,18 +25,11 @@ public class OptionGroup extends BaseTimeEntity {
     @Column(name = "max_select_count", nullable = false)
     private Quantity maxSelectCount;
 
-    @OneToMany(mappedBy = "optionGroup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OptionInGroup> options = new ArrayList<>();
-
     public OptionGroup(String name, Quantity maxSelectCount) {
         Assert.hasText(name, "name");
         Assert.notNull(maxSelectCount, "maxSelectCount");
 
         this.name = name;
         this.maxSelectCount = maxSelectCount;
-    }
-
-    public void addOption(Option option, int displayOrder) {
-        options.add(new OptionInGroup(this, option, displayOrder));
     }
 }

@@ -8,8 +8,6 @@ import com.mysema.commons.lang.Assert;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -44,10 +42,6 @@ public class Product extends BaseTimeEntity {
     @Column(name = "max_order_quantity", nullable = false)
     private Quantity maxOrderQuantity;
 
-    @OrderBy("displayOrder")
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductIngredientGroup> ingredientGroups = new ArrayList<>();
-
     @Builder
     public Product(Long stockId,
                    Long thumbnailFileId,
@@ -67,9 +61,5 @@ public class Product extends BaseTimeEntity {
         this.description = description;
         this.price = price;
         this.maxOrderQuantity = maxOrderQuantity;
-    }
-
-    public void addIngredientGroup(IngredientGroup ingredientGroup, int displayOrder) {
-        ingredientGroups.add(new ProductIngredientGroup(this, ingredientGroup, displayOrder));
     }
 }

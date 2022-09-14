@@ -5,8 +5,6 @@ import com.mysema.commons.lang.Assert;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -24,10 +22,6 @@ public class IngredientGroup extends BaseTimeEntity {
     @Embedded
     private SelectCount selectCount;
 
-    @OrderBy("displayInfo.displayOrder")
-    @OneToMany(mappedBy = "ingredientGroup", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<IngredientInGroup> ingredients = new ArrayList<>();
-
     @Builder
     public IngredientGroup(String name, SelectCount selectCount) {
         Assert.hasText(name, "name");
@@ -35,9 +29,5 @@ public class IngredientGroup extends BaseTimeEntity {
 
         this.name = name;
         this.selectCount = selectCount;
-    }
-
-    public void addIngredient(Ingredient ingredient, int displayOrder) {
-        ingredients.add(new IngredientInGroup(this, ingredient, displayOrder));
     }
 }

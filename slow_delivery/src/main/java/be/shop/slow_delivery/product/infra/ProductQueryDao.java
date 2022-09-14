@@ -53,7 +53,7 @@ public class ProductQueryDao {
         List<IngredientGroupValidate> list = queryFactory
                 .from(productIngredientGroup)
                 .innerJoin(productIngredientGroup.ingredientGroup, ingredientGroup)
-                .innerJoin(ingredientGroup.ingredients, ingredientInGroup)
+                .innerJoin(ingredientInGroup).on(ingredientInGroup.ingredientGroup.eq(ingredientGroup))
                 .leftJoin(ingredientInGroup.ingredient, ingredient).on(ingredient.id.in(ingredientIds))
                 .where(productIngredientGroup.product.id.eq(productId),
                         ingredientInGroup.displayInfo.isDisplay.isTrue(),
@@ -79,7 +79,7 @@ public class ProductQueryDao {
         List<OptionGroupValidate> list = queryFactory
                 .from(productOptionGroup)
                 .innerJoin(productOptionGroup.optionGroup, optionGroup)
-                .innerJoin(optionGroup.options, optionInGroup)
+                .innerJoin(optionInGroup).on(optionInGroup.optionGroup.eq(optionGroup))
                 .innerJoin(optionInGroup.option, option)
                 .where(productOptionGroup.product.id.eq(productId),
                         optionGroup.id.in(optionIdMap.keySet()),

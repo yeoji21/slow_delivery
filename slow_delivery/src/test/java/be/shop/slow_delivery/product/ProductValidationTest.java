@@ -64,11 +64,11 @@ public class ProductValidationTest {
         em.persist(optionB);
         em.persist(optionC);
 
-        optionGroupA.addOption(optionA, 1);
-        optionGroupA.addOption(optionB, 2);
-        optionGroupA.addOption(optionC, 3);
+        em.persist(new OptionInGroup(optionGroupA, optionA, 1));
+        em.persist(new OptionInGroup(optionGroupA, optionB, 2));
+        em.persist(new OptionInGroup(optionGroupA, optionC, 3));
 
-        optionGroupB.addOption(optionA, 1);
+        em.persist(new OptionInGroup(optionGroupB, optionA, 1));
 
         OptionValidateCriteria ocA = OptionValidateCriteria.builder()
                 .id(optionA.getId())
@@ -117,14 +117,14 @@ public class ProductValidationTest {
         em.persist(ingredientGroupA);
         em.persist(ingredientGroupB);
 
-        product.addIngredientGroup(ingredientGroupA, 1);
-        product.addIngredientGroup(ingredientGroupB, 2);
+        em.persist(new ProductIngredientGroup(product, ingredientGroupA, 1));
+        em.persist(new ProductIngredientGroup(product, ingredientGroupB, 2));
 
-        ingredientGroupA.addIngredient(ingredientA, 1);
-        ingredientGroupA.addIngredient(ingredientB, 2);
+        em.persist(new IngredientInGroup(ingredientGroupA, ingredientA, 1));
+        em.persist(new IngredientInGroup(ingredientGroupA, ingredientB, 2));
 
-        ingredientGroupB.addIngredient(ingredientA, 1);
-        ingredientGroupB.addIngredient(ingredientC, 2);
+        em.persist(new IngredientInGroup(ingredientGroupB, ingredientA, 1));
+        em.persist(new IngredientInGroup(ingredientGroupB, ingredientC, 2));
 
         em.flush();
         em.clear();
