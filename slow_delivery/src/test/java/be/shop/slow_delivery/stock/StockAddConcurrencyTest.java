@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Disabled
 @SpringBootTest
-public class StockConcurrencyTest {
+public class StockAddConcurrencyTest {
     private final int COUNT = 100;
     private final ExecutorService executorService = Executors.newFixedThreadPool(COUNT);
 
@@ -30,7 +30,7 @@ public class StockConcurrencyTest {
     private EntityManager entityManager;
 
     @Test @Transactional @Rollback(value = false) @Order(1)
-    void test() {
+    void 데이터_세팅() {
         Stock stock = new Stock(Quantity.ZERO);
         entityManager.persist(stock);
 
