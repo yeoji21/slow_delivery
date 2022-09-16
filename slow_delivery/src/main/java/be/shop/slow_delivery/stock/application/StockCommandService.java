@@ -21,7 +21,7 @@ public class StockCommandService {
         return stock.getId();
     }
 
-    // TODO: 2022/09/05 TEST
+    @Transactional
     public void add(long stockId, Quantity quantity) {
         Stock stock = stockRepository.findByIdForUpdate(stockId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.STOCK_NOT_FOUND));

@@ -27,8 +27,8 @@ public class StockJpaRepository implements StockRepository {
     public Optional<Stock> findByIdForUpdate(long stockId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(stock)
-                        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .where(stock.id.eq(stockId))
+                        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne()
         );
     }
