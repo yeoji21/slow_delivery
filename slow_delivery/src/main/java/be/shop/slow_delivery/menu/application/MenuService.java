@@ -1,9 +1,9 @@
 package be.shop.slow_delivery.menu.application;
 
 import be.shop.slow_delivery.exception.NotFoundException;
-import be.shop.slow_delivery.menu.application.dto.request.MenuCreateRequestDto;
-import be.shop.slow_delivery.menu.application.dto.request.MenuUpdateRequestDto;
-import be.shop.slow_delivery.menu.application.dto.response.MenuListResponseDto;
+import be.shop.slow_delivery.menu.application.dto.request.MenuCreateCommand;
+import be.shop.slow_delivery.menu.application.dto.request.MenuUpdateCommand;
+import be.shop.slow_delivery.menu.application.dto.response.MenuListCriteria;
 import be.shop.slow_delivery.menu.domain.Menu;
 import be.shop.slow_delivery.menu.domain.MenuRepository;
 import be.shop.slow_delivery.shop.domain.Shop;
@@ -26,26 +26,26 @@ public class MenuService {
     private final MenuRepository menuRepository;
 
     @Transactional(readOnly = true)
-    public MenuListResponseDto findShopMenuList(Long shopId){
+    public MenuListCriteria findShopMenuList(Long shopId){
         List<Menu> menus = menuRepository.findAllByShopId(shopId);
-        return new MenuListResponseDto(menus);
+        return new MenuListCriteria(menus);
     }
 
     @Transactional
-    public Long createMenu(MenuCreateRequestDto menuCreateRequestDto, Long shopId){
+    public Long createMenu(MenuCreateCommand menuCreateCommand, Long shopId){
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
         int countMenu = getMenuCount(shop.getId());
-        Menu menu = makeMenuEntity(shop, menuCreateRequestDto,countMenu);
+        Menu menu = makeMenuEntity(shop, menuCreateCommand,countMenu);
         menuRepository.save(menu);
         return menu.getId();
     }
 
     @Transactional
-    public void updateMenu(Long menuId, MenuUpdateRequestDto menuUpdateRequestDto){
+    public void updateMenu(Long menuId, MenuUpdateCommand menuUpdateCommand){
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new NotFoundException(MENU_NOT_FOUND));
-        menu.updateMenu(menuUpdateRequestDto.getMenuName(),menuUpdateRequestDto.getIntroduction());
+        menu.updateMenu(menuUpdateCommand.getMenuName(), menuUpdateCommand.getIntroduction());
     }
 
     @Transactional
@@ -53,8 +53,8 @@ public class MenuService {
         menuRepository.deleteById(menuId);
     }
 
-    private Menu makeMenuEntity(Shop shop, MenuCreateRequestDto menuCreateRequestDto, int countMenu){
-        return menuCreateRequestDto.toEntity(shop,countMenu);
+    private Menu makeMenuEntity(Shop shop, MenuCreateCommand menuCreateCommand, int countMenu){
+        return menuCreateCommand.toEntity(shop,countMenu);
     }
 
     private int getMenuCount(Long shopId){

@@ -2,9 +2,9 @@ package be.shop.slow_delivery.menu.presentation;
 
 import be.shop.slow_delivery.menu.application.MenuDisplayService;
 import be.shop.slow_delivery.menu.application.MenuService;
-import be.shop.slow_delivery.menu.application.dto.request.MenuDisplayUpdateRequestDto;
-import be.shop.slow_delivery.menu.application.dto.request.MenuUpdateRequestDto;
-import be.shop.slow_delivery.menu.application.dto.response.MenuListResponseDto;
+import be.shop.slow_delivery.menu.application.dto.request.MenuDisplayUpdateCommand;
+import be.shop.slow_delivery.menu.application.dto.request.MenuUpdateCommand;
+import be.shop.slow_delivery.menu.application.dto.response.MenuListCriteria;
 import be.shop.slow_delivery.menu.presentation.dto.MenuDtoMapper;
 import be.shop.slow_delivery.menu.presentation.dto.MenuFormDto;
 import io.swagger.annotations.ApiOperation;
@@ -23,7 +23,7 @@ public class MenuController {
 
     @ApiOperation(value = "메뉴 목록 보기")
     @GetMapping("/shop/{shopId}/menus")
-    public MenuListResponseDto getMenuList(@PathVariable("shopId") long shopId){
+    public MenuListCriteria getMenuList(@PathVariable("shopId") long shopId){
         return menuService.findShopMenuList(shopId);
     }
 
@@ -31,14 +31,14 @@ public class MenuController {
     @PostMapping("/shop/{shopId}/menu/")
     public Long createMenu(@RequestBody @Valid MenuFormDto menuForm,
                            @PathVariable("shopId") long shopId){
-        return menuService.createMenu(mapper.toCreateRequestDto(menuForm),shopId);
+        return menuService.createMenu(mapper.toCreateCommand(menuForm),shopId);
     }
 
     @ApiOperation(value = "메뉴 수정")
     @PutMapping("/shop/{shopId}/menu/{menuId}")
-    public void updateMenu(@RequestBody @Valid MenuUpdateRequestDto menuUpdateRequestDto,
+    public void updateMenu(@RequestBody @Valid MenuUpdateCommand menuUpdateCommand,
                            @PathVariable("menuId") long menuId){
-        menuService.updateMenu(menuId,menuUpdateRequestDto);
+        menuService.updateMenu(menuId, menuUpdateCommand);
     }
 
     @ApiOperation(value = "메뉴 삭제")
@@ -49,9 +49,9 @@ public class MenuController {
 
     @ApiOperation(value = "메뉴 전시정보 수정")
     @PutMapping("/shop/{shopId}/menu/{menuId}/Display")
-    public void updateMenu(@RequestBody @Valid MenuDisplayUpdateRequestDto menuDisplayUpdateRequestDto,
+    public void updateMenu(@RequestBody @Valid MenuDisplayUpdateCommand menuDisplayUpdateCommand,
                            @PathVariable("menuId") long menuId){
-        menuDisplayService.updateDisplayInfo(menuId,menuDisplayUpdateRequestDto);
+        menuDisplayService.updateDisplayInfo(menuId, menuDisplayUpdateCommand);
     }
 
 }

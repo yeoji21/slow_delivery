@@ -1,6 +1,6 @@
 package be.shop.slow_delivery.menu.presentation.dto;
 
-import be.shop.slow_delivery.menu.application.dto.request.MenuCreateRequestDto;
+import be.shop.slow_delivery.menu.application.dto.request.MenuCreateCommand;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -9,5 +9,5 @@ public interface MenuDtoMapper {
 
     MenuDtoMapper INSTANCE = Mappers.getMapper(MenuDtoMapper.class);
 
-    MenuCreateRequestDto toCreateRequestDto(MenuFormDto menuForm);
+    MenuCreateCommand toCreateCommand(MenuFormDto menuForm);
 }

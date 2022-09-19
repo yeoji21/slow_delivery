@@ -1,7 +1,7 @@
 package be.shop.slow_delivery.menu.presentation;
 
 import be.shop.slow_delivery.ControllerTest;
-import be.shop.slow_delivery.menu.application.dto.request.MenuCreateRequestDto;
+import be.shop.slow_delivery.menu.application.dto.request.MenuCreateCommand;
 import be.shop.slow_delivery.menu.presentation.dto.MenuFormDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -22,9 +22,9 @@ class MenuControllerTest extends ControllerTest {
                 .introduction("매움")
                 .build();
 
-        MenuCreateRequestDto menuCreateRequestDto = menuDtoMapper.toCreateRequestDto(menuFormDto);
+        MenuCreateCommand menuCreateCommand = menuDtoMapper.toCreateCommand(menuFormDto);
 
-        given(menuService.createMenu(menuCreateRequestDto,shopId)).willReturn(1L);
+        given(menuService.createMenu(menuCreateCommand,shopId)).willReturn(1L);
 
         System.out.println(menuFormDto.getMenuName());
 

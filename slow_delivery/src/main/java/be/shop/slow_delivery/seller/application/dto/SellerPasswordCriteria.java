@@ -5,7 +5,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class SellerPassword {
+public class SellerPasswordCriteria {
     @NotBlank
     private String password;
 }

@@ -6,7 +6,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotEmpty;
 
 @Getter
-public class SellerCreate {
+public class SellerCommand {
 
     @NotEmpty
     private String username;

@@ -1,7 +1,7 @@
 package be.shop.slow_delivery.seller.application;
 
-import be.shop.slow_delivery.seller.application.dto.SellerCreate;
-import be.shop.slow_delivery.seller.application.dto.SellerPassword;
+import be.shop.slow_delivery.seller.application.dto.SellerCommand;
+import be.shop.slow_delivery.seller.application.dto.SellerPasswordCriteria;
 import be.shop.slow_delivery.seller.domain.Authority;
 import be.shop.slow_delivery.seller.domain.Seller;
 import be.shop.slow_delivery.seller.domain.SellerRepository;
@@ -22,12 +22,12 @@ public class SellerService {
     private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void join(SellerCreate sellerCreate){
+    public void join(SellerCommand sellerCommand){
 
         Authority authority = new Authority("ROLE_USER");
 
-        Seller seller = new Seller(sellerCreate.getLoginId(), passwordEncoder.encode(sellerCreate.getPassword()),
-                sellerCreate.getEmail(), sellerCreate.getPhoneNumber(),sellerCreate.getUsername());
+        Seller seller = new Seller(sellerCommand.getLoginId(), passwordEncoder.encode(sellerCommand.getPassword()),
+                sellerCommand.getEmail(), sellerCommand.getPhoneNumber(), sellerCommand.getUsername());
 
         sellerRepository.save(seller);
     }
@@ -51,7 +51,7 @@ public class SellerService {
     }
 
     @Transactional
-    public void deleteSeller(Seller seller, SellerPassword password){
+    public void deleteSeller(Seller seller, SellerPasswordCriteria password){
         if(passwordEncoder.matches(password.getPassword(),seller.getPassword())){
             sellerRepository.delete(seller);
         }
