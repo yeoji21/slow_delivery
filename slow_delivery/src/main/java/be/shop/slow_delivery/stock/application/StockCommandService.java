@@ -37,10 +37,10 @@ public class StockCommandService {
         // 데드락 방지
         reduceCommands.sort(Comparator.comparing(StockReduceCommand::getStockId));
 
-        for (StockReduceCommand command : reduceCommands) {
-            Stock stock = stockRepository.findByIdForUpdate(command.getStockId())
+        for (int i = 0; i < reduceCommands.size(); i++) {
+            Stock stock = stockRepository.findByIdForUpdate(reduceCommands.get(i).getStockId())
                     .orElseThrow(() -> new NotFoundException(ErrorCode.STOCK_NOT_FOUND));
-            stock.reduceStock(command.getQuantity());
+            stock.reduceStock(reduceCommands.get(i).getQuantity());
         }
     }
 }

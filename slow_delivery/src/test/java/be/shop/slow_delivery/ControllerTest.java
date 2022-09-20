@@ -12,6 +12,8 @@ import be.shop.slow_delivery.shop.application.ShopCommandService;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
 import be.shop.slow_delivery.shop.presentation.ShopController;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
+import be.shop.slow_delivery.stock.application.StockCommandService;
+import be.shop.slow_delivery.stock.presentation.StockController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @WebMvcTest({
         ShopController.class,
         ProductController.class,
-        MenuController.class
+        MenuController.class,
+        StockController.class
 })
 public abstract class ControllerTest {
     protected MockMvc mockMvc;
@@ -51,6 +54,8 @@ public abstract class ControllerTest {
     @MockBean protected MenuService menuService;
     @MockBean protected MenuDtoMapper menuDtoMapper;
     @MockBean protected MenuDisplayService menuDisplayService;
+
+    @MockBean protected StockCommandService stockCommandService;
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider contextProvider) {

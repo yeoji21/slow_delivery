@@ -1,0 +1,31 @@
+package be.shop.slow_delivery.stock.presentation;
+
+import be.shop.slow_delivery.common.domain.Quantity;
+import be.shop.slow_delivery.stock.application.StockCommandService;
+import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
+import be.shop.slow_delivery.stock.presentation.dto.StockReduceDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
+@RestController
+public class StockController {
+    private final StockCommandService stockCommandService;
+
+    @PatchMapping("/stock/reduce")
+    public void reduceStock(@RequestBody StockReduceDto stockReduceDto) {
+        List<StockReduceCommand> commands = stockReduceDto.getStocks().stream()
+                .map(dto -> StockReduceCommand.builder()
+                        .stockId(dto.getStockId())
+                        .quantity(new Quantity(dto.getQuantity()))
+                        .build())
+                .collect(Collectors.toList());
+        stockCommandService.reduce(commands);
+    }
+
+}
