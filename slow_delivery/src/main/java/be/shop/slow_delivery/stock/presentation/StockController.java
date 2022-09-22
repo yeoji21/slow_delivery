@@ -27,5 +27,4 @@ public class StockController {
                 .collect(Collectors.toList());
         stockCommandService.reduce(commands);
     }
-
 }

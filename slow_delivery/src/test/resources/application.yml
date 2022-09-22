@@ -1,6 +1,9 @@
 spring:
   session:
     store-type: jdbc
+  redis:
+    host: localhost
+    port: 6379
   datasource:
     url: jdbc:h2:tcp://localhost/~/jpa/h2/bin/be_shop
     username: sa
