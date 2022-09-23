@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.redisson.api.RedissonClient;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.doAnswer;
 @ExtendWith(MockitoExtension.class)
 class StockCommandServiceTest {
     @Mock private StockRepository stockRepository;
+    @Mock private RedissonClient redissonClient;
     @InjectMocks private StockCommandService stockCommandService;
 
     @Test @DisplayName("새로운 재고 저장")

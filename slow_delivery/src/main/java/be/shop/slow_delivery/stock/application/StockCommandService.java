@@ -7,6 +7,7 @@ import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockRepository;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @Service
 public class StockCommandService {
     private final StockRepository stockRepository;
+    private final RedissonClient redissonClient;
 
     @Transactional
     public long create(Quantity quantity) {
