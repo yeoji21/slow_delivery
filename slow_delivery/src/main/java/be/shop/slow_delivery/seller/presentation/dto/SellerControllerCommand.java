@@ -1,4 +1,4 @@
-package be.shop.slow_delivery.seller.application.dto;
+package be.shop.slow_delivery.seller.presentation.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -7,10 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Getter
-public class SellerCommand {
-
-    @NotEmpty
-    private String username;
+public class SellerControllerCommand {
 
     @NotEmpty
     @Size(min = 3, max = 50)
@@ -24,9 +21,5 @@ public class SellerCommand {
     @NotEmpty
     @Size(min=3, max=50)
     private String email;
-
-    @NotEmpty
-    private String phoneNumber;
-
 
 }
