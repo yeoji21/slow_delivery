@@ -1,9 +1,11 @@
 package be.shop.slow_delivery.stock;
 
+import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
+import be.shop.slow_delivery.product.domain.Product;
 import be.shop.slow_delivery.stock.application.StockCommandService;
-import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.domain.Stock;
+import be.shop.slow_delivery.stock.domain.StockStore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -13,8 +15,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,23 +23,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Disabled
 @SpringBootTest
-public class StockReduceConcurrencyTest {
-    private final int COUNT = 10;
+public class RedisStockReduceConcurrencyTest {
+    private final int COUNT = 100;
     private final ExecutorService executorService = Executors.newFixedThreadPool(COUNT);
 
-    @Autowired
-    private StockCommandService stockCommandService;
-    @Autowired
-    private EntityManager entityManager;
-    private static long stockId;
+    @Autowired private StockCommandService stockCommandService;
+    @Autowired private EntityManager entityManager;
+    @Autowired private StockStore stockStore;
 
-    @Test @Transactional @Rollback(value = false) @Order(1)
+    private static long stockId, productId;
+
+    @Test
+    @Transactional
+    @Rollback(value = false) @Order(1)
     void 데이터_세팅() {
         Stock stock = new Stock(new Quantity(COUNT));
         entityManager.persist(stock);
         stockId = stock.getId();
-//        entityManager.createQuery("update Stock s set s.id = 1L")
-//                .executeUpdate();
+
+        Product product = Product.builder()
+                .stockId(stock.getId())
+                .name("product A")
+                .description("~~~")
+                .price(new Money(10_000))
+                .maxOrderQuantity(new Quantity(5))
+                .build();
+        entityManager.persist(product);
+        productId = product.getId();
+
+        stockStore.save(product.getStockKey(), stock.getQuantity().toInt());
 
         entityManager.flush();
         entityManager.clear();
@@ -48,18 +60,16 @@ public class StockReduceConcurrencyTest {
     @Test @Transactional @Order(2)
     void 재고_감소_테스트() throws Exception{
         //given
-        Stock stock = entityManager.find(Stock.class, stockId);
-        Quantity before = stock.getQuantity();
+        Product product = entityManager.find(Product.class, productId);
+        Integer before = stockStore.getValue(product.getStockKey()).orElseThrow(IllegalArgumentException::new);
+        System.out.println("before stock : " + before);
 
         CountDownLatch latch = new CountDownLatch(COUNT);
-
-        List<StockReduceCommand> commands = new ArrayList<>();
-        commands.add(new StockReduceCommand(stock.getId(), new Quantity(1)));
 
         //when
         for (int i = 0; i < COUNT; i++) {
             executorService.execute(() -> {
-                stockCommandService.reduce(commands);
+                stockCommandService.reduceByRedisson(productId);
                 latch.countDown();
             });
         }
@@ -69,8 +79,10 @@ public class StockReduceConcurrencyTest {
         entityManager.flush();
         entityManager.clear();
 
-        Quantity after = entityManager.find(Stock.class, stock.getId()).getQuantity();
-        assertThat(after.toInt()).isEqualTo(0);
-        assertThat(after.plus(before).toInt()).isEqualTo(COUNT);
+        Integer after = stockStore.getValue(product.getStockKey()).orElseThrow(IllegalArgumentException::new);
+        System.out.println("after stock : " + after);
+
+        assertThat(after).isEqualTo(0);
+        assertThat(after + before).isEqualTo(COUNT);
     }
 }

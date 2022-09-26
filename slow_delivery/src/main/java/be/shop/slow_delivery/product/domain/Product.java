@@ -62,4 +62,8 @@ public class Product extends BaseTimeEntity {
         this.price = price;
         this.maxOrderQuantity = maxOrderQuantity;
     }
+
+    public String getStockKey() {
+        return "product:" + stockId;
+    }
 }

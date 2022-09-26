@@ -5,9 +5,7 @@ import be.shop.slow_delivery.stock.application.StockCommandService;
 import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.presentation.dto.StockReduceDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +14,11 @@ import java.util.stream.Collectors;
 @RestController
 public class StockController {
     private final StockCommandService stockCommandService;
+
+    @PostMapping("/test")
+    public void reduceByRedis(@RequestBody Long productId) {
+        stockCommandService.reduceByRedisson(productId);
+    }
 
     @PatchMapping("/stock/reduce")
     public void reduceStock(@RequestBody StockReduceDto stockReduceDto) {
