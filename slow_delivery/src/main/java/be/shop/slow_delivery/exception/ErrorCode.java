@@ -11,6 +11,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @AllArgsConstructor
 public enum ErrorCode {
 
+
     // 400 BAD_REQUEST : 잘못된 요청
     REQUEST_PARAMETER(BAD_REQUEST, "잘못된 요청 형식입니다."),
     PHONE_NUMBER(BAD_REQUEST, "잘못된 전화번호 형식입니다."),
