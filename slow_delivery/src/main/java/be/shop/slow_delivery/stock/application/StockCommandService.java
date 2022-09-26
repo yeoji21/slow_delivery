@@ -13,8 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,29 +41,38 @@ public class StockCommandService {
     }
 
     @Transactional
-    public void reduceByRedisson(StockReduceCommand command) {
-        String key = RedisKeyResolver.getKey(command.getStockId());
+    public void reduceByRedisson(List<StockReduceCommand> commands) {
+        List<String> keys = commands.stream()
+                .map(command -> RedisKeyResolver.getKey(command.getStockId()))
+                .collect(Collectors.toList());
 
-        stockStore.executeWithLock(key, () -> {
-            int remainingStock = stockStore.getValue(key)
-                    .orElseThrow(IllegalArgumentException::new);
-            if(remainingStock <= 0){
-                log.info("재고 수량 : " + remainingStock + " , 주문 수량 : " + command.getQuantity().toInt());
-                throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
-            }
-            stockStore.save(key, new Quantity(remainingStock).minus(command.getQuantity()).toInt());
+        stockStore.executeWithMultiLock(keys, () -> {
+            List<Integer> nowStocks = new ArrayList<>();
+            commands.forEach(command -> {
+                int remainingStock = stockStore.getValue(RedisKeyResolver.getKey(command.getStockId()))
+                        .orElseThrow(IllegalArgumentException::new);
+                int nowStock = remainingStock - command.getQuantity().toInt();
+                if(nowStock < 0){
+                    log.info("재고 ID "+ command.getStockId() + " 재고 수량 : " + remainingStock + " , 주문 수량 : " + command.getQuantity().toInt());
+                    throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
+                }
+                nowStocks.add(nowStock);
+            });
+
+            IntStream.range(0, keys.size())
+                    .forEach(i -> stockStore.save(keys.get(i), nowStocks.get(i)));
         });
     }
 
     @Transactional
-    public void reduce(List<StockReduceCommand> reduceCommands) {
+    public void reduce(List<StockReduceCommand> commands) {
         // 데드락 방지
-        reduceCommands.sort(Comparator.comparing(StockReduceCommand::getStockId));
+        commands.sort(Comparator.comparing(StockReduceCommand::getStockId));
 
-        for (int i = 0; i < reduceCommands.size(); i++) {
-            Stock stock = stockRepository.findByIdForUpdate(reduceCommands.get(i).getStockId())
+        for (int i = 0; i < commands.size(); i++) {
+            Stock stock = stockRepository.findByIdForUpdate(commands.get(i).getStockId())
                     .orElseThrow(() -> new NotFoundException(ErrorCode.STOCK_NOT_FOUND));
-            stock.reduceStock(reduceCommands.get(i).getQuantity());
+            stock.reduceStock(commands.get(i).getQuantity());
         }
     }
 }

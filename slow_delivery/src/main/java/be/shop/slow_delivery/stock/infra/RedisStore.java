@@ -9,6 +9,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisStore implements StockStore {
     private final RedissonClient redissonClient;
+    private static final String LOCK_SUFFIX = ":lock";
     private static final long WAIT_TIME_SECONDS = 3;
     private static final long LEASE_TIME_SECONDS = 3;
 
@@ -29,18 +31,13 @@ public class RedisStore implements StockStore {
     }
 
     @Override
-    public void save(String key, String value) {
-        redissonClient.getBucket(key).set(value);
-    }
-
-    @Override
     public <T> void save(String key, T value) {
         redissonClient.getBucket(key).set(value);
     }
 
     @Override
     public void executeWithLock(String key, Runnable function) {
-        RLock lock = redissonClient.getLock("stock:" + key);
+        RLock lock = redissonClient.getLock(key + LOCK_SUFFIX);
 
         try {
             boolean isLocked = lock.tryLock(WAIT_TIME_SECONDS, LEASE_TIME_SECONDS, TimeUnit.SECONDS);
@@ -50,6 +47,24 @@ public class RedisStore implements StockStore {
             throw new IllegalArgumentException(e);
         } finally {
             lock.unlock();
+        }
+    }
+
+    @Override
+    public void executeWithMultiLock(List<String> keys, Runnable runnable) {
+        RLock[] rLocks = keys.stream()
+                .map(key -> redissonClient.getLock(key + LOCK_SUFFIX))
+                .toArray(RLock[]::new);
+        RLock multiLock = redissonClient.getMultiLock(rLocks);
+
+        try {
+            boolean isLocked = multiLock.tryLock(WAIT_TIME_SECONDS, LEASE_TIME_SECONDS, TimeUnit.SECONDS);
+            if (!isLocked) throw new BusinessException(ErrorCode.REDIS_UNAVAILABLE);
+            runnable.run();
+        } catch (InterruptedException e) {
+            throw new IllegalArgumentException(e);
+        } finally {
+            multiLock.unlock();
         }
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,17 +32,27 @@ public class RedisStockReduceConcurrencyTest {
     @Autowired private EntityManager entityManager;
     @Autowired private StockStore stockStore;
 
-    private static long stockId;
+    private static long firstStockId, secondStockId, thirdStockId;
 
     @Test
     @Transactional
     @Rollback(value = false) @Order(1)
     void 데이터_세팅() {
-        Stock stock = new Stock(new Quantity(COUNT));
-        entityManager.persist(stock);
-        stockId = stock.getId();
+        Stock firstStock = new Stock(new Quantity(COUNT));
+        entityManager.persist(firstStock);
+        firstStockId = firstStock.getId();
 
-        stockStore.save(RedisKeyResolver.getKey(stockId), stock.getQuantity().toInt());
+        Stock secondStock = new Stock(new Quantity(COUNT));
+        entityManager.persist(secondStock);
+        secondStockId = secondStock.getId();
+
+        Stock thirdStock = new Stock(new Quantity(COUNT));
+        entityManager.persist(thirdStock);
+        thirdStockId = thirdStock.getId();
+
+        stockStore.save(RedisKeyResolver.getKey(firstStockId), firstStock.getQuantity().toInt());
+        stockStore.save(RedisKeyResolver.getKey(secondStockId), firstStock.getQuantity().toInt());
+        stockStore.save(RedisKeyResolver.getKey(thirdStockId), firstStock.getQuantity().toInt());
 
         entityManager.flush();
         entityManager.clear();
@@ -50,16 +61,17 @@ public class RedisStockReduceConcurrencyTest {
     @Test @Transactional @Order(2)
     void 재고_감소_테스트() throws Exception{
         //given
-        String key = RedisKeyResolver.getKey(stockId);
-        Integer before = stockStore.getValue(key).orElseThrow(IllegalArgumentException::new);
-        System.out.println("before stock : " + before);
-
         CountDownLatch latch = new CountDownLatch(COUNT);
+        List<StockReduceCommand> commands = List.of(
+                new StockReduceCommand(firstStockId, new Quantity(1)),
+                new StockReduceCommand(secondStockId, new Quantity(1)),
+                new StockReduceCommand(thirdStockId, new Quantity(1))
+        );
 
         //when
         for (int i = 0; i < COUNT; i++) {
             executorService.execute(() -> {
-                stockCommandService.reduceByRedisson(new StockReduceCommand(stockId, new Quantity(1)));
+                stockCommandService.reduceByRedisson(commands);
                 latch.countDown();
             });
         }
@@ -69,10 +81,11 @@ public class RedisStockReduceConcurrencyTest {
         entityManager.flush();
         entityManager.clear();
 
-        Integer after = stockStore.getValue(key).orElseThrow(IllegalArgumentException::new);
-        System.out.println("after stock : " + after);
-
-        assertThat(after).isEqualTo(0);
-        assertThat(after + before).isEqualTo(COUNT);
+        assertThat((int) stockStore.getValue(RedisKeyResolver.getKey(firstStockId))
+                .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
+        assertThat((int) stockStore.getValue(RedisKeyResolver.getKey(firstStockId))
+                .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
+        assertThat((int) stockStore.getValue(RedisKeyResolver.getKey(firstStockId))
+                .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
     }
 }

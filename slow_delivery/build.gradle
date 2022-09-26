@@ -38,6 +38,7 @@ dependencies {
 	//mySql
 	runtimeOnly 'mysql:mysql-connector-java'
 	implementation group: 'org.javassist', name: 'javassist', version: '3.29.0-GA'
+	runtimeOnly "org.mariadb.jdbc:mariadb-java-client"
 
 	//Lombok & Mapstruct
 	implementation 'org.projectlombok:lombok'
@@ -72,6 +73,7 @@ dependencies {
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.redisson:redisson-spring-boot-starter:3.16.3'
+
 }
 
 ext {

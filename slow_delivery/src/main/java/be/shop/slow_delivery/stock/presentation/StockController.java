@@ -16,8 +16,15 @@ public class StockController {
     private final StockCommandService stockCommandService;
 
     @PostMapping("/test")
-    public void reduceByRedis(@RequestBody StockReduceCommand command) {
-        stockCommandService.reduceByRedisson(command);
+    public void reduceByRedis(@RequestBody StockReduceDto stockReduceDto) {
+        List<StockReduceCommand> commands = stockReduceDto.getStocks().stream()
+                .map(dto -> StockReduceCommand.builder()
+                        .stockId(dto.getStockId())
+                        .quantity(new Quantity(dto.getQuantity()))
+                        .build())
+                .collect(Collectors.toList());
+        stockCommandService.reduceByRedisson(commands);
+//        stockCommandService.reduce(commands);
     }
 
     @PatchMapping("/stock/reduce")
