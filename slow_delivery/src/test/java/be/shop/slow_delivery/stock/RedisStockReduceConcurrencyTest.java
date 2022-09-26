@@ -1,11 +1,11 @@
 package be.shop.slow_delivery.stock;
 
-import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.common.domain.Quantity;
-import be.shop.slow_delivery.product.domain.Product;
 import be.shop.slow_delivery.stock.application.StockCommandService;
+import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockStore;
+import be.shop.slow_delivery.stock.infra.RedisKeyResolver;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class RedisStockReduceConcurrencyTest {
     @Autowired private EntityManager entityManager;
     @Autowired private StockStore stockStore;
 
-    private static long stockId, productId;
+    private static long stockId;
 
     @Test
     @Transactional
@@ -41,17 +41,7 @@ public class RedisStockReduceConcurrencyTest {
         entityManager.persist(stock);
         stockId = stock.getId();
 
-        Product product = Product.builder()
-                .stockId(stock.getId())
-                .name("product A")
-                .description("~~~")
-                .price(new Money(10_000))
-                .maxOrderQuantity(new Quantity(5))
-                .build();
-        entityManager.persist(product);
-        productId = product.getId();
-
-        stockStore.save(product.getStockKey(), stock.getQuantity().toInt());
+        stockStore.save(RedisKeyResolver.getKey(stockId), stock.getQuantity().toInt());
 
         entityManager.flush();
         entityManager.clear();
@@ -60,8 +50,8 @@ public class RedisStockReduceConcurrencyTest {
     @Test @Transactional @Order(2)
     void 재고_감소_테스트() throws Exception{
         //given
-        Product product = entityManager.find(Product.class, productId);
-        Integer before = stockStore.getValue(product.getStockKey()).orElseThrow(IllegalArgumentException::new);
+        String key = RedisKeyResolver.getKey(stockId);
+        Integer before = stockStore.getValue(key).orElseThrow(IllegalArgumentException::new);
         System.out.println("before stock : " + before);
 
         CountDownLatch latch = new CountDownLatch(COUNT);
@@ -69,7 +59,7 @@ public class RedisStockReduceConcurrencyTest {
         //when
         for (int i = 0; i < COUNT; i++) {
             executorService.execute(() -> {
-                stockCommandService.reduceByRedisson(productId);
+                stockCommandService.reduceByRedisson(new StockReduceCommand(stockId, new Quantity(1)));
                 latch.countDown();
             });
         }
@@ -79,7 +69,7 @@ public class RedisStockReduceConcurrencyTest {
         entityManager.flush();
         entityManager.clear();
 
-        Integer after = stockStore.getValue(product.getStockKey()).orElseThrow(IllegalArgumentException::new);
+        Integer after = stockStore.getValue(key).orElseThrow(IllegalArgumentException::new);
         System.out.println("after stock : " + after);
 
         assertThat(after).isEqualTo(0);

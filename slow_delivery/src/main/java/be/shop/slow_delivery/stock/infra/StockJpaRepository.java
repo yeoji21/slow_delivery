@@ -32,4 +32,13 @@ public class StockJpaRepository implements StockRepository {
                         .fetchOne()
         );
     }
+
+    @Override
+    public Optional<Stock> findById(long stockId) {
+        return Optional.ofNullable(
+                queryFactory.selectFrom(stock)
+                        .where(stock.id.eq(stockId))
+                        .fetchOne()
+        );
+    }
 }

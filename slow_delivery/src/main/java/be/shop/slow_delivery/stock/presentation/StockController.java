@@ -16,8 +16,8 @@ public class StockController {
     private final StockCommandService stockCommandService;
 
     @PostMapping("/test")
-    public void reduceByRedis(@RequestBody Long productId) {
-        stockCommandService.reduceByRedisson(productId);
+    public void reduceByRedis(@RequestBody StockReduceCommand command) {
+        stockCommandService.reduceByRedisson(command);
     }
 
     @PatchMapping("/stock/reduce")

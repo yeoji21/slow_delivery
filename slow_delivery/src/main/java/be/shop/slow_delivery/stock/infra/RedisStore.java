@@ -1,5 +1,7 @@
 package be.shop.slow_delivery.stock.infra;
 
+import be.shop.slow_delivery.exception.BusinessException;
+import be.shop.slow_delivery.exception.ErrorCode;
 import be.shop.slow_delivery.stock.domain.StockStore;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBucket;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 @Component
@@ -38,20 +39,17 @@ public class RedisStore implements StockStore {
     }
 
     @Override
-    public <T> T executeWithLock(String key, Supplier<T> function) {
+    public void executeWithLock(String key, Runnable function) {
         RLock lock = redissonClient.getLock("stock:" + key);
 
         try {
             boolean isLocked = lock.tryLock(WAIT_TIME_SECONDS, LEASE_TIME_SECONDS, TimeUnit.SECONDS);
-            if (!isLocked) {
-                System.out.println("UNLOCKED");
-            }
-            return function.get();
+            if (!isLocked) throw new BusinessException(ErrorCode.REDIS_UNAVAILABLE);
+            function.run();
         } catch (InterruptedException e) {
-            System.out.println("THREAD INTERRUPTED");
+            throw new IllegalArgumentException(e);
         } finally {
             lock.unlock();
         }
-        return null;
     }
 }

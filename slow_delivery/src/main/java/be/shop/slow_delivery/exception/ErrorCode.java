@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Getter
 @AllArgsConstructor
@@ -23,8 +22,10 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(NOT_FOUND, "해당 카테고리를 찾을 수 없습니다"),
     PRODUCT_NOT_FOUND(NOT_FOUND, "해당 상품을 찾을 수 없습니다"),
     STOCK_NOT_FOUND(NOT_FOUND, "해당 재고를 찾을 수 없습니다."),
-    MENU_NOT_FOUND(NOT_FOUND, "해당 메뉴를 찾을 수 없습니다.");
+    MENU_NOT_FOUND(NOT_FOUND, "해당 메뉴를 찾을 수 없습니다."),
 
+    // 503 SERVICE_UNAVAILABLE : 서비스 이용 불가
+    REDIS_UNAVAILABLE(SERVICE_UNAVAILABLE, "레디스 서버에 문제가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String detail;

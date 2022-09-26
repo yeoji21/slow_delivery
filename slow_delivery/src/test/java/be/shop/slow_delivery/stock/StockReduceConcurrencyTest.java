@@ -38,8 +38,6 @@ public class StockReduceConcurrencyTest {
         Stock stock = new Stock(new Quantity(COUNT));
         entityManager.persist(stock);
         stockId = stock.getId();
-//        entityManager.createQuery("update Stock s set s.id = 1L")
-//                .executeUpdate();
 
         entityManager.flush();
         entityManager.clear();

@@ -1,7 +1,6 @@
 package be.shop.slow_delivery.stock.domain;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public interface StockStore {
     Optional<Integer> getValue(String key);
@@ -9,5 +8,5 @@ public interface StockStore {
 
     <T> void save(String key, T value);
 
-    <T> T executeWithLock(String key, Supplier<T> function);
+    void executeWithLock(String key, Runnable function);
 }

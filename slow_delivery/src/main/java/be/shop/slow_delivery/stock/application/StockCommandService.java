@@ -3,12 +3,11 @@ package be.shop.slow_delivery.stock.application;
 import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.exception.ErrorCode;
 import be.shop.slow_delivery.exception.NotFoundException;
-import be.shop.slow_delivery.product.domain.Product;
-import be.shop.slow_delivery.product.domain.ProductRepository;
 import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockRepository;
 import be.shop.slow_delivery.stock.domain.StockStore;
+import be.shop.slow_delivery.stock.infra.RedisKeyResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import java.util.List;
 @Service
 public class StockCommandService {
     private final StockRepository stockRepository;
-    private final ProductRepository productRepository;
     private final StockStore stockStore;
 
     @Transactional
@@ -40,20 +38,17 @@ public class StockCommandService {
     }
 
     @Transactional
-    public void reduceByRedisson(long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(IllegalArgumentException::new);
+    public void reduceByRedisson(StockReduceCommand command) {
+        String key = RedisKeyResolver.getKey(command.getStockId());
 
-        stockStore.executeWithLock(product.getStockKey(), () -> {
-            Integer stock = stockStore.getValue(product.getStockKey())
+        stockStore.executeWithLock(key, () -> {
+            int remainingStock = stockStore.getValue(key)
                     .orElseThrow(IllegalArgumentException::new);
-            System.out.println(stock);
-            if(stock <= 0){
-                log.info("재고 수량 : " + stock + " , 주문 수량 : " + 1);
+            if(remainingStock <= 0){
+                log.info("재고 수량 : " + remainingStock + " , 주문 수량 : " + command.getQuantity().toInt());
                 throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
             }
-            stockStore.save(product.getStockKey(), stock - 1);
-            return null;
+            stockStore.save(key, new Quantity(remainingStock).minus(command.getQuantity()).toInt());
         });
     }
 
