@@ -57,7 +57,7 @@ public class StockReduceConcurrencyTest {
         //when
         for (int i = 0; i < COUNT; i++) {
             executorService.execute(() -> {
-                stockCommandService.reduce(commands);
+                stockCommandService.reduceByDBLock(commands);
                 latch.countDown();
             });
         }

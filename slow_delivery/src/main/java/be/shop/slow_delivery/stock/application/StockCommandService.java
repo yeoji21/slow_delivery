@@ -41,31 +41,41 @@ public class StockCommandService {
     }
 
     @Transactional
-    public void reduceByRedisson(List<StockReduceCommand> commands) {
+    public void reduceByRedissonLock(List<StockReduceCommand> commands) {
         List<String> keys = commands.stream()
                 .map(command -> RedisKeyResolver.getKey(command.getStockId()))
                 .collect(Collectors.toList());
 
         stockStore.executeWithMultiLock(keys, () -> {
-            List<Integer> nowStocks = new ArrayList<>();
+            List<Integer> stocks = new ArrayList<>();
             commands.forEach(command -> {
                 int remainingStock = stockStore.getValue(RedisKeyResolver.getKey(command.getStockId()))
-                        .orElseThrow(IllegalArgumentException::new);
-                int nowStock = remainingStock - command.getQuantity().toInt();
-                if(nowStock < 0){
-                    log.info("재고 ID "+ command.getStockId() + " 재고 수량 : " + remainingStock + " , 주문 수량 : " + command.getQuantity().toInt());
-                    throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
-                }
-                nowStocks.add(nowStock);
+                                                .orElseThrow(IllegalArgumentException::new);
+                stocks.add(getReducedStock(command, remainingStock));
             });
 
             IntStream.range(0, keys.size())
-                    .forEach(i -> stockStore.save(keys.get(i), nowStocks.get(i)));
+                    .forEach(i -> stockStore.save(keys.get(i), stocks.get(i)));
         });
     }
 
     @Transactional
-    public void reduce(List<StockReduceCommand> commands) {
+    public void reduceByAtomic(List<StockReduceCommand> commands) {
+        for (int commandIdx = 0; commandIdx < commands.size(); commandIdx++) {
+            StockReduceCommand command = commands.get(commandIdx);
+            long nowStock = stockStore.atomicDecrease(RedisKeyResolver.getKey(command.getStockId()), command.getQuantity());
+            if (nowStock < 0) {
+                for (int rewardIdx = 0; rewardIdx <= commandIdx; rewardIdx++) {
+                    StockReduceCommand rewardCommand = commands.get(rewardIdx);
+                    stockStore.atomicIncrease(RedisKeyResolver.getKey(rewardCommand.getStockId()), rewardCommand.getQuantity());
+                }
+                throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
+            }
+        }
+    }
+
+    @Transactional
+    public void reduceByDBLock(List<StockReduceCommand> commands) {
         // 데드락 방지
         commands.sort(Comparator.comparing(StockReduceCommand::getStockId));
 
@@ -74,5 +84,11 @@ public class StockCommandService {
                     .orElseThrow(() -> new NotFoundException(ErrorCode.STOCK_NOT_FOUND));
             stock.reduceStock(commands.get(i).getQuantity());
         }
+    }
+
+    private int getReducedStock(StockReduceCommand command, int remainingStock) {
+        int nowStock = remainingStock - command.getQuantity().toInt();
+        if(nowStock < 0) throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
+        return nowStock;
     }
 }

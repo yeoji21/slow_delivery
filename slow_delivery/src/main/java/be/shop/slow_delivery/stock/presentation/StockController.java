@@ -23,8 +23,8 @@ public class StockController {
                         .quantity(new Quantity(dto.getQuantity()))
                         .build())
                 .collect(Collectors.toList());
-        stockCommandService.reduceByRedisson(commands);
-//        stockCommandService.reduce(commands);
+        stockCommandService.reduceByRedissonLock(commands);
+//        stockCommandService.reduceByDBLock(commands);
     }
 
     @PatchMapping("/stock/reduce")
@@ -35,6 +35,6 @@ public class StockController {
                         .quantity(new Quantity(dto.getQuantity()))
                         .build())
                 .collect(Collectors.toList());
-        stockCommandService.reduce(commands);
+        stockCommandService.reduceByDBLock(commands);
     }
 }

@@ -33,7 +33,7 @@ class StockControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andDo(document("stock-reduce",
+                .andDo(document("stock-reduceByDBLock",
                         requestFields(
                                 fieldWithPath("stocks[].stockId").description("stockId"),
                                 fieldWithPath("stocks[].quantity").description("quantity")

@@ -46,13 +46,13 @@ public class RedisStockReduceConcurrencyTest {
         entityManager.persist(secondStock);
         secondStockId = secondStock.getId();
 
-        Stock thirdStock = new Stock(new Quantity(COUNT));
+        Stock thirdStock = new Stock(new Quantity(30));
         entityManager.persist(thirdStock);
         thirdStockId = thirdStock.getId();
 
         stockStore.save(RedisKeyResolver.getKey(firstStockId), firstStock.getQuantity().toInt());
-        stockStore.save(RedisKeyResolver.getKey(secondStockId), firstStock.getQuantity().toInt());
-        stockStore.save(RedisKeyResolver.getKey(thirdStockId), firstStock.getQuantity().toInt());
+        stockStore.save(RedisKeyResolver.getKey(secondStockId), secondStock.getQuantity().toInt());
+        stockStore.save(RedisKeyResolver.getKey(thirdStockId), thirdStock.getQuantity().toInt());
 
         entityManager.flush();
         entityManager.clear();
@@ -71,7 +71,8 @@ public class RedisStockReduceConcurrencyTest {
         //when
         for (int i = 0; i < COUNT; i++) {
             executorService.execute(() -> {
-                stockCommandService.reduceByRedisson(commands);
+//                stockCommandService.reduceByRedissonLock(commands);
+                stockCommandService.reduceByAtomic(commands);
                 latch.countDown();
             });
         }

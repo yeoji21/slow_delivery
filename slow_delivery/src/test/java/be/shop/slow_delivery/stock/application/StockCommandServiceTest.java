@@ -79,7 +79,7 @@ class StockCommandServiceTest {
         given(stockRepository.findByIdForUpdate(stock3.getId())).willReturn(Optional.of(stock3));
 
         //when
-        stockCommandService.reduce(commands);
+        stockCommandService.reduceByDBLock(commands);
 
         //then
         assertThat(stock1.getQuantity()).isEqualTo(new Quantity(7));
