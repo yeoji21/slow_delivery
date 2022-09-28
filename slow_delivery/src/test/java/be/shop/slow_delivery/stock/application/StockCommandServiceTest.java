@@ -60,7 +60,7 @@ class StockCommandServiceTest {
     }
 
     @Test @DisplayName("재고량 감소")
-    void reduce() throws Exception{
+    void reduceByRedissonLock() throws Exception{
         //given
         Stock stock1 = new Stock(new Quantity(10));
         ReflectionTestUtils.setField(stock1, "id", 1L);

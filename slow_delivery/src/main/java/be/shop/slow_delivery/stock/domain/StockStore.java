@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StockStore {
-    Optional<Integer> getValue(String key);
+    Optional<Integer> getValue(long stockId);
 
-    <T> void save(String key, T value);
+    <T> void save(long stockId, T value);
 
     void executeWithLock(String key, Runnable function);
 
-    void executeWithMultiLock(List<String> keys, Runnable runnable);
+    void executeWithMultiLock(List<Long> stockIds, Runnable runnable);
 
-    long atomicDecrease(String key, Quantity quantity);
-    long atomicIncrease(String key, Quantity quantity);
+    long atomicDecrease(long stockId, Quantity quantity);
+    long atomicIncrease(long stockId, Quantity quantity);
 }

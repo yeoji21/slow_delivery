@@ -23,7 +23,9 @@ public class StockController {
                         .quantity(new Quantity(dto.getQuantity()))
                         .build())
                 .collect(Collectors.toList());
-        stockCommandService.reduceByRedissonLock(commands);
+
+        stockCommandService.reduceByAtomic(commands);
+//        stockCommandService.reduceByRedissonLock(commands);
 //        stockCommandService.reduceByDBLock(commands);
     }
 

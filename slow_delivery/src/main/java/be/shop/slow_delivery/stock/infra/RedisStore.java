@@ -23,8 +23,8 @@ public class RedisStore implements StockStore {
     private static final long LEASE_TIME_SECONDS = 3;
 
     @Override
-    public Optional<Integer> getValue(String key) {
-        RBucket<String> bucket = redissonClient.getBucket(key);
+    public Optional<Integer> getValue(long stockId) {
+        RBucket<String> bucket = redissonClient.getBucket(RedisKeyResolver.getKey(stockId));
         if (bucket.isExists()) {
             return Optional.of(Integer.parseInt((String) bucket.get()));
         }
@@ -32,8 +32,8 @@ public class RedisStore implements StockStore {
     }
 
     @Override
-    public <T> void save(String key, T value) {
-        redissonClient.getBucket(key).set(value);
+    public <T> void save(long stockId, T value) {
+        redissonClient.getBucket(RedisKeyResolver.getKey(stockId)).set(value);
     }
 
     @Override
@@ -52,9 +52,9 @@ public class RedisStore implements StockStore {
     }
 
     @Override
-    public void executeWithMultiLock(List<String> keys, Runnable runnable) {
-        RLock[] rLocks = keys.stream()
-                .map(key -> redissonClient.getLock(key + LOCK_SUFFIX))
+    public void executeWithMultiLock(List<Long> stockIds, Runnable runnable) {
+        RLock[] rLocks = stockIds.stream()
+                .map(stockId -> redissonClient.getLock(RedisKeyResolver.getKey(stockId) + LOCK_SUFFIX))
                 .toArray(RLock[]::new);
         RLock multiLock = redissonClient.getMultiLock(rLocks);
 
@@ -70,12 +70,20 @@ public class RedisStore implements StockStore {
     }
 
     @Override
-    public long atomicIncrease(String key, Quantity quantity) {
-        return redissonClient.getAtomicLong(key).addAndGet(quantity.toInt());
+    public long atomicIncrease(long stockId, Quantity quantity) {
+        return redissonClient.getAtomicLong(RedisKeyResolver.getKey(stockId))
+                            .addAndGet(quantity.toInt());
     }
 
     @Override
-    public long atomicDecrease(String key, Quantity quantity) {
-        return redissonClient.getAtomicLong(key).addAndGet(quantity.toInt() * -1);
+    public long atomicDecrease(long stockId, Quantity quantity) {
+        return redissonClient.getAtomicLong(RedisKeyResolver.getKey(stockId))
+                            .addAndGet(quantity.toInt() * -1);
+    }
+
+    private static class RedisKeyResolver{
+        public static String getKey(long stockId) {
+            return "stock:" + stockId;
+        }
     }
 }

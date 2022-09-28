@@ -5,7 +5,6 @@ import be.shop.slow_delivery.stock.application.StockCommandService;
 import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockStore;
-import be.shop.slow_delivery.stock.infra.RedisKeyResolver;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -46,13 +45,13 @@ public class RedisStockReduceConcurrencyTest {
         entityManager.persist(secondStock);
         secondStockId = secondStock.getId();
 
-        Stock thirdStock = new Stock(new Quantity(30));
+        Stock thirdStock = new Stock(new Quantity(COUNT));
         entityManager.persist(thirdStock);
         thirdStockId = thirdStock.getId();
 
-        stockStore.save(RedisKeyResolver.getKey(firstStockId), firstStock.getQuantity().toInt());
-        stockStore.save(RedisKeyResolver.getKey(secondStockId), secondStock.getQuantity().toInt());
-        stockStore.save(RedisKeyResolver.getKey(thirdStockId), thirdStock.getQuantity().toInt());
+        stockStore.save(firstStockId, firstStock.getQuantity().toInt());
+        stockStore.save(secondStockId, secondStock.getQuantity().toInt());
+        stockStore.save(thirdStockId, thirdStock.getQuantity().toInt());
 
         entityManager.flush();
         entityManager.clear();
@@ -71,8 +70,8 @@ public class RedisStockReduceConcurrencyTest {
         //when
         for (int i = 0; i < COUNT; i++) {
             executorService.execute(() -> {
-//                stockCommandService.reduceByRedissonLock(commands);
-                stockCommandService.reduceByAtomic(commands);
+                stockCommandService.reduceByRedissonLock(commands);
+//                stockCommandService.reduceByAtomic(commands);
                 latch.countDown();
             });
         }
@@ -82,11 +81,11 @@ public class RedisStockReduceConcurrencyTest {
         entityManager.flush();
         entityManager.clear();
 
-        assertThat((int) stockStore.getValue(RedisKeyResolver.getKey(firstStockId))
+        assertThat((int) stockStore.getValue(firstStockId)
                 .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
-        assertThat((int) stockStore.getValue(RedisKeyResolver.getKey(firstStockId))
+        assertThat((int) stockStore.getValue(secondStockId)
                 .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
-        assertThat((int) stockStore.getValue(RedisKeyResolver.getKey(firstStockId))
+        assertThat((int) stockStore.getValue(thirdStockId)
                 .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
     }
 }
