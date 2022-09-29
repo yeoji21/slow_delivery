@@ -19,7 +19,7 @@ spring:
         default_batch_fetch_size: 500
     open-in-view: false
   mvc:
-    pathmatch:
+    path match:
       matching-strategy: ant_path_matcher
 
 springfox:
