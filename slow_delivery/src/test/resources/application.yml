@@ -22,6 +22,15 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+#logging.level:
+#  root: warn
+#  org.hibernate.SQL: warn
+#  org.hibernate.type: warn
+#decorator:
+#  datasource:
+#    p6spy:
+#      enable-logging: false
+
 jwt:
   header: test
   secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK

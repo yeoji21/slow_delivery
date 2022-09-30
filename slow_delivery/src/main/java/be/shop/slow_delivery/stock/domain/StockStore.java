@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface StockStore {
     Optional<Integer> getValue(long stockId);
 
-    <T> void save(long stockId, T value);
+    <T> T save(long stockId, T value);
 
     void executeWithLock(String key, Runnable function);
 

@@ -8,6 +8,7 @@ import be.shop.slow_delivery.stock.domain.StockStore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -30,6 +31,7 @@ public class RedisStockReduceConcurrencyTest {
     @Autowired private StockCommandService stockCommandService;
     @Autowired private EntityManager entityManager;
     @Autowired private StockStore stockStore;
+    @Autowired private RedissonClient redissonClient;
 
     private static long firstStockId, secondStockId, thirdStockId;
 
@@ -49,9 +51,7 @@ public class RedisStockReduceConcurrencyTest {
         entityManager.persist(thirdStock);
         thirdStockId = thirdStock.getId();
 
-        stockStore.save(firstStockId, firstStock.getQuantity().toInt());
-        stockStore.save(secondStockId, secondStock.getQuantity().toInt());
-        stockStore.save(thirdStockId, thirdStock.getQuantity().toInt());
+        redissonClient.getKeys().flushall();
 
         entityManager.flush();
         entityManager.clear();

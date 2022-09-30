@@ -32,8 +32,9 @@ public class RedisStore implements StockStore {
     }
 
     @Override
-    public <T> void save(long stockId, T value) {
+    public <T> T save(long stockId, T value) {
         redissonClient.getBucket(RedisKeyResolver.getKey(stockId)).set(value);
+        return value;
     }
 
     @Override

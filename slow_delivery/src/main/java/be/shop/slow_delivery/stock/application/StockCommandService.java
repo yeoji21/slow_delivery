@@ -38,7 +38,7 @@ public class StockCommandService {
         stock.addStock(quantity);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void reduceByRedissonLock(List<StockReduceCommand> commands) {
         List<Long> stockIds = commands.stream()
                 .map(StockReduceCommand::getStockId)
@@ -46,8 +46,13 @@ public class StockCommandService {
 
         stockStore.executeWithMultiLock(stockIds, () -> {
             List<Integer> reducedStocks = commands.stream()
-                    .map(command -> getReducedStock(command, stockStore.getValue(command.getStockId())
-                                                                    .orElseThrow(IllegalArgumentException::new)))
+                    .map(command -> {
+                        int remainingStock = stockStore.getValue(command.getStockId())
+                                .orElseGet(() -> stockStore.save(command.getStockId(), stockRepository.findById(command.getStockId())
+                                        .orElseThrow(IllegalArgumentException::new).getQuantity().toInt())
+                        );
+                        return getReducedStock(command, remainingStock);
+                    })
                     .collect(Collectors.toList());
             IntStream.range(0, reducedStocks.size())
                     .forEach(idx -> stockStore.save(commands.get(idx).getStockId(), reducedStocks.get(idx)));
