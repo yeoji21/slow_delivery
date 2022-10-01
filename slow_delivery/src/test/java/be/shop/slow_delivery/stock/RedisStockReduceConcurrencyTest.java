@@ -4,6 +4,7 @@ import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.stock.application.StockCommandService;
 import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.domain.Stock;
+import be.shop.slow_delivery.stock.domain.StockRepository;
 import be.shop.slow_delivery.stock.domain.StockStore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
@@ -29,6 +30,7 @@ public class RedisStockReduceConcurrencyTest {
     private final ExecutorService executorService = Executors.newFixedThreadPool(COUNT);
 
     @Autowired private StockCommandService stockCommandService;
+    @Autowired private StockRepository stockRepository;
     @Autowired private EntityManager entityManager;
     @Autowired private StockStore stockStore;
     @Autowired private RedissonClient redissonClient;
@@ -71,7 +73,6 @@ public class RedisStockReduceConcurrencyTest {
         for (int i = 0; i < COUNT; i++) {
             executorService.execute(() -> {
                 stockCommandService.reduceByRedissonLock(commands);
-//                stockCommandService.reduceByAtomic(commands);
                 latch.countDown();
             });
         }
@@ -87,5 +88,12 @@ public class RedisStockReduceConcurrencyTest {
                 .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
         assertThat((int) stockStore.getValue(thirdStockId)
                 .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
+
+        assertThat(stockRepository.findById(firstStockId)
+                .orElseThrow(IllegalArgumentException::new).getQuantity()).isEqualTo(Quantity.ZERO);
+        assertThat(stockRepository.findById(secondStockId)
+                .orElseThrow(IllegalArgumentException::new).getQuantity()).isEqualTo(Quantity.ZERO);
+        assertThat(stockRepository.findById(thirdStockId)
+                .orElseThrow(IllegalArgumentException::new).getQuantity()).isEqualTo(Quantity.ZERO);
     }
 }

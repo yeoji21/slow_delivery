@@ -24,8 +24,8 @@ public class StockController {
                         .build())
                 .collect(Collectors.toList());
 
-        stockCommandService.reduceByAtomic(commands);
-//        stockCommandService.reduceByRedissonLock(commands);
+//        stockCommandService.reduceByAtomic(commands);
+        stockCommandService.reduceByRedissonLock(commands);
 //        stockCommandService.reduceByDBLock(commands);
     }
 

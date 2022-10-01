@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.stock.infra;
 
+import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -40,5 +41,13 @@ public class StockJpaRepository implements StockRepository {
                         .where(stock.id.eq(stockId))
                         .fetchOne()
         );
+    }
+
+    @Override
+    public void setStockQuantity(long stockId, Quantity quantity) {
+        queryFactory.update(stock)
+                .set(stock.quantity, quantity)
+                .where(stock.id.eq(stockId))
+                .execute();
     }
 }

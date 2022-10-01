@@ -7,8 +7,11 @@ import be.shop.slow_delivery.stock.application.dto.StockReduceCommand;
 import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockRepository;
 import be.shop.slow_delivery.stock.domain.StockStore;
+import be.shop.slow_delivery.stock.domain.event.StockUpdatedEvent;
+import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 @Service
 public class StockCommandService {
+    private final ApplicationEventPublisher eventPublisher;
     private final StockRepository stockRepository;
     private final StockStore stockStore;
 
@@ -38,7 +42,7 @@ public class StockCommandService {
         stock.addStock(quantity);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void reduceByRedissonLock(List<StockReduceCommand> commands) {
         List<Long> stockIds = commands.stream()
                 .map(StockReduceCommand::getStockId)
@@ -57,22 +61,7 @@ public class StockCommandService {
             IntStream.range(0, reducedStocks.size())
                     .forEach(idx -> stockStore.save(commands.get(idx).getStockId(), reducedStocks.get(idx)));
         });
-    }
-
-    @Transactional
-    public void reduceByAtomic(List<StockReduceCommand> commands) {
-        for (int commandIdx = 0; commandIdx < commands.size(); commandIdx++) {
-            StockReduceCommand command = commands.get(commandIdx);
-            long reducedStock = stockStore.atomicDecrease(command.getStockId(), command.getQuantity());
-
-            if (reducedStock < 0) {
-                for (int rewardIdx = 0; rewardIdx <= commandIdx; rewardIdx++) {
-                    StockReduceCommand rewardCommand = commands.get(rewardIdx);
-                    stockStore.atomicIncrease(command.getStockId(), rewardCommand.getQuantity());
-                }
-                throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
-            }
-        }
+        eventPublisher.publishEvent(new StockUpdatedEvent(stockIds));
     }
 
     @Transactional
@@ -89,8 +78,7 @@ public class StockCommandService {
 
     private int getReducedStock(StockReduceCommand command, int remainingStock) {
         int reducedStock = remainingStock - command.getQuantity().toInt();
-        if(reducedStock < 0)
-            throw new IllegalArgumentException("주문 수량이 재고 수량보다 많습니다.");
+        Assert.isTrue(reducedStock >= 0, "주문 수량이 재고 수량보다 많습니다.");
         return reducedStock;
     }
 }

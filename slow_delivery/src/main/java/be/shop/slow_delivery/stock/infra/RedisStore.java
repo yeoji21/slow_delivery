@@ -1,6 +1,5 @@
 package be.shop.slow_delivery.stock.infra;
 
-import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.exception.BusinessException;
 import be.shop.slow_delivery.exception.ErrorCode;
 import be.shop.slow_delivery.stock.domain.StockStore;
@@ -68,18 +67,6 @@ public class RedisStore implements StockStore {
         } finally {
             multiLock.unlock();
         }
-    }
-
-    @Override
-    public long atomicIncrease(long stockId, Quantity quantity) {
-        return redissonClient.getAtomicLong(RedisKeyResolver.getKey(stockId))
-                            .addAndGet(quantity.toInt());
-    }
-
-    @Override
-    public long atomicDecrease(long stockId, Quantity quantity) {
-        return redissonClient.getAtomicLong(RedisKeyResolver.getKey(stockId))
-                            .addAndGet(quantity.toInt() * -1);
     }
 
     private static class RedisKeyResolver{
