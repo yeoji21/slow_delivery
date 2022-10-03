@@ -22,6 +22,15 @@ spring:
     path match:
       matching-strategy: ant_path_matcher
 
+#logging.level:
+#  root: warn
+#  org.hibernate.SQL: warn
+#  org.hibernate.type: warn
+#decorator:
+#  datasource:
+#    p6spy:
+#      enable-logging: false
+
 springfox:
   documentation:
     auto-startup: false

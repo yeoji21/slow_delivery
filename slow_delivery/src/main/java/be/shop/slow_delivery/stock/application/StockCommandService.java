@@ -8,17 +8,16 @@ import be.shop.slow_delivery.stock.domain.Stock;
 import be.shop.slow_delivery.stock.domain.StockRepository;
 import be.shop.slow_delivery.stock.domain.StockStore;
 import be.shop.slow_delivery.stock.domain.event.StockUpdatedEvent;
-import com.mysema.commons.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,19 +48,21 @@ public class StockCommandService {
                 .collect(Collectors.toList());
 
         stockStore.executeWithMultiLock(stockIds, () -> {
-            List<Integer> reducedStocks = commands.stream()
-                    .map(command -> {
-                        int remainingStock = stockStore.getValue(command.getStockId())
-                                .orElseGet(() -> stockStore.save(command.getStockId(), stockRepository.findById(command.getStockId())
-                                        .orElseThrow(IllegalArgumentException::new).getQuantity().toInt())
-                        );
-                        return getReducedStock(command, remainingStock);
-                    })
-                    .collect(Collectors.toList());
-            IntStream.range(0, reducedStocks.size())
-                    .forEach(idx -> stockStore.save(commands.get(idx).getStockId(), reducedStocks.get(idx)));
+            commands.forEach(command -> {
+                int remainingStock = stockStore.getValue(command.getStockId()).orElseGet(
+                        () -> stockStore.save(command.getStockId(), stockRepository.findById(command.getStockId())
+                                .orElseThrow(IllegalArgumentException::new).getQuantity().toInt()));
+                validateStockReducible(command, remainingStock);
+            });
+            commands.forEach(command -> stockStore.reduce(command.getStockId(), command.getQuantity()));
         });
+
         eventPublisher.publishEvent(new StockUpdatedEvent(stockIds));
+    }
+
+    private void validateStockReducible(StockReduceCommand command, int remainingStock) {
+        Assert.isTrue(remainingStock - command.getQuantity().toInt() >= 0,
+                "stockId :" + command.getStockId() + " 현재 재고 :" + remainingStock + " 주문 재고 :" + command.getQuantity().toInt());
     }
 
     @Transactional
@@ -76,9 +77,4 @@ public class StockCommandService {
         }
     }
 
-    private int getReducedStock(StockReduceCommand command, int remainingStock) {
-        int reducedStock = remainingStock - command.getQuantity().toInt();
-        Assert.isTrue(reducedStock >= 0, "주문 수량이 재고 수량보다 많습니다.");
-        return reducedStock;
-    }
 }

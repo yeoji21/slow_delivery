@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.stock.infra;
 
+import be.shop.slow_delivery.common.domain.Quantity;
 import be.shop.slow_delivery.exception.BusinessException;
 import be.shop.slow_delivery.exception.ErrorCode;
 import be.shop.slow_delivery.stock.domain.StockStore;
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisStore implements StockStore {
     private final RedissonClient redissonClient;
     private static final String LOCK_SUFFIX = ":lock";
-    private static final long WAIT_TIME_SECONDS = 3;
+    private static final long WAIT_TIME_SECONDS = 5;
     private static final long LEASE_TIME_SECONDS = 3;
 
     @Override
@@ -37,21 +38,6 @@ public class RedisStore implements StockStore {
     }
 
     @Override
-    public void executeWithLock(String key, Runnable function) {
-        RLock lock = redissonClient.getLock(key + LOCK_SUFFIX);
-
-        try {
-            boolean isLocked = lock.tryLock(WAIT_TIME_SECONDS, LEASE_TIME_SECONDS, TimeUnit.SECONDS);
-            if (!isLocked) throw new BusinessException(ErrorCode.REDIS_UNAVAILABLE);
-            function.run();
-        } catch (InterruptedException e) {
-            throw new IllegalArgumentException(e);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
     public void executeWithMultiLock(List<Long> stockIds, Runnable runnable) {
         RLock[] rLocks = stockIds.stream()
                 .map(stockId -> redissonClient.getLock(RedisKeyResolver.getKey(stockId) + LOCK_SUFFIX))
@@ -67,6 +53,12 @@ public class RedisStore implements StockStore {
         } finally {
             multiLock.unlock();
         }
+    }
+
+    @Override
+    public void reduce(long stockId, Quantity quantity) {
+        redissonClient.getAtomicLong(RedisKeyResolver.getKey(stockId))
+                .addAndGet(quantity.toInt() * -1);
     }
 
     private static class RedisKeyResolver{

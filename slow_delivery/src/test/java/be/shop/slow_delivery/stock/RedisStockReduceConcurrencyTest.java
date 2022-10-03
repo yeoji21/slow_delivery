@@ -89,6 +89,8 @@ public class RedisStockReduceConcurrencyTest {
         assertThat((int) stockStore.getValue(thirdStockId)
                 .orElseThrow(IllegalArgumentException::new)).isEqualTo(0);
 
+        Thread.sleep(3000);
+
         assertThat(stockRepository.findById(firstStockId)
                 .orElseThrow(IllegalArgumentException::new).getQuantity()).isEqualTo(Quantity.ZERO);
         assertThat(stockRepository.findById(secondStockId)
