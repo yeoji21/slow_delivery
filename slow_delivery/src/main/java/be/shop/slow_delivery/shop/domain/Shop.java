@@ -34,7 +34,8 @@ public class Shop extends BaseTimeEntity {
     @Column(name = "thumbnail_file_id", nullable = true)
     private Long thumbnailFileId;
 
-    @Embedded @Column(name = "min_order_price", nullable = false)
+    @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "min_order_price", nullable = false))
     private Money minOrderAmount;
 
     @Column(name = "description", nullable = true)

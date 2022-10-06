@@ -18,6 +18,7 @@ public class Ingredient extends BaseTimeEntity {
     @Column(name = "name", nullable = false)
     private String name;
     @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "price", nullable = false))
     private Money price;
     @Column(name = "stock_id", nullable = false)
     private Long stockId;

@@ -22,7 +22,7 @@ public class OptionGroup extends BaseTimeEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "max_select_count", nullable = false)
+    @AttributeOverride(name = "quantity", column = @Column(name = "max_select_count", nullable = false))
     private Quantity maxSelectCount;
 
     public OptionGroup(String name, Quantity maxSelectCount) {

@@ -21,7 +21,7 @@ public class Option extends BaseTimeEntity {
     private String name;
 
     @Embedded
-    @Column(name = "price", nullable = false)
+    @AttributeOverride(name = "amount", column = @Column(name = "price", nullable = false))
     private Money price;
 
     @Column(name = "stock_id", nullable = false)

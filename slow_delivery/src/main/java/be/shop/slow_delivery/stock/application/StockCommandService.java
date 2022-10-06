@@ -41,7 +41,7 @@ public class StockCommandService {
         stock.addStock(quantity);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void reduceByRedissonLock(List<StockReduceCommand> commands) {
         List<Long> stockIds = commands.stream()
                 .map(StockReduceCommand::getStockId)
