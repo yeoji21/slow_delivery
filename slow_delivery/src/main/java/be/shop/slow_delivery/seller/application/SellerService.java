@@ -7,6 +7,7 @@ import be.shop.slow_delivery.seller.application.dto.*;
 import be.shop.slow_delivery.seller.domain.Authority;
 import be.shop.slow_delivery.seller.domain.Seller;
 import be.shop.slow_delivery.seller.domain.SellerRepository;
+import be.shop.slow_delivery.seller.presentation.dto.SellerSignUpDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -32,28 +33,33 @@ public class SellerService {
     private final TokenProvider tokenProvider;
 
     @Transactional
-    public LoginErrorCode signUp(SellerCommand sellerCommand) {
-        if(findSellerById(sellerCommand.getLoginId()).isPresent())
-            return LoginErrorCode.DUPLICATE_EMAIL;
-        join(sellerCommand);
+    public LoginErrorCode signUp(SellerSignUpCommand command) {
+        if(findSellerById(command.getLoginId()).isPresent()) return LoginErrorCode.DUPLICATE_EMAIL;
+
+        // join method 그대로 복사
+        Authority authority = new Authority("ROLE_USER");
+        Seller seller = new Seller(command.getLoginId(), passwordEncoder.encode(command.getPassword()),
+                command.getEmail(), command.getPhoneNumber(), command.getUsername());
+        sellerRepository.save(seller);
+
         return LoginErrorCode.SUCCESS;
     }
 
     @Transactional
-    public void join(SellerCommand sellerCommand){
+    public void join(SellerSignUpDto sellerSignUpDto){
         Authority authority = new Authority("ROLE_USER");
 
-        Seller seller = new Seller(sellerCommand.getLoginId(), passwordEncoder.encode(sellerCommand.getPassword()),
-                sellerCommand.getEmail(), sellerCommand.getPhoneNumber(), sellerCommand.getUsername());
+        Seller seller = new Seller(sellerSignUpDto.getLoginId(), passwordEncoder.encode(sellerSignUpDto.getPassword()),
+                sellerSignUpDto.getEmail(), sellerSignUpDto.getPhoneNumber(), sellerSignUpDto.getUsername());
 
         sellerRepository.save(seller);
     }
-
     public void setTemPassword(String email, String password){
         Seller seller = sellerRepository.findByEmail(email).get();
         seller.changePassword(passwordEncoder.encode(password));
         sellerRepository.save(seller);
     }
+
     public void changePassword(Seller seller, String password){
         seller.changePassword(passwordEncoder.encode(password));
         sellerRepository.save(seller);
@@ -66,13 +72,13 @@ public class SellerService {
     public Optional<Seller> findSellerById(String loginId){
         return sellerRepository.findByLoginId(loginId);
     }
-
     @Transactional
     public void deleteSeller(Seller seller, SellerPasswordCommand password){
         if(passwordEncoder.matches(password.getPassword(),seller.getPassword())){
             sellerRepository.delete(seller);
         }
     }
+
     public SellerLoginCriteria login(SellerLoginCommand sellerLoginCommand) throws Exception{
         Optional<Seller> loginSeller = sellerRepository.findByLoginId(sellerLoginCommand.getLoginId());
         if((loginSeller.orElse(null)==null) || !passwordEncoder.matches(sellerLoginCommand.getPassword(), loginSeller.get().getPassword())) {
@@ -103,5 +109,4 @@ public class SellerService {
 
         return new TokenCriteria(jwt);
     }
-
 }

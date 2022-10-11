@@ -4,13 +4,10 @@ import be.shop.slow_delivery.exception.LoginErrorCode;
 import be.shop.slow_delivery.exception.LoginErrorResponse;
 import be.shop.slow_delivery.seller.application.EmailServiceImpl;
 import be.shop.slow_delivery.seller.application.SellerService;
-import be.shop.slow_delivery.seller.application.dto.SellerCommand;
 import be.shop.slow_delivery.seller.application.dto.SellerLoginCommand;
 import be.shop.slow_delivery.seller.application.dto.SellerLoginCriteria;
 import be.shop.slow_delivery.seller.domain.Seller;
-import be.shop.slow_delivery.seller.presentation.dto.EmailCriteria;
-import be.shop.slow_delivery.seller.presentation.dto.PasswordCommand;
-import be.shop.slow_delivery.seller.presentation.dto.VerifyCodeCriteria;
+import be.shop.slow_delivery.seller.presentation.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -25,15 +22,16 @@ public class SellerController {
 
     private final SellerService sellerService;
     private final EmailServiceImpl emailServiceImpl;
+    private final SellerDtoMapper sellerDtoMapper;
 
     @PostMapping("/seller/signup")
-    public LoginErrorResponse<?> sellerSignUp(SellerCommand sellerCommand) throws Exception{
-        Optional<Seller> findSeller = sellerService.findSellerById(sellerCommand.getLoginId());
+    public LoginErrorResponse<?> sellerSignUp(SellerSignUpDto sellerSignUpDto) throws Exception{
+        Optional<Seller> findSeller = sellerService.findSellerById(sellerSignUpDto.getLoginId());
         try{
             if(findSeller.isPresent()){
                 return new LoginErrorResponse<> (LoginErrorCode.DUPLICATE_EMAIL);
             }
-            sellerService.join(sellerCommand);
+            sellerService.join(sellerSignUpDto);
             return new LoginErrorResponse<> (LoginErrorCode.SUCCESS);
         } catch (ConstraintViolationException e){
             return new LoginErrorResponse<> (LoginErrorCode.INVALID_INPUT_VALUE);
@@ -41,8 +39,8 @@ public class SellerController {
     }
 
     @PostMapping("/seller")
-    public LoginErrorResponse<?> signUp(SellerCommand sellerCommand){
-        LoginErrorCode loginErrorCode = sellerService.signUp(sellerCommand);
+    public LoginErrorResponse<?> signUp(SellerSignUpDto sellerSignUpDto){
+        LoginErrorCode loginErrorCode = sellerService.signUp(sellerDtoMapper.toCommand(sellerSignUpDto));
         return new LoginErrorResponse<>(loginErrorCode);
     }
 

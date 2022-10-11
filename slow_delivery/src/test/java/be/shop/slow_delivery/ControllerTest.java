@@ -8,6 +8,10 @@ import be.shop.slow_delivery.product.application.ProductCommandService;
 import be.shop.slow_delivery.product.application.ProductQueryService;
 import be.shop.slow_delivery.product.presentation.ProductController;
 import be.shop.slow_delivery.product.presentation.dto.ProductDtoMapper;
+import be.shop.slow_delivery.seller.application.EmailServiceImpl;
+import be.shop.slow_delivery.seller.application.SellerService;
+import be.shop.slow_delivery.seller.presentation.SellerController;
+import be.shop.slow_delivery.seller.presentation.dto.SellerDtoMapper;
 import be.shop.slow_delivery.shop.application.ShopCommandService;
 import be.shop.slow_delivery.shop.application.ShopQueryService;
 import be.shop.slow_delivery.shop.presentation.ShopController;
@@ -37,7 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
         ShopController.class,
         ProductController.class,
         MenuController.class,
-        StockController.class
+        StockController.class,
+        SellerController.class
 })
 public abstract class ControllerTest {
     protected MockMvc mockMvc;
@@ -57,6 +62,10 @@ public abstract class ControllerTest {
 
     @MockBean protected StockCommandService stockCommandService;
 
+    @MockBean protected SellerService sellerService;
+    @MockBean protected EmailServiceImpl emailServiceImpl;
+    @MockBean protected SellerDtoMapper sellerDtoMapper;
+
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider contextProvider) {
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
@@ -65,6 +74,7 @@ public abstract class ControllerTest {
                         .withRequestDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .alwaysDo(print()).build();
+                .alwaysDo(print())
+                .build();
     }
 }
