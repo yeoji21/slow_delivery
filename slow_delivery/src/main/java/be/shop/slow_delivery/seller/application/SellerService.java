@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.seller.application;
 
+import be.shop.slow_delivery.exception.LoginErrorCode;
 import be.shop.slow_delivery.jwt.JwtFilter;
 import be.shop.slow_delivery.jwt.TokenProvider;
 import be.shop.slow_delivery.seller.application.dto.*;
@@ -8,13 +9,13 @@ import be.shop.slow_delivery.seller.domain.Seller;
 import be.shop.slow_delivery.seller.domain.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.http.HttpHeaders;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -30,8 +31,16 @@ public class SellerService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
 
-    public void join(SellerCommand sellerCommand){
+    @Transactional
+    public LoginErrorCode signUp(SellerCommand sellerCommand) {
+        if(findSellerById(sellerCommand.getLoginId()).isPresent())
+            return LoginErrorCode.DUPLICATE_EMAIL;
+        join(sellerCommand);
+        return LoginErrorCode.SUCCESS;
+    }
 
+    @Transactional
+    public void join(SellerCommand sellerCommand){
         Authority authority = new Authority("ROLE_USER");
 
         Seller seller = new Seller(sellerCommand.getLoginId(), passwordEncoder.encode(sellerCommand.getPassword()),

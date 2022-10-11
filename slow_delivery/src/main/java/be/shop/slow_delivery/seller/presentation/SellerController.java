@@ -40,6 +40,12 @@ public class SellerController {
         }
     }
 
+    @PostMapping("/seller")
+    public LoginErrorResponse<?> signUp(SellerCommand sellerCommand){
+        LoginErrorCode loginErrorCode = sellerService.signUp(sellerCommand);
+        return new LoginErrorResponse<>(loginErrorCode);
+    }
+
     @PostMapping("/mailConfirm") //본인 인증 메일 전송
     public LoginErrorResponse<?> emailConfirm(@RequestBody EmailCriteria emailCriteria) throws Exception{
         Optional<Seller> seller = sellerService.findSellerById(emailCriteria.getEmail());
