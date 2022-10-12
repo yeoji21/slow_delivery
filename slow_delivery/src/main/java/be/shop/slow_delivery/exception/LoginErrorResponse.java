@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class LoginErrorResponse<T> {
-
     private Boolean isSuccess;
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)

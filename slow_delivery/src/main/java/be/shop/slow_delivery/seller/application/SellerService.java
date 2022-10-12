@@ -109,4 +109,8 @@ public class SellerService {
 
         return new TokenCriteria(jwt);
     }
+
+    public void emailValidate(EmailValidateCommand command) {
+
+    }
 }

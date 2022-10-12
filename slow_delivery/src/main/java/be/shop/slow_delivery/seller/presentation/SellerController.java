@@ -12,36 +12,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ConstraintViolationException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
 public class SellerController {
-
     private final SellerService sellerService;
     private final EmailServiceImpl emailServiceImpl;
     private final SellerDtoMapper sellerDtoMapper;
-
-    @PostMapping("/seller/signup")
-    public LoginErrorResponse<?> sellerSignUp(SellerSignUpDto sellerSignUpDto) throws Exception{
-        Optional<Seller> findSeller = sellerService.findSellerById(sellerSignUpDto.getLoginId());
-        try{
-            if(findSeller.isPresent()){
-                return new LoginErrorResponse<> (LoginErrorCode.DUPLICATE_EMAIL);
-            }
-            sellerService.join(sellerSignUpDto);
-            return new LoginErrorResponse<> (LoginErrorCode.SUCCESS);
-        } catch (ConstraintViolationException e){
-            return new LoginErrorResponse<> (LoginErrorCode.INVALID_INPUT_VALUE);
-        }
-    }
 
     @PostMapping("/seller")
     public LoginErrorResponse<?> signUp(SellerSignUpDto sellerSignUpDto){
         LoginErrorCode loginErrorCode = sellerService.signUp(sellerDtoMapper.toCommand(sellerSignUpDto));
         return new LoginErrorResponse<>(loginErrorCode);
+    }
+
+    @PostMapping("/seller/email-validate")
+    public void signUpEmailValidate(@RequestBody EmailValidateDto emailValidateDto) {
+        sellerService.emailValidate(sellerDtoMapper.toCommand(emailValidateDto));
     }
 
     @PostMapping("/mailConfirm") //본인 인증 메일 전송

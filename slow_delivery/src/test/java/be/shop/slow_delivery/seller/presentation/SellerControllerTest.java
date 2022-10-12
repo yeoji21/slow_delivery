@@ -3,7 +3,9 @@ package be.shop.slow_delivery.seller.presentation;
 import be.shop.slow_delivery.ControllerTest;
 import be.shop.slow_delivery.exception.LoginErrorCode;
 import be.shop.slow_delivery.exception.LoginErrorResponse;
+import be.shop.slow_delivery.seller.application.dto.EmailValidateCommand;
 import be.shop.slow_delivery.seller.application.dto.SellerSignUpCommand;
+import be.shop.slow_delivery.seller.presentation.dto.EmailValidateDto;
 import be.shop.slow_delivery.seller.presentation.dto.SellerSignUpDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.springframework.http.MediaType;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,5 +43,21 @@ class SellerControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)));
 
+    }
+
+    @Test @DisplayName("본인 인증 메일 전송")
+    void signUpEmailValidate() throws Exception{
+        //given
+        EmailValidateDto dto = new EmailValidateDto("seller@email.com");
+
+        //when
+        given(sellerDtoMapper.toCommand(any(EmailValidateDto.class))).willReturn(new EmailValidateCommand(dto.getEmailAddress()));
+
+        //then
+        mockMvc.perform(post("/seller/email-validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+        verify(sellerService).emailValidate(any(EmailValidateCommand.class));
     }
 }
