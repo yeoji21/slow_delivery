@@ -1,12 +1,12 @@
 package be.shop.slow_delivery.seller.application;
 
+import be.shop.slow_delivery.exception.ErrorCode;
+import be.shop.slow_delivery.exception.InvalidValueException;
 import be.shop.slow_delivery.exception.LoginErrorCode;
 import be.shop.slow_delivery.jwt.JwtFilter;
 import be.shop.slow_delivery.jwt.TokenProvider;
 import be.shop.slow_delivery.seller.application.dto.*;
-import be.shop.slow_delivery.seller.domain.Authority;
-import be.shop.slow_delivery.seller.domain.Seller;
-import be.shop.slow_delivery.seller.domain.SellerRepository;
+import be.shop.slow_delivery.seller.domain.*;
 import be.shop.slow_delivery.seller.presentation.dto.SellerSignUpDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +26,17 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SellerService {
-
     private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
+    private final EmailSender emailSender;
+    private final EmailMessageGenerator emailMessageGenerator;
 
     @Transactional
     public LoginErrorCode signUp(SellerSignUpCommand command) {
-        if(findSellerById(command.getLoginId()).isPresent()) return LoginErrorCode.DUPLICATE_EMAIL;
+        if(findSellerById(command.getLoginId()).isPresent())
+            return LoginErrorCode.DUPLICATE_EMAIL;
 
         // join method 그대로 복사
         Authority authority = new Authority("ROLE_USER");
@@ -43,6 +45,15 @@ public class SellerService {
         sellerRepository.save(seller);
 
         return LoginErrorCode.SUCCESS;
+    }
+
+    public void emailValidate(EmailValidateCommand command) {
+        if(sellerRepository.findByEmail(command.getEmailAddress()).isPresent())
+            throw new InvalidValueException(ErrorCode.DUPLICATED_EMAIL);
+        // TODO: 2022/10/13 이메일 확인 코드를 저장해두었다가 검증할 때 사용해야 함
+        String randomCode = RandomCodeGenerator.getEmailValidateCode();
+
+        emailSender.send(emailMessageGenerator.emailValidateMessage(command.getEmailAddress(), randomCode));
     }
 
     @Transactional
@@ -54,6 +65,7 @@ public class SellerService {
 
         sellerRepository.save(seller);
     }
+
     public void setTemPassword(String email, String password){
         Seller seller = sellerRepository.findByEmail(email).get();
         seller.changePassword(passwordEncoder.encode(password));
@@ -68,10 +80,10 @@ public class SellerService {
     public Optional<Seller> findSellerByEmail(String email){
         return sellerRepository.findByEmail(email);
     }
-
     public Optional<Seller> findSellerById(String loginId){
         return sellerRepository.findByLoginId(loginId);
     }
+
     @Transactional
     public void deleteSeller(Seller seller, SellerPasswordCommand password){
         if(passwordEncoder.matches(password.getPassword(),seller.getPassword())){
@@ -108,9 +120,5 @@ public class SellerService {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER,"Bearer "+jwt);
 
         return new TokenCriteria(jwt);
-    }
-
-    public void emailValidate(EmailValidateCommand command) {
-
     }
 }

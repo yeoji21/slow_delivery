@@ -9,11 +9,10 @@ import static org.springframework.http.HttpStatus.*;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-
-
     // 400 BAD_REQUEST : 잘못된 요청
     REQUEST_PARAMETER(BAD_REQUEST, "잘못된 요청 형식입니다."),
     PHONE_NUMBER(BAD_REQUEST, "잘못된 전화번호 형식입니다."),
+    DUPLICATED_EMAIL(BAD_REQUEST, "이미 존재하는 사용자의 이메일입니다."),
     CATEGORY_COUNT(BAD_REQUEST, "가게는 카테고리를 한 개 이상 가져야 합니다."),
 
 

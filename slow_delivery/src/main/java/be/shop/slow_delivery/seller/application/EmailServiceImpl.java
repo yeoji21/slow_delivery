@@ -37,7 +37,7 @@ public class EmailServiceImpl implements EmailService{
         msgg+= "<h3 style='color:blue;'>회원가입 인증 코드입니다.</h3>";
         msgg+= "<div style='font-size:130%'>";
         msgg+= "CODE : <strong>";
-        msgg+=ePw+"</strong><div><br/> ";
+        msgg+= ePw+"</strong><div><br/> ";
         msgg+= "</div>";
         message.setText(msgg, "utf-8", "html");//내용
         message.setFrom(new InternetAddress("slowdelivery22@gmail.com","slowdelivery"));//보내는 사람
@@ -65,7 +65,7 @@ public class EmailServiceImpl implements EmailService{
         msgg+= "<h3 style='color:blue;'>아래의 비밀번호로 로그인 해주세요.</h3>";
         msgg+= "<div style='font-size:130%'>";
         msgg+= "CODE : <strong>";
-        msgg+=ePw+"</strong><div><br/> ";
+        msgg+= ePw+"</strong><div><br/> ";
         msgg+= "</div>";
         message.setText(msgg, "utf-8", "html");//내용
         message.setFrom(new InternetAddress("slowdelivery22@gmail.com","slowdelivery"));//보내는 사람

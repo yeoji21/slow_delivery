@@ -35,7 +35,7 @@ public class SellerController {
 
     @PostMapping("/mailConfirm") //본인 인증 메일 전송
     public LoginErrorResponse<?> emailConfirm(@RequestBody EmailCriteria emailCriteria) throws Exception{
-        Optional<Seller> seller = sellerService.findSellerById(emailCriteria.getEmail());
+        Optional<Seller> seller = sellerService.findSellerByEmail(emailCriteria.getEmail());
 
         if(seller.isEmpty()){
             emailServiceImpl.sendSimpleMessage(emailCriteria.getEmail());
