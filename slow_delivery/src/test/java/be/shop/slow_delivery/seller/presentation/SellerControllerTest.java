@@ -27,8 +27,8 @@ class SellerControllerTest extends ControllerTest {
                 .username("username")
                 .loginId("loginId")
                 .password("password")
-                .email("email")
-                .phoneNumber("phoneNumber")
+                .email("email@test.com")
+                .phoneNumber("010-1234-5678")
                 .build();
         LoginErrorResponse response = new LoginErrorResponse(LoginErrorCode.SUCCESS);
 

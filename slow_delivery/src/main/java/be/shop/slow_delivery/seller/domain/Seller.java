@@ -1,6 +1,7 @@
 package be.shop.slow_delivery.seller.domain;
 
 import be.shop.slow_delivery.common.domain.PhoneNumber;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class Seller {
     @Column(name = "login_id",nullable = false, unique = true)
     private String loginId;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password")
     private String password;
 

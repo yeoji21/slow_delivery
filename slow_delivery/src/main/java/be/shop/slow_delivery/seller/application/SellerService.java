@@ -31,6 +31,7 @@ public class SellerService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
     private final EmailSender emailSender;
+    private final SecretCodeService secretCodeService;
     private final EmailMessageGenerator emailMessageGenerator;
 
     @Transactional
@@ -47,13 +48,14 @@ public class SellerService {
         return LoginErrorCode.SUCCESS;
     }
 
+    @Transactional
     public void emailValidate(EmailValidateCommand command) {
         if(sellerRepository.findByEmail(command.getEmailAddress()).isPresent())
             throw new InvalidValueException(ErrorCode.DUPLICATED_EMAIL);
-        // TODO: 2022/10/13 이메일 확인 코드를 저장해두었다가 검증할 때 사용해야 함
-        String randomCode = RandomCodeGenerator.getEmailValidateCode();
 
-        emailSender.send(emailMessageGenerator.emailValidateMessage(command.getEmailAddress(), randomCode));
+        String secretCode = secretCodeService.generateEmailValidateCode(command.getEmailAddress());
+        EmailMessage emailMessage = emailMessageGenerator.emailValidateMessage(command.getEmailAddress(), secretCode);
+        emailSender.send(emailMessage);
     }
 
     @Transactional

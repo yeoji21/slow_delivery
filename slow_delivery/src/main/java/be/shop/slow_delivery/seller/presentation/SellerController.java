@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -23,26 +24,14 @@ public class SellerController {
     private final SellerDtoMapper sellerDtoMapper;
 
     @PostMapping("/seller")
-    public LoginErrorResponse<?> signUp(SellerSignUpDto sellerSignUpDto){
+    public LoginErrorResponse<?> signUp(@RequestBody @Valid SellerSignUpDto sellerSignUpDto){
         LoginErrorCode loginErrorCode = sellerService.signUp(sellerDtoMapper.toCommand(sellerSignUpDto));
         return new LoginErrorResponse<>(loginErrorCode);
     }
 
     @PostMapping("/seller/email-validate")
-    public void signUpEmailValidate(@RequestBody EmailValidateDto emailValidateDto) {
+    public void signUpEmailValidate(@RequestBody @Valid EmailValidateDto emailValidateDto) {
         sellerService.emailValidate(sellerDtoMapper.toCommand(emailValidateDto));
-    }
-
-    @PostMapping("/mailConfirm") //본인 인증 메일 전송
-    public LoginErrorResponse<?> emailConfirm(@RequestBody EmailCriteria emailCriteria) throws Exception{
-        Optional<Seller> seller = sellerService.findSellerByEmail(emailCriteria.getEmail());
-
-        if(seller.isEmpty()){
-            emailServiceImpl.sendSimpleMessage(emailCriteria.getEmail());
-            return new LoginErrorResponse<>(LoginErrorCode.SUCCESS);
-        } else{
-            return new LoginErrorResponse<>(LoginErrorCode.DUPLICATE_EMAIL);
-        }
     }
 
     @PostMapping("/verifyCode") //본인 인증 코드 일치 여부 확인

@@ -1,28 +1,26 @@
 package be.shop.slow_delivery.seller.presentation.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SellerSignUpDto {
-
-    @NotEmpty
+    @NotBlank
     private String username;
 
-    @NotEmpty
+    @NotBlank
     @Size(min = 3, max = 50)
     private String loginId;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotEmpty
+    @NotBlank
     @Size(min = 3, max = 50)
     private String password;
 
@@ -30,7 +28,7 @@ public class SellerSignUpDto {
     @Size(min=3, max=50)
     private String email;
 
-    @NotEmpty
+    @NotBlank
     private String phoneNumber;
 
     @Builder
