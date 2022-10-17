@@ -30,16 +30,13 @@ public class SellerController {
     }
 
     @PostMapping("/seller/email-validate")
-    public void signUpEmailValidate(@RequestBody @Valid EmailValidateDto emailValidateDto) {
-        sellerService.emailValidate(sellerDtoMapper.toCommand(emailValidateDto));
+    public void sendSignUpValidateEmail(@RequestBody @Valid EmailValidateDto emailValidateDto) {
+        sellerService.sendSignUpValidationMail(sellerDtoMapper.toCommand(emailValidateDto));
     }
 
-    @PostMapping("/verifyCode") //본인 인증 코드 일치 여부 확인
-    public LoginErrorResponse<?> verifyCode(@RequestBody VerifyCodeCriteria verifyCodeCriteria){
-        if(emailServiceImpl.ePw.equals(verifyCodeCriteria.getCode())){
-            return new LoginErrorResponse<>(LoginErrorCode.SUCCESS);
-        } else
-            return new LoginErrorResponse<>(LoginErrorCode.NOT_MATCH_CODE);
+    @GetMapping("/seller/email-validate")
+    public void verifySignUpValidateEmail(@RequestBody @Valid CheckEmailValidateDto checkEmailValidateDto) {
+        sellerService.checkSignUpValidationCode(sellerDtoMapper.toCriteria(checkEmailValidateDto));
     }
 
     @PostMapping("seller/login") //로그인

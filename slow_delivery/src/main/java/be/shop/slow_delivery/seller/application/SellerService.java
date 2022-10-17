@@ -49,7 +49,7 @@ public class SellerService {
     }
 
     @Transactional
-    public void emailValidate(EmailValidateCommand command) {
+    public void sendSignUpValidationMail(EmailValidateCommand command) {
         if(sellerRepository.findByEmail(command.getEmailAddress()).isPresent())
             throw new InvalidValueException(ErrorCode.DUPLICATED_EMAIL);
 
@@ -122,5 +122,9 @@ public class SellerService {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER,"Bearer "+jwt);
 
         return new TokenCriteria(jwt);
+    }
+
+    public void checkSignUpValidationCode(CheckEmailValidateCriteria criteria) {
+
     }
 }

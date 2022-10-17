@@ -44,7 +44,7 @@ class SellerServiceTest {
                 .willReturn(EmailMessage.builder().build());
 
         //when
-        sellerService.emailValidate(command);
+        sellerService.sendSignUpValidationMail(command);
 
         //then
         verify(emailSender).send(any(EmailMessage.class));

@@ -3,8 +3,10 @@ package be.shop.slow_delivery.seller.presentation;
 import be.shop.slow_delivery.ControllerTest;
 import be.shop.slow_delivery.exception.LoginErrorCode;
 import be.shop.slow_delivery.exception.LoginErrorResponse;
+import be.shop.slow_delivery.seller.application.dto.CheckEmailValidateCriteria;
 import be.shop.slow_delivery.seller.application.dto.EmailValidateCommand;
 import be.shop.slow_delivery.seller.application.dto.SellerSignUpCommand;
+import be.shop.slow_delivery.seller.presentation.dto.CheckEmailValidateDto;
 import be.shop.slow_delivery.seller.presentation.dto.EmailValidateDto;
 import be.shop.slow_delivery.seller.presentation.dto.SellerSignUpDto;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,7 +49,7 @@ class SellerControllerTest extends ControllerTest {
     }
 
     @Test @DisplayName("본인 인증 메일 전송")
-    void signUpEmailValidate() throws Exception{
+    void sendSignUpValidateEmail() throws Exception{
         //given
         EmailValidateDto dto = new EmailValidateDto("seller@email.com");
 
@@ -58,6 +61,25 @@ class SellerControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
-        verify(sellerService).emailValidate(any(EmailValidateCommand.class));
+        verify(sellerService).sendSignUpValidationMail(any(EmailValidateCommand.class));
+    }
+
+    @Test @DisplayName("본인 인증 메일로 전송된 코드 검증")
+    void verifySignUpValidateEmail() throws Exception{
+        //given
+        CheckEmailValidateDto dto = CheckEmailValidateDto.builder()
+                .emailAddress("test@test.com")
+                .code("123456")
+                .build();
+
+        //when
+        given(sellerDtoMapper.toCriteria(any(CheckEmailValidateDto.class))).willReturn(CheckEmailValidateCriteria.builder().build());
+
+        //then
+        mockMvc.perform(get("/seller/email-validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+        verify(sellerService).checkSignUpValidationCode(any(CheckEmailValidateCriteria.class));
     }
 }
