@@ -1,18 +1,12 @@
 package be.shop.slow_delivery.seller.domain;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-@RequiredArgsConstructor
 @Component
-public class SecretCodeService {
-    private final RedisTemplate<String, String> redisTemplate;
-
-    public String generateEmailValidateCode(String emailAddress){
+public class SecretCodeFactory {
+    public String generate() {
         StringBuilder secretCode = new StringBuilder();
         Random random = new Random(System.currentTimeMillis());
 
@@ -33,9 +27,6 @@ public class SecretCodeService {
                     break;
             }
         }
-
-        // 이메일로 전송된 코드를 5분간 레디스에 저장
-        redisTemplate.opsForValue().set(emailAddress, secretCode.toString(), 5, TimeUnit.MINUTES);
         return secretCode.toString();
     }
 }

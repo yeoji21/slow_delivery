@@ -4,7 +4,7 @@ import be.shop.slow_delivery.seller.application.dto.EmailMessage;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmailMessageGenerator {
+public class EmailMessageFactory {
 
     public EmailMessage emailValidateMessage(String sendTo, String randomCode) {
         StringBuilder body = new StringBuilder();

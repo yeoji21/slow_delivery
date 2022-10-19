@@ -17,8 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 
@@ -32,7 +32,8 @@ public class SellerService {
     private final TokenProvider tokenProvider;
     private final EmailSender emailSender;
     private final SecretCodeService secretCodeService;
-    private final EmailMessageGenerator emailMessageGenerator;
+    private final EmailMessageFactory emailMessageFactory;
+    private final SecretCodeFactory secretCodeFactory;
 
     @Transactional
     public LoginErrorCode signUp(SellerSignUpCommand command) {
@@ -52,10 +53,17 @@ public class SellerService {
     public void sendSignUpValidationMail(EmailValidateCommand command) {
         if(sellerRepository.findByEmail(command.getEmailAddress()).isPresent())
             throw new InvalidValueException(ErrorCode.DUPLICATED_EMAIL);
-
-        String secretCode = secretCodeService.generateEmailValidateCode(command.getEmailAddress());
-        EmailMessage emailMessage = emailMessageGenerator.emailValidateMessage(command.getEmailAddress(), secretCode);
+        String secretCode = secretCodeFactory.generate();
+        EmailMessage emailMessage = emailMessageFactory.emailValidateMessage(command.getEmailAddress(), secretCode);
+        secretCodeService.saveSignUpCode(command.getEmailAddress(), secretCode);
         emailSender.send(emailMessage);
+    }
+
+    @Transactional(readOnly = true)
+    public void checkSignUpValidationCode(CheckEmailValidateCriteria criteria) {
+        String code = secretCodeService.findSighUpCode(criteria.getEmailAddress());
+        if(!code.equals(criteria.getCode()))
+            throw new InvalidValueException(ErrorCode.NOT_MATCH_CODE);
     }
 
     @Transactional
@@ -78,10 +86,10 @@ public class SellerService {
         seller.changePassword(passwordEncoder.encode(password));
         sellerRepository.save(seller);
     }
-
     public Optional<Seller> findSellerByEmail(String email){
         return sellerRepository.findByEmail(email);
     }
+
     public Optional<Seller> findSellerById(String loginId){
         return sellerRepository.findByLoginId(loginId);
     }
@@ -122,9 +130,5 @@ public class SellerService {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER,"Bearer "+jwt);
 
         return new TokenCriteria(jwt);
-    }
-
-    public void checkSignUpValidationCode(CheckEmailValidateCriteria criteria) {
-
     }
 }
