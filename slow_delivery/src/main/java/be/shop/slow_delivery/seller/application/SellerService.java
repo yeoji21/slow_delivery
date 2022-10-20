@@ -7,7 +7,6 @@ import be.shop.slow_delivery.jwt.JwtFilter;
 import be.shop.slow_delivery.jwt.TokenProvider;
 import be.shop.slow_delivery.seller.application.dto.*;
 import be.shop.slow_delivery.seller.domain.*;
-import be.shop.slow_delivery.seller.presentation.dto.SellerSignUpDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -40,12 +39,15 @@ public class SellerService {
         if(findSellerById(command.getLoginId()).isPresent())
             return LoginErrorCode.DUPLICATE_EMAIL;
 
-        // join method 그대로 복사
-        Authority authority = new Authority("ROLE_USER");
-        Seller seller = new Seller(command.getLoginId(), passwordEncoder.encode(command.getPassword()),
-                command.getEmail(), command.getPhoneNumber(), command.getUsername());
+        Seller seller = Seller.builder()
+                .loginId(command.getLoginId())
+                .password(passwordEncoder.encode(command.getPassword()))
+                .email(command.getEmail())
+                .phoneNumber(command.getPhoneNumber())
+                .username(command.getUsername())
+                .role(SellerRole.USER)
+                .build();
         sellerRepository.save(seller);
-
         return LoginErrorCode.SUCCESS;
     }
 
@@ -64,16 +66,6 @@ public class SellerService {
         String code = secretCodeService.findSighUpCode(criteria.getEmailAddress());
         if(!code.equals(criteria.getCode()))
             throw new InvalidValueException(ErrorCode.NOT_MATCH_CODE);
-    }
-
-    @Transactional
-    public void join(SellerSignUpDto sellerSignUpDto){
-        Authority authority = new Authority("ROLE_USER");
-
-        Seller seller = new Seller(sellerSignUpDto.getLoginId(), passwordEncoder.encode(sellerSignUpDto.getPassword()),
-                sellerSignUpDto.getEmail(), sellerSignUpDto.getPhoneNumber(), sellerSignUpDto.getUsername());
-
-        sellerRepository.save(seller);
     }
 
     public void setTemPassword(String email, String password){

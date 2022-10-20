@@ -39,13 +39,15 @@ public class SellerController {
         sellerService.checkSignUpValidationCode(sellerDtoMapper.toCriteria(checkEmailValidateDto));
     }
 
-    @PostMapping("seller/login") //로그인
-    public LoginErrorResponse<?> login (@RequestBody SellerLoginCommand sellerLoginCommand) throws NoSuchElementException{
+    @PatchMapping("seller/changePw") //비밀번호 변경
+    public LoginErrorResponse<?> changePw(Authentication authentication,
+                                          @RequestBody PasswordCommand passwordCommand){
         try{
-            SellerLoginCriteria seller = sellerService.login(sellerLoginCommand);
-            return new LoginErrorResponse<>(seller);
-        } catch (Exception e){
-            return new LoginErrorResponse<>(LoginErrorCode.ACCESS_DENIED_LOGIN);
+            Seller seller = (Seller) authentication.getPrincipal();
+            sellerService.changePassword(seller,passwordCommand.getPassword());
+            return new LoginErrorResponse<>(LoginErrorCode.SUCCESS);
+        } catch (Exception e) {
+            return new LoginErrorResponse<>(LoginErrorCode.INVALID_JWT);
         }
     }
 
@@ -62,16 +64,14 @@ public class SellerController {
         return new LoginErrorResponse<>(LoginErrorCode.SUCCESS);
     }
 
-    @PatchMapping("seller/changePw") //비밀번호 변경
-    public LoginErrorResponse<?> changePw(Authentication authentication, @RequestBody PasswordCommand passwordCommand){
+    @PostMapping("seller/login") //로그인
+    public LoginErrorResponse<?> login (@RequestBody SellerLoginCommand sellerLoginCommand) throws NoSuchElementException{
         try{
-            Seller seller = (Seller) authentication.getPrincipal();
-            sellerService.changePassword(seller,passwordCommand.getPassword());
-            return new LoginErrorResponse<>(LoginErrorCode.SUCCESS);
-        } catch (Exception e) {
-            return new LoginErrorResponse<>(LoginErrorCode.INVALID_JWT);
+            SellerLoginCriteria seller = sellerService.login(sellerLoginCommand);
+            return new LoginErrorResponse<>(seller);
+        } catch (Exception e){
+            return new LoginErrorResponse<>(LoginErrorCode.ACCESS_DENIED_LOGIN);
         }
-
     }
 
     @GetMapping("seller/findId") //아이디 찾기

@@ -34,13 +34,22 @@ public class Seller {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "role", nullable = false)
+    private String role;
+
     @Builder
-    public Seller(String loginId,String password, String email, String phoneNumber, String username){
+    public Seller(String loginId,
+                  String password,
+                  String email,
+                  String phoneNumber,
+                  String username,
+                  SellerRole role){
         this.username = username;
         this.email = email;
         this.phoneNumber = new PhoneNumber(phoneNumber);
         this.loginId = loginId;
         this.password = password;
+        this.role = role.getRole();
     }
 
     public void changePassword(String password) {

@@ -5,10 +5,8 @@ import be.shop.slow_delivery.jwt.TokenProvider;
 import be.shop.slow_delivery.seller.application.dto.CheckEmailValidateCriteria;
 import be.shop.slow_delivery.seller.application.dto.EmailMessage;
 import be.shop.slow_delivery.seller.application.dto.EmailValidateCommand;
-import be.shop.slow_delivery.seller.domain.EmailMessageFactory;
-import be.shop.slow_delivery.seller.domain.EmailSender;
-import be.shop.slow_delivery.seller.domain.SecretCodeFactory;
-import be.shop.slow_delivery.seller.domain.SellerRepository;
+import be.shop.slow_delivery.seller.application.dto.SellerSignUpCommand;
+import be.shop.slow_delivery.seller.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +35,27 @@ class SellerServiceTest {
     @Mock private SecretCodeService secretCodeService;
     @Mock private SecretCodeFactory secretCodeFactory;
     @InjectMocks private SellerService sellerService;
+
+    @Test @DisplayName("회원 가입")
+    void signUp() throws Exception{
+        //given
+        SellerSignUpCommand command = SellerSignUpCommand.builder()
+                .username("username")
+                .loginId("loginId")
+                .password("password")
+                .email("email@test.com")
+                .phoneNumber("010-1234-5678")
+                .build();
+
+        given(sellerRepository.findByLoginId(anyString())).willReturn(Optional.empty());
+
+        //when
+        sellerService.signUp(command);
+
+        //then
+        verify(sellerRepository).save(any(Seller.class));
+    }
+
 
     @Test @DisplayName("가입 시 이메일 검증")
     void sendSignUpValidationMail() throws Exception{
