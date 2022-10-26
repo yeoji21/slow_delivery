@@ -3,13 +3,11 @@ package be.shop.slow_delivery.seller.application;
 import be.shop.slow_delivery.exception.ErrorCode;
 import be.shop.slow_delivery.exception.InvalidValueException;
 import be.shop.slow_delivery.exception.LoginErrorCode;
-import be.shop.slow_delivery.jwt.JwtFilter;
 import be.shop.slow_delivery.jwt.TokenProvider;
 import be.shop.slow_delivery.seller.application.dto.*;
 import be.shop.slow_delivery.seller.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -118,8 +116,8 @@ public class SellerService {
 
         String jwt = tokenProvider.createToken(seller.getId(),authentication);
 
-        HttpHeaders httpHeaders = new org.springframework.http.HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER,"Bearer "+jwt);
+//        HttpHeaders httpHeaders = new org.springframework.http.HttpHeaders();
+//        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER,"Bearer "+jwt);
 
         return new TokenCriteria(jwt);
     }

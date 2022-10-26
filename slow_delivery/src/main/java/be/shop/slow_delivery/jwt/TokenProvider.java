@@ -41,6 +41,14 @@ public class TokenProvider implements InitializingBean {
         this.sellerRepository=sellerRepository;
     }
 
+    public Claims verify(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception{
         byte[] keyBytes = Decoders.BASE64.decode(secret);

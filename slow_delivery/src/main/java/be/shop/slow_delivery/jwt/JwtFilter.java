@@ -1,5 +1,6 @@
 package be.shop.slow_delivery.jwt;
 
+import be.shop.slow_delivery.config.auth.AuthConstraints;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,9 +16,6 @@ import java.io.IOException;
 
 @Slf4j
 public class JwtFilter extends GenericFilterBean {
-
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-
     private TokenProvider tokenProvider;
 
     public JwtFilter(TokenProvider tokenProvider){
@@ -42,7 +40,7 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     private String resolveToken(HttpServletRequest request){
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        String bearerToken = request.getHeader(AuthConstraints.HEADER_STRING.getValue());
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
             return bearerToken.substring(7);
         }
