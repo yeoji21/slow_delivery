@@ -1,6 +1,5 @@
 package be.shop.slow_delivery.config.auth;
 
-import be.shop.slow_delivery.jwt.TokenProvider;
 import io.jsonwebtoken.Claims;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,8 +15,7 @@ public class JwtUserDetails implements UserDetails {
     private String role;
     private boolean isAuthenticated;
 
-    public JwtUserDetails(TokenProvider provider, String accessToken) {
-        Claims claims = provider.verify(accessToken);
+    public JwtUserDetails(Claims claims) {
         id = (Long) claims.get("seller_id");
         role = (String) claims.get("auth");
         isAuthenticated = true;

@@ -22,7 +22,7 @@ public class OrderAmountDeliveryFee extends BaseTimeEntity {
     private Shop shop;
 
     @Embedded
-    @AttributeOverride(name = "amount", column = @Column(name = "order_price", nullable = false))
+    @AttributeOverride(name = "amount", column = @Column(name = "order_amount", nullable = false))
     private Money orderAmount;
 
     @Embedded

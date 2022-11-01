@@ -1,20 +1,31 @@
 package be.shop.slow_delivery.shop.presentation;
 
 import be.shop.slow_delivery.ControllerTest;
+import be.shop.slow_delivery.category.domain.Category;
+import be.shop.slow_delivery.category.domain.CategoryType;
+import be.shop.slow_delivery.common.domain.Money;
+import be.shop.slow_delivery.shop.application.dto.DeliveryFeeInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.domain.Shop;
+import be.shop.slow_delivery.shop.domain.ShopLocation;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
 import be.shop.slow_delivery.shop.presentation.dto.ShopOrderType;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -75,24 +86,52 @@ class ShopControllerTest extends ControllerTest {
 
     @Test
     void 단건_가게_상세정보_조회() throws Exception{
-        ShopDetailInfo shopDetailInfo = ShopDetailInfo.builder()
-                .shopId(1L)
-                .shopName("A shop")
-                .thumbnailPath("thumbnail path")
-                .minOrderAmount(10_000)
+        Shop shop = Shop.builder()
+                .name("shop A")
+                .minOrderAmount(new Money(15_000))
                 .phoneNumber("010-1234-5678")
-                .openingHours("매일 15시 ~ 02시")
+                .description("~~~")
+                .openingHours("오후 2시 ~ 익일 새벽 1시")
                 .dayOff("연중무휴")
-                .streetAddress("xxxx-xxxx")
-                .defaultDeliveryFees(List.of(3000, 2000))
+                .location(ShopLocation.builder()
+                        .areaId(1L)
+                        .streetAddress("xxx-xxxx")
+                        .build())
+                .thumbnailFileId(1L)
+                .category(new Category(CategoryType.CHICKEN))
                 .build();
+        ReflectionTestUtils.setField(shop, "id", 1L);
+        ShopDetailInfo shopDetailInfo = new ShopDetailInfo(shop,
+                "thumbnail file path",
+                List.of(new DeliveryFeeInfo(10_000, 3000),
+                        new DeliveryFeeInfo(15_000, 2000),
+                        new DeliveryFeeInfo(20_000, 1000)),
+                List.of("category1", "category2"));
 
         given(shopQueryService.findDetailInfo(any(Long.class))).willReturn(shopDetailInfo);
 
         mockMvc.perform(get("/shop/{shopId}/detail", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(shopDetailInfo)));
+                .andExpect(content().json(objectMapper.writeValueAsString(shopDetailInfo)))
+                .andDo(document("shop-detail-info",
+                        responseFields(
+                                fieldWithPath("shopId").description("가게 ID").type(JsonFieldType.NUMBER),
+                                fieldWithPath("thumbnailPath").description("가게 썸네일 이미지 저장 경로").type(JsonFieldType.STRING),
+                                fieldWithPath("areaId").description("가게 권역 ID").type(JsonFieldType.NUMBER),
+                                fieldWithPath("shopName").description("가게명").type(JsonFieldType.STRING),
+                                fieldWithPath("minOrderAmount").description("최소 주문 금액").type(JsonFieldType.NUMBER),
+                                fieldWithPath("phoneNumber").description("가게 번호").type(JsonFieldType.STRING),
+                                fieldWithPath("description").description("소개글").type(JsonFieldType.STRING),
+                                fieldWithPath("openingHours").description("영업 시간").type(JsonFieldType.STRING),
+                                fieldWithPath("dayOff").description("휴무일").type(JsonFieldType.STRING),
+                                fieldWithPath("streetAddress").description("도로명 주소").type(JsonFieldType.STRING),
+                                fieldWithPath("openStatus").description("영업 여부 : true - 영업 중, false - 준비 중").type(JsonFieldType.BOOLEAN),
+                                fieldWithPath("deliveryFees[].orderAmount").description("주문 금액 별 배달비에서 주문 금액").type(JsonFieldType.NUMBER),
+                                fieldWithPath("deliveryFees[].deliveryFee").description("주문 금액 별 배달비에서 배달비").type(JsonFieldType.NUMBER),
+                                fieldWithPath("categories").description("가게 카테고리").type(JsonFieldType.ARRAY)
+                        )
+                ));
     }
 
     @Test

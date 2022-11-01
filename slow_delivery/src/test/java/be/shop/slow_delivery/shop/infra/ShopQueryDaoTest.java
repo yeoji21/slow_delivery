@@ -16,8 +16,10 @@ import be.shop.slow_delivery.shop.domain.ShopLocation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.persistence.EntityManager;
@@ -30,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Import({JpaQueryFactoryConfig.class, ShopQueryDao.class, ApplicationAuditingConfig.class})
 @ExtendWith(SpringExtension.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class ShopQueryDaoTest {
     @PersistenceContext
@@ -62,11 +65,15 @@ class ShopQueryDaoTest {
     }
 
 
-    @Test
+    @Test @Rollback(value = false)
     void 단건_가게_상세정보_조회() throws Exception{
         //given
+        Category category = new Category(CategoryType.CHICKEN);
+        em.persist(category);
+
         File thumbnailFile = createThumbnailFile();
         Shop shop = createShop();
+        shop.belongToCategory(category);
         shop.updateShopThumbnail(thumbnailFile.getId());
 
         em.flush();
@@ -75,15 +82,16 @@ class ShopQueryDaoTest {
         //when
         ShopDetailInfo info = shopQueryDao.findDetailInfo(shop.getId())
                 .orElseThrow(IllegalArgumentException::new);
+        System.out.println(info);
 
         //then
         assertThat(info.getShopId()).isEqualTo(shop.getId());
         assertThat(info.getShopName()).isEqualTo(shop.getName());
         assertThat(info.getThumbnailPath()).isEqualTo(thumbnailFile.getFilePath());
         assertThat(info.getMinOrderAmount()).isEqualTo(shop.getMinOrderAmount().toInt());
-        assertThat(info.getDefaultDeliveryFees()).hasSize(2);
-        info.getDefaultDeliveryFees()
-                .forEach(deliveryFee -> assertThat(deliveryFee).isGreaterThan(1000));
+        assertThat(info.getDeliveryFees()).hasSize(2);
+        info.getDeliveryFees()
+                .forEach(deliveryFee -> assertThat(deliveryFee.getDeliveryFee()).isGreaterThan(1000));
         assertThat(info.getStreetAddress()).isEqualTo(shop.getLocation().getStreetAddress());
         assertThat(info.getOpeningHours()).isEqualTo(shop.getBusinessTimeInfo().getOpeningHours());
         assertThat(info.getPhoneNumber()).isEqualTo(shop.getPhoneNumber().toString());
@@ -205,6 +213,7 @@ class ShopQueryDaoTest {
                 .fee(new Money(2000))
                 .build()
         );
+
         em.persist(OrderAmountDeliveryFee.builder()
                 .shop(shop)
                 .orderAmount(new Money(15_000))

@@ -2,64 +2,65 @@ package be.shop.slow_delivery.shop.application.dto;
 
 import be.shop.slow_delivery.shop.domain.Shop;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
-
-/*
-    가게 상세 정보 :
-    가게 ID, 가게 이름, 최소 주문 금액, 가게 썸네일 파일 저장 경로, 기본 배달료 리스트,
-    소개글, 전화번호, 영업 시간, 휴무일, 도로명 주소
- */
+@ToString
 @Getter
 public class ShopDetailInfo {
     private Long shopId;
+    private String thumbnailPath;
+    private Long areaId;
     private String shopName;
     private int minOrderAmount;
-    private String thumbnailPath;
-    private List<Integer> defaultDeliveryFees;
-    private String introduction;
     private String phoneNumber;
+    private String description;
     private String openingHours;
     private String dayOff;
     private String streetAddress;
+    private boolean openStatus;
+    private List<String> categories;
+    private List<DeliveryFeeInfo> deliveryFees;
 
     @QueryProjection
-    public ShopDetailInfo(Shop shop, String thumbnailPath, List<Integer> defaultDeliveryFees) {
+    public ShopDetailInfo(Shop shop, String thumbnailPath) {
         this.shopId = shop.getId();
+        this.thumbnailPath = thumbnailPath;
+        this.areaId = shop.getLocation().getAreaId();
         this.shopName = shop.getName();
         this.minOrderAmount = shop.getMinOrderAmount().toInt();
-        this.thumbnailPath = thumbnailPath;
-        this.defaultDeliveryFees = defaultDeliveryFees;
-        this.introduction = shop.getDescription();
+        this.description = shop.getDescription();
         this.phoneNumber = shop.getPhoneNumber().toString();
         this.openingHours = shop.getBusinessTimeInfo().getOpeningHours();
         this.dayOff = shop.getBusinessTimeInfo().getDayOff();
         this.streetAddress = shop.getLocation().getStreetAddress();
+        this.openStatus = shop.isOpen();
     }
 
-    @Builder
-    public ShopDetailInfo(Long shopId,
-                          String shopName,
-                          int minOrderAmount,
-                          String thumbnailPath,
-                          String introduction,
-                          String phoneNumber,
-                          String openingHours,
-                          String dayOff,
-                          String streetAddress,
-                          List<Integer> defaultDeliveryFees) {
-        this.shopId = shopId;
-        this.shopName = shopName;
-        this.minOrderAmount = minOrderAmount;
+    public void setDeliveryFees(List<DeliveryFeeInfo> deliveryFees) {
+        this.deliveryFees = deliveryFees;
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
+    }
+
+    @QueryProjection
+    public ShopDetailInfo(Shop shop, String thumbnailPath, List<DeliveryFeeInfo> deliveryFees, List<String> categories) {
+        this.shopId = shop.getId();
         this.thumbnailPath = thumbnailPath;
-        this.defaultDeliveryFees = defaultDeliveryFees;
-        this.introduction = introduction;
-        this.phoneNumber = phoneNumber;
-        this.openingHours = openingHours;
-        this.dayOff = dayOff;
-        this.streetAddress = streetAddress;
+        this.areaId = shop.getLocation().getAreaId();
+        this.shopName = shop.getName();
+        this.minOrderAmount = shop.getMinOrderAmount().toInt();
+        this.deliveryFees = deliveryFees;
+        this.description = shop.getDescription();
+        this.phoneNumber = shop.getPhoneNumber().toString();
+        this.openingHours = shop.getBusinessTimeInfo().getOpeningHours();
+        this.dayOff = shop.getBusinessTimeInfo().getDayOff();
+        this.streetAddress = shop.getLocation().getStreetAddress();
+        this.openStatus = shop.isOpen();
+        this.categories = categories;
     }
 }

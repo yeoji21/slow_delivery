@@ -12,3 +12,6 @@ operation::create-product[snippets='curl-request,http-request,http-response,requ
 
 == 옵션을 포함한 상품 검증
 operation::validate-product[snippets='curl-request,http-request,http-response,request-fields']
+
+== 가게 상세 정보
+operation::shop-detail-info[snippets='curl-request,http-request,http-response,response-fields']

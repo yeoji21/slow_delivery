@@ -1,7 +1,5 @@
 package be.shop.slow_delivery.jwt;
 
-import be.shop.slow_delivery.seller.domain.Seller;
-import be.shop.slow_delivery.seller.domain.SellerRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -23,22 +21,19 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class TokenProvider implements InitializingBean {
-
     private static final String AUTHORITIES_KEY = "auth";
-
     private final String secret;
     private final long tokenValidityInMilliseconds;
 
-    private final SellerRepository sellerRepository;
+//    private final SellerRepository sellerRepository;
     private Key key;
 
     public TokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInMilliseconds, SellerRepository sellerRepository){
-
-        this.secret=secret;
-        this.tokenValidityInMilliseconds=tokenValidityInMilliseconds*1000;
-        this.sellerRepository=sellerRepository;
+            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInMilliseconds){
+        this.secret = secret;
+        this.tokenValidityInMilliseconds = tokenValidityInMilliseconds * 1000;
+//        this.sellerRepository = sellerRepository;
     }
 
     public Claims verify(String token) {
@@ -84,9 +79,9 @@ public class TokenProvider implements InitializingBean {
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-
-        Seller seller = sellerRepository.findById(Long.valueOf(claims.get("seller_id").toString()));
-        return new UsernamePasswordAuthenticationToken(seller,token,authorities);
+        // TODO: 2022/10/31 수정 예정
+//        Seller seller = sellerRepository.findById(Long.valueOf(claims.get("seller_id").toString()));
+        return new UsernamePasswordAuthenticationToken(null, token, authorities);
     }
 
     public boolean validateToken(String token){

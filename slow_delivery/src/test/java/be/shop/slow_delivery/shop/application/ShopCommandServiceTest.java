@@ -79,8 +79,7 @@ class ShopCommandServiceTest {
                 .description("~~~")
                 .openingHours("오후 2시 ~ 익일 새벽 1시")
                 .dayOff("연중무휴")
-                .location(
-                        ShopLocation.builder()
+                .location(ShopLocation.builder()
                                 .streetAddress("xxx-xxxx")
                                 .build())
                 .thumbnailFileId(1L)

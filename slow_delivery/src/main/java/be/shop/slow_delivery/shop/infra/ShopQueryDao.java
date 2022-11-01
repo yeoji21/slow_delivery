@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static be.shop.slow_delivery.category.domain.QCategory.category;
 import static be.shop.slow_delivery.exception.ErrorCode.SHOP_NOT_FOUND;
 import static be.shop.slow_delivery.file.domain.QFile.file;
 import static be.shop.slow_delivery.shop.domain.QCategoryShop.categoryShop;
@@ -48,18 +49,29 @@ public class ShopQueryDao {
 
     // 단건 가게 상세 정보
     public Optional<ShopDetailInfo> findDetailInfo(long shopId) {
-        return Optional.ofNullable(
-                queryFactory
+        List<String> categories = queryFactory.select(category.categoryName.stringValue())
+                .from(categoryShop)
+                .join(category).on(categoryShop.categoryId.eq(category.id))
+                .where(categoryShop.shop.id.eq(shopId))
+                .fetch();
+
+        List<DeliveryFeeInfo> deliveryFees = queryFactory.select(new QDeliveryFeeInfo(
+                        orderAmountDeliveryFee.orderAmount.amount,
+                        orderAmountDeliveryFee.fee.amount))
+                .from(orderAmountDeliveryFee)
+                .where(orderAmountDeliveryFee.shop.eq(shop))
+                .fetch();
+
+        ShopDetailInfo shopDetailInfo =
+                queryFactory.select(new QShopDetailInfo(shop, file.filePath))
                         .from(shop)
-                        .where(shop.id.eq(shopId))
                         .leftJoin(file).on(file.id.eq(shop.thumbnailFileId))
-                        .leftJoin(orderAmountDeliveryFee).on(orderAmountDeliveryFee.shop.eq(shop))
-                        .transform(
-                                groupBy(shop.id).as(
-                                        new QShopDetailInfo(shop, file.filePath, list(orderAmountDeliveryFee.fee.amount))
-                                )
-                        ).get(shopId)
-        );
+                        .where(shop.id.eq(shopId))
+                        .fetchOne();
+
+        shopDetailInfo.setCategories(categories);
+        shopDetailInfo.setDeliveryFees(deliveryFees);
+        return Optional.of(shopDetailInfo);
     }
 
     // 카테고리별 가게 목록 (간략 정보) -> 기본순 (shopId로 정렬)

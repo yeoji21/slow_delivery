@@ -1,6 +1,7 @@
 package be.shop.slow_delivery.config.auth;
 
 import be.shop.slow_delivery.jwt.TokenProvider;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -45,7 +46,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         try {
             SecurityContext context = SecurityContextHolder.createEmptyContext();
-            JwtUserDetails jwtUserDetails = new JwtUserDetails(tokenProvider, accessToken);
+            Claims claims = tokenProvider.verify(accessToken);
+            JwtUserDetails jwtUserDetails = new JwtUserDetails(claims);
             Authentication authentication
                     = new UsernamePasswordAuthenticationToken(jwtUserDetails, null, jwtUserDetails.getAuthorities());
             context.setAuthentication(authentication);
