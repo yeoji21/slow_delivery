@@ -115,10 +115,6 @@ public class SellerService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.createToken(seller.getId(),authentication);
-
-//        HttpHeaders httpHeaders = new org.springframework.http.HttpHeaders();
-//        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER,"Bearer "+jwt);
-
         return new TokenCriteria(jwt);
     }
 }
