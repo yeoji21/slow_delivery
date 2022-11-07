@@ -2,6 +2,7 @@ package be.shop.slow_delivery.jwt;
 
 import be.shop.slow_delivery.config.auth.AuthConstraints;
 import be.shop.slow_delivery.config.auth.JwtUserDetails;
+import be.shop.slow_delivery.seller.domain.Seller;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -40,18 +41,28 @@ public class TokenProvider{
                 .getBody();
     }
 
+    public String generateToken(Seller seller){
+        return Jwts.builder()
+                .setSubject(seller.getUsername())
+                .claim(AuthConstraints.HEADER_STRING.getValue(), seller.getRole())
+                .claim("seller_id", seller.getId())
+                .signWith(key, SignatureAlgorithm.ES512)
+                .setExpiration(new Date((new Date()).getTime() + this.tokenValidityInMilliseconds))
+                .compact();
+    }
+
     public String createToken(Long sellerId, Authentication authentication){
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        Date validity = new Date((new Date()).getTime() + this.tokenValidityInMilliseconds);
+        Date expirationDate = new Date((new Date()).getTime() + this.tokenValidityInMilliseconds);
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AuthConstraints.HEADER_STRING.getValue(), authorities)
                 .claim("seller_id", sellerId)
                 .signWith(key, SignatureAlgorithm.ES512)
-                .setExpiration(validity)
+                .setExpiration(expirationDate)
                 .compact();
     }
 

@@ -3,9 +3,7 @@ package be.shop.slow_delivery.seller.presentation;
 import be.shop.slow_delivery.ControllerTest;
 import be.shop.slow_delivery.exception.LoginErrorCode;
 import be.shop.slow_delivery.exception.LoginErrorResponse;
-import be.shop.slow_delivery.seller.application.dto.CheckEmailValidateCriteria;
-import be.shop.slow_delivery.seller.application.dto.EmailValidateCommand;
-import be.shop.slow_delivery.seller.application.dto.SellerSignUpCommand;
+import be.shop.slow_delivery.seller.application.dto.*;
 import be.shop.slow_delivery.seller.presentation.dto.CheckEmailValidateDto;
 import be.shop.slow_delivery.seller.presentation.dto.EmailValidateDto;
 import be.shop.slow_delivery.seller.presentation.dto.SellerSignUpDto;
@@ -22,6 +20,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class SellerControllerTest extends ControllerTest {
+    @Test @DisplayName("로그인")
+    void login() throws Exception {
+        //given
+        SellerLoginCommand command = SellerLoginCommand.builder()
+                .loginId("loginId")
+                .password("password")
+                .build();
+        SellerLoginResult result = new SellerLoginResult("JWT");
+
+        //when
+        given(sellerService.login(any(SellerLoginCommand.class))).willReturn(result);
+
+        //then
+        mockMvc.perform(post("/seller/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(command)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)));
+    }
 
     @Test @DisplayName("회원 가입")
     void signUp() throws Exception{

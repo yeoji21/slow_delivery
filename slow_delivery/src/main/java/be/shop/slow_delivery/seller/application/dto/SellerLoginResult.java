@@ -1,10 +1,12 @@
 package be.shop.slow_delivery.seller.application.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-public class TokenCriteria {
+public class SellerLoginResult {
     private String token;
+
+    public SellerLoginResult(String token) {
+        this.token = token;
+    }
 }

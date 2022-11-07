@@ -3,15 +3,12 @@ package be.shop.slow_delivery.seller.application;
 import be.shop.slow_delivery.exception.ErrorCode;
 import be.shop.slow_delivery.exception.InvalidValueException;
 import be.shop.slow_delivery.exception.LoginErrorCode;
+import be.shop.slow_delivery.exception.NotFoundException;
 import be.shop.slow_delivery.jwt.TokenProvider;
 import be.shop.slow_delivery.seller.application.dto.*;
 import be.shop.slow_delivery.seller.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +22,20 @@ import java.util.Optional;
 public class SellerService {
     private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TokenProvider tokenProvider;
     private final EmailSender emailSender;
     private final SecretCodeService secretCodeService;
     private final EmailMessageFactory emailMessageFactory;
     private final SecretCodeFactory secretCodeFactory;
+
+    @Transactional
+    public SellerLoginResult login(SellerLoginCommand sellerLoginCommand){
+        Seller seller = sellerRepository.findByLoginId(sellerLoginCommand.getLoginId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.SELLER_NOT_FOUND));
+        if(!passwordEncoder.matches(sellerLoginCommand.getPassword(), seller.getPassword()))
+            throw new IllegalArgumentException("아이디와 비밀번호가 일치하지 않습니다.");
+        return new SellerLoginResult(tokenProvider.generateToken(seller));
+    }
 
     @Transactional
     public LoginErrorCode signUp(SellerSignUpCommand command) {
@@ -71,11 +76,11 @@ public class SellerService {
         seller.changePassword(passwordEncoder.encode(password));
         sellerRepository.save(seller);
     }
-
     public void changePassword(Seller seller, String password){
         seller.changePassword(passwordEncoder.encode(password));
         sellerRepository.save(seller);
     }
+
     public Optional<Seller> findSellerByEmail(String email){
         return sellerRepository.findByEmail(email);
     }
@@ -89,32 +94,5 @@ public class SellerService {
         if(passwordEncoder.matches(password.getPassword(),seller.getPassword())){
             sellerRepository.delete(seller);
         }
-    }
-
-    public SellerLoginCriteria login(SellerLoginCommand sellerLoginCommand) throws Exception{
-        Optional<Seller> loginSeller = sellerRepository.findByLoginId(sellerLoginCommand.getLoginId());
-        if((loginSeller.orElse(null)==null) || !passwordEncoder.matches(sellerLoginCommand.getPassword(), loginSeller.get().getPassword())) {
-            throw new Exception("아이디와 비밀번호가 일치하지 않습니다.");
-        } else{
-            Seller seller = loginSeller.get();
-            TokenCriteria tokenCriteria = getTokenCriteriaEntity(sellerLoginCommand);
-            return new SellerLoginCriteria(
-                    tokenCriteria.getToken(),
-                    seller.getId(),
-                    seller.getLoginId(),
-                    seller.getEmail()
-            );
-        }
-    }
-
-    private TokenCriteria getTokenCriteriaEntity(SellerLoginCommand sellerLoginCommand){
-        Seller seller = sellerRepository.findByLoginId(sellerLoginCommand.getLoginId()).get();
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(seller.getEmail(),seller.getPassword());
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        String jwt = tokenProvider.createToken(seller.getId(),authentication);
-        return new TokenCriteria(jwt);
     }
 }

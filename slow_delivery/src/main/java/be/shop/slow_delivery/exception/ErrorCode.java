@@ -23,6 +23,7 @@ public enum ErrorCode {
     CATEGORY_COUNT(BAD_REQUEST, "가게는 카테고리를 한 개 이상 가져야 합니다."),
 
     // 404 NOT_FOUND : Resource를 찾을 수 없음
+    SELLER_NOT_FOUND(NOT_FOUND,"판매자를 찾을 수 없습니다."),
     ID_NOT_FOUND(NOT_FOUND,"해당 이메일로 가입된 아이디가 존재하지 않습니다."),
     SHOP_NOT_FOUND(NOT_FOUND, "해당 가게를 찾을 수 없습니다."),
     CATEGORY_NOT_FOUND(NOT_FOUND, "해당 카테고리를 찾을 수 없습니다"),

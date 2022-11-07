@@ -5,7 +5,7 @@ import be.shop.slow_delivery.exception.LoginErrorResponse;
 import be.shop.slow_delivery.seller.application.EmailServiceImpl;
 import be.shop.slow_delivery.seller.application.SellerService;
 import be.shop.slow_delivery.seller.application.dto.SellerLoginCommand;
-import be.shop.slow_delivery.seller.application.dto.SellerLoginCriteria;
+import be.shop.slow_delivery.seller.application.dto.SellerLoginResult;
 import be.shop.slow_delivery.seller.domain.Seller;
 import be.shop.slow_delivery.seller.presentation.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -64,14 +63,9 @@ public class SellerController {
         return new LoginErrorResponse<>(LoginErrorCode.SUCCESS);
     }
 
-    @PostMapping("seller/login") //로그인
-    public LoginErrorResponse<?> login (@RequestBody SellerLoginCommand sellerLoginCommand) throws NoSuchElementException{
-        try{
-            SellerLoginCriteria seller = sellerService.login(sellerLoginCommand);
-            return new LoginErrorResponse<>(seller);
-        } catch (Exception e){
-            return new LoginErrorResponse<>(LoginErrorCode.ACCESS_DENIED_LOGIN);
-        }
+    @PostMapping("/seller/login") //로그인
+    public SellerLoginResult login (@Valid @RequestBody SellerLoginCommand sellerLoginCommand){
+        return sellerService.login(sellerLoginCommand);
     }
 
     @GetMapping("seller/findId") //아이디 찾기
