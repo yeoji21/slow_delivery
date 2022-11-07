@@ -4,15 +4,14 @@ import be.shop.slow_delivery.ControllerTest;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.category.domain.CategoryType;
 import be.shop.slow_delivery.common.domain.Money;
-import be.shop.slow_delivery.shop.application.dto.DeliveryFeeInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
-import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
-import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
+import be.shop.slow_delivery.shop.application.dto.*;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
+import be.shop.slow_delivery.shop.presentation.dto.ShopInfoModifyDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopOrderType;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -54,6 +53,27 @@ class ShopControllerTest extends ControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(1L)));
+    }
+
+    @Test @DisplayName("가게 기본 정보 수정")
+    void updateInfo() throws Exception{
+        //given
+        ShopInfoModifyDto dto = ShopInfoModifyDto.builder()
+                .minOrderPrice(10_000)
+                .description("가게 소개글")
+                .openingHours("영업시간")
+                .dayOff("휴무일")
+                .build();
+
+        //when
+        given(shopDtoMapper.toCommand(any(Long.class), any(ShopInfoModifyDto.class))).willReturn(ShopInfoModifyCommand.builder().build());
+
+        //then
+        mockMvc.perform(patch("/shop/{shopId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk());
+        verify(shopCommandService).update(any(ShopInfoModifyCommand.class));
     }
 
     @Test

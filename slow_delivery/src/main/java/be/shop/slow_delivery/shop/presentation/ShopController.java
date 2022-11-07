@@ -7,6 +7,7 @@ import be.shop.slow_delivery.shop.application.dto.ShopListQueryResult;
 import be.shop.slow_delivery.shop.application.dto.ShopSimpleInfo;
 import be.shop.slow_delivery.shop.presentation.dto.ShopCreateDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopDtoMapper;
+import be.shop.slow_delivery.shop.presentation.dto.ShopInfoModifyDto;
 import be.shop.slow_delivery.shop.presentation.dto.ShopOrderType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,12 @@ public class ShopController {
     private final ShopQueryService shopQueryService;
     private final ShopCommandService shopCommandService;
     private final ShopDtoMapper mapper;
+
+    @PatchMapping("/shop/{shopId}")
+    public void updateInfo(@PathVariable long shopId,
+                           @RequestBody ShopInfoModifyDto shopInfoModifyDto) {
+        shopCommandService.update(mapper.toCommand(shopId, shopInfoModifyDto));
+    }
 
     @PostMapping("/shop")
     public long createShop(@RequestBody @Valid ShopCreateDto shopCreateDto) {

@@ -5,6 +5,7 @@ import be.shop.slow_delivery.category.domain.CategoryRepository;
 import be.shop.slow_delivery.exception.NotFoundException;
 import be.shop.slow_delivery.shop.application.dto.ShopCommandMapper;
 import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
+import be.shop.slow_delivery.shop.application.dto.ShopInfoModifyCommand;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +35,10 @@ public class ShopCommandService {
         Shop shop = shopRepository.findById(shopId)
                 .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
         shop.toggleOpen();
+    }
+
+    @Transactional
+    public void update(ShopInfoModifyCommand command) {
+
     }
 }
