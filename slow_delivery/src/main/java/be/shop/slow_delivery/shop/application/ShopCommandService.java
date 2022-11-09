@@ -38,7 +38,9 @@ public class ShopCommandService {
     }
 
     @Transactional
-    public void update(ShopInfoModifyCommand command) {
-
+    public void update(long shopId, ShopInfoModifyCommand command) {
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
+        shop.update(mapper.toDomain(command));
     }
 }

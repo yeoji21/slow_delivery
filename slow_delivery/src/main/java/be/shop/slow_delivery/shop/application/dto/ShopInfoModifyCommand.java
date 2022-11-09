@@ -1,27 +1,23 @@
 package be.shop.slow_delivery.shop.application.dto;
 
 import be.shop.slow_delivery.common.domain.Money;
+import be.shop.slow_delivery.shop.domain.BusinessTimeInfo;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class ShopInfoModifyCommand {
-    private long shopId;
-    private Money minOrderPrice;
+    private Money minOrderAmount;
     private String description;
-    private String openingHours;
-    private String dayOff;
+    private BusinessTimeInfo businessTimeInfo;
 
     @Builder
-    public ShopInfoModifyCommand(long shopId,
-                                 int minOrderPrice,
+    public ShopInfoModifyCommand(int minOrderAmount,
                                  String description,
                                  String openingHours,
                                  String dayOff) {
-        this.shopId = shopId;
-        this.minOrderPrice = new Money(minOrderPrice);
+        this.minOrderAmount = new Money(minOrderAmount);
         this.description = description;
-        this.openingHours = openingHours;
-        this.dayOff = dayOff;
+        this.businessTimeInfo = new BusinessTimeInfo(openingHours, dayOff);
     }
 }

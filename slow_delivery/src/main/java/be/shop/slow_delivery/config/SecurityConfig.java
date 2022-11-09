@@ -30,7 +30,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/product/validate", "/stock/reduce", "/test", "/seller/**").permitAll()
+                .antMatchers("/product/validate", "/stock/reduce", "/test", "/seller/**",
+                        "/shop/**").permitAll()
                 .anyRequest().authenticated();
     }
 

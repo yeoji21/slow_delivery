@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,5 +21,25 @@ public class BusinessTimeInfo {
     public BusinessTimeInfo(String openingHours, String dayOff) {
         this.openingHours = openingHours;
         this.dayOff = dayOff;
+    }
+
+    public void update(BusinessTimeInfo businessTimeInfo) {
+        if(businessTimeInfo.getOpeningHours() != null)
+            this.openingHours = businessTimeInfo.getOpeningHours();
+        if(businessTimeInfo.getDayOff() != null)
+            this.dayOff = businessTimeInfo.getDayOff();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BusinessTimeInfo that = (BusinessTimeInfo) o;
+        return Objects.equals(getOpeningHours(), that.getOpeningHours()) && Objects.equals(getDayOff(), that.getDayOff());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getOpeningHours(), getDayOff());
     }
 }

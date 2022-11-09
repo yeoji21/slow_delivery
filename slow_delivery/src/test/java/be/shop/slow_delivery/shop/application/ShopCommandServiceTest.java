@@ -6,9 +6,11 @@ import be.shop.slow_delivery.category.domain.CategoryType;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.shop.application.dto.ShopCommandMapper;
 import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
+import be.shop.slow_delivery.shop.application.dto.ShopInfoModifyCommand;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
 import be.shop.slow_delivery.shop.domain.ShopRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,6 +39,28 @@ class ShopCommandServiceTest {
 
     @InjectMocks
     private ShopCommandService shopCommandService;
+
+    @Test @DisplayName("가게 정보 수정")
+    void update() throws Exception{
+        //given
+        ShopInfoModifyCommand command = ShopInfoModifyCommand.builder()
+                .minOrderAmount(10_000)
+                .description("변경된 가게 소개글")
+                .openingHours("변경된 영업시간")
+                .dayOff("변경된 휴무일")
+                .build();
+        Shop shop = createShop();
+        given(shopRepository.findById(1L)).willReturn(Optional.ofNullable(shop));
+
+        //when
+        shopCommandService.update(1L, command);
+
+        //then
+        assertThat(shop.getDescription()).startsWith("변경된");
+        assertThat(shop.getBusinessTimeInfo().getOpeningHours()).startsWith("변경된");
+        assertThat(shop.getBusinessTimeInfo().getDayOff()).startsWith("변경된");
+        assertThat(shop.getMinOrderAmount().toInt()).isEqualTo(10_000);
+    }
 
     @Test
     void 가게_생성() throws Exception{
@@ -72,6 +96,22 @@ class ShopCommandServiceTest {
     @Test
     void 영업_상태_변경() throws Exception{
         //given
+        Shop shop = createShop();
+        boolean before = shop.isOpen();
+        long shopId = 1L;
+        given(shopRepository.findById(shopId)).willReturn(Optional.ofNullable(shop));
+
+        //when
+        shopCommandService.toggleOpenStatus(shopId);
+        boolean after = shop.isOpen();
+
+        //then
+        assertThat(before).isNotEqualTo(after);
+        assertThat(shop.isOpen()).isTrue();
+
+    }
+
+    private Shop createShop() {
         Shop shop = Shop.builder()
                 .name("shop A")
                 .minOrderAmount(new Money(15_000))
@@ -85,17 +125,6 @@ class ShopCommandServiceTest {
                 .thumbnailFileId(1L)
                 .category(new Category(CategoryType.CHICKEN))
                 .build();
-        boolean before = shop.isOpen();
-        long shopId = 1L;
-        given(shopRepository.findById(shopId)).willReturn(Optional.ofNullable(shop));
-
-        //when
-        shopCommandService.toggleOpenStatus(shopId);
-        boolean after = shop.isOpen();
-
-        //then
-        assertThat(before).isNotEqualTo(after);
-        assertThat(shop.isOpen()).isTrue();
-
+        return shop;
     }
 }

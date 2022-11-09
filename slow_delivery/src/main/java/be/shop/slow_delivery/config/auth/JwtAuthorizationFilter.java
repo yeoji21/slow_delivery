@@ -33,7 +33,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader(AuthConstraints.HEADER_STRING.getValue());
-        if(authorizationHeader.isBlank() || !authorizationHeader.startsWith(AuthConstraints.TOKEN_PREFIX.getValue())){
+        if(authorizationHeader == null || !authorizationHeader.startsWith(AuthConstraints.TOKEN_PREFIX.getValue())){
             filterChain.doFilter(request, response);
             return;
         }

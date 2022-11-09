@@ -24,12 +24,12 @@ public class ShopController {
     @PatchMapping("/shop/{shopId}")
     public void updateInfo(@PathVariable long shopId,
                            @RequestBody ShopInfoModifyDto shopInfoModifyDto) {
-        shopCommandService.update(mapper.toCommand(shopId, shopInfoModifyDto));
+        shopCommandService.update(shopId, mapper.toCommand(shopInfoModifyDto));
     }
 
     @PostMapping("/shop")
     public long createShop(@RequestBody @Valid ShopCreateDto shopCreateDto) {
-        return shopCommandService.create(mapper.toCreateCommand(shopCreateDto));
+        return shopCommandService.create(mapper.toCommand(shopCreateDto));
     }
 
     @PatchMapping("/shop/{shopId}/open")

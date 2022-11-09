@@ -3,9 +3,8 @@ package be.shop.slow_delivery.shop.application.dto;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.shop.domain.Shop;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import be.shop.slow_delivery.shop.domain.ShopModifyDomain;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
@@ -19,6 +18,8 @@ public interface ShopCommandMapper {
             @Mapping(target = "category", source = "category")
     })
     Shop toShop(ShopCreateCommand command, Category category);
+
+    ShopModifyDomain toDomain(ShopInfoModifyCommand command);
 
     default Money toMoney(int minOrderAmount){
         return new Money(minOrderAmount);

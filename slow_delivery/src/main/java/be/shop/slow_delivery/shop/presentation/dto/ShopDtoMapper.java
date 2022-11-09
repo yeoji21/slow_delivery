@@ -9,7 +9,7 @@ import org.mapstruct.factory.Mappers;
 public interface ShopDtoMapper {
     ShopDtoMapper INSTANCE = Mappers.getMapper(ShopDtoMapper.class);
 
-    ShopCreateCommand toCreateCommand(ShopCreateDto shopCreateDto);
+    ShopCreateCommand toCommand(ShopCreateDto shopCreateDto);
 
-    ShopInfoModifyCommand toCommand(Long shopId, ShopInfoModifyDto dto);
+    ShopInfoModifyCommand toCommand(ShopInfoModifyDto dto);
 }

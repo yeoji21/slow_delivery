@@ -27,29 +27,21 @@ public class Shop extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(name = "name", nullable = false)
     private String name;
-
     @Column(name = "thumbnail_file_id", nullable = true)
     private Long thumbnailFileId;
-
     @Embedded
     @AttributeOverride(name = "amount", column = @Column(name = "min_order_amount", nullable = false))
     private Money minOrderAmount;
-
     @Column(name = "description", nullable = true)
     private String description;
-
     @Embedded
     private PhoneNumber phoneNumber;
-
     @Embedded
     private BusinessTimeInfo businessTimeInfo;
-
     @Embedded
     private ShopLocation location;
-
     @Column(name = "is_open", nullable = false)
     private boolean isOpen;
 
@@ -95,5 +87,15 @@ public class Shop extends BaseTimeEntity {
 
     public void toggleOpen() {
         isOpen = !isOpen;
+    }
+
+    public void update(ShopModifyDomain modify) {
+        if (modify.getDescription() != null)
+            this.description = modify.getDescription();
+        if (modify.getMinOrderAmount() != null)
+            this.minOrderAmount = modify.getMinOrderAmount();
+        if (modify.getBusinessTimeInfo() != null) {
+            this.businessTimeInfo.update(modify.getBusinessTimeInfo());
+        }
     }
 }

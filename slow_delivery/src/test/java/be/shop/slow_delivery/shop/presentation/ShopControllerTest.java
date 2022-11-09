@@ -43,8 +43,8 @@ class ShopControllerTest extends ControllerTest {
                 .category("치킨")
                 .build();
 
-        given(shopDtoMapper.toCreateCommand(any(ShopCreateDto.class)))
-                .willReturn(ShopDtoMapper.INSTANCE.toCreateCommand(shopCreateDto));
+        given(shopDtoMapper.toCommand(any(ShopCreateDto.class)))
+                .willReturn(ShopDtoMapper.INSTANCE.toCommand(shopCreateDto));
         given(shopCommandService.create(any())).willReturn(1L);
 
         mockMvc.perform(post("/shop")
@@ -66,14 +66,14 @@ class ShopControllerTest extends ControllerTest {
                 .build();
 
         //when
-        given(shopDtoMapper.toCommand(any(Long.class), any(ShopInfoModifyDto.class))).willReturn(ShopInfoModifyCommand.builder().build());
+        given(shopDtoMapper.toCommand(any(ShopInfoModifyDto.class))).willReturn(ShopInfoModifyCommand.builder().build());
 
         //then
         mockMvc.perform(patch("/shop/{shopId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
-        verify(shopCommandService).update(any(ShopInfoModifyCommand.class));
+        verify(shopCommandService).update(any(Long.class), any(ShopInfoModifyCommand.class));
     }
 
     @Test

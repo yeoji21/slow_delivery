@@ -3,12 +3,23 @@ package be.shop.slow_delivery.shop.domain;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.category.domain.CategoryType;
 import be.shop.slow_delivery.common.domain.Money;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ShopUnitTest {
+
+    @Test @DisplayName("가게 기본 정보 수정")
+    void update() throws Exception{
+        //given
+
+        //when
+
+        //then
+//        assertThat()
+    }
 
     @Test
     void 가게_생성() throws Exception{
