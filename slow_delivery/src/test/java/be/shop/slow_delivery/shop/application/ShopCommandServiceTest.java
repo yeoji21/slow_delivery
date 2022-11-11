@@ -3,13 +3,16 @@ package be.shop.slow_delivery.shop.application;
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.category.domain.CategoryRepository;
 import be.shop.slow_delivery.category.domain.CategoryType;
+import be.shop.slow_delivery.common.client.BeServiceClient;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.shop.application.dto.ShopCommandMapper;
 import be.shop.slow_delivery.shop.application.dto.ShopCreateCommand;
+import be.shop.slow_delivery.shop.application.dto.ShopDetailInfo;
 import be.shop.slow_delivery.shop.application.dto.ShopInfoModifyCommand;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
 import be.shop.slow_delivery.shop.domain.ShopRepository;
+import be.shop.slow_delivery.shop.infra.ShopQueryDao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +37,10 @@ class ShopCommandServiceTest {
     private ShopRepository shopRepository;
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private BeServiceClient serviceClient;
+    @Mock
+    private ShopQueryDao shopQueryDao;
     @Spy
     private ShopCommandMapper mapper = ShopCommandMapper.INSTANCE;
 
@@ -97,9 +104,14 @@ class ShopCommandServiceTest {
     void 영업_상태_변경() throws Exception{
         //given
         Shop shop = createShop();
+        ReflectionTestUtils.setField(shop, "id", 1L);
         boolean before = shop.isOpen();
         long shopId = 1L;
+        ShopDetailInfo info = ShopDetailInfo.builder()
+                .shop(shop)
+                .build();
         given(shopRepository.findById(shopId)).willReturn(Optional.ofNullable(shop));
+        given(shopQueryDao.findDetailInfo(shopId)).willReturn(Optional.ofNullable(info));
 
         //when
         shopCommandService.toggleOpenStatus(shopId);
@@ -108,7 +120,7 @@ class ShopCommandServiceTest {
         //then
         assertThat(before).isNotEqualTo(after);
         assertThat(shop.isOpen()).isTrue();
-
+        verify(serviceClient).updateShopInfo(any(Long.class), any(ShopDetailInfo.class));
     }
 
     private Shop createShop() {

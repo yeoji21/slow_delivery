@@ -43,3 +43,7 @@ jwt:
 springfox:
   documentation:
     auto-startup: false
+
+feign:
+  url:
+    be-service: https://localhost:8080
