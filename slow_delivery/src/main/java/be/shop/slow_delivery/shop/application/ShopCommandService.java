@@ -36,8 +36,7 @@ public class ShopCommandService {
 
     @Transactional
     public void toggleOpenStatus(long shopId) {
-        Shop shop = shopRepository.findById(shopId)
-                .orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
+        Shop shop = shopRepository.findById(shopId).orElseThrow(() -> new NotFoundException(SHOP_NOT_FOUND));
         shop.toggleOpen();
         serviceClient.updateShopInfo(shopId, shopQueryDao.findDetailInfo(shopId).orElseThrow(IllegalArgumentException::new));
     }

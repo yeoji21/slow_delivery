@@ -127,6 +127,7 @@ public class ShopQueryDao {
         String nextCursor = hasNext ? getDeliveryFeeNextCursor(infoList) : null;
         return new ShopListQueryResult(infoList, hasNext, nextCursor);
     }
+
     private String getDeliveryFeeNextCursor(List<ShopSimpleInfo> infoList) {
         ShopSimpleInfo lastOne = infoList.get(infoList.size() - 1);
 

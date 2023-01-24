@@ -17,6 +17,7 @@ import org.springframework.util.Assert;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,9 +50,7 @@ public class StockCommandService {
 
         stockStore.executeWithMultiLock(stockIds, () -> {
             commands.forEach(command -> {
-                int remainingStock = stockStore.getValue(command.getStockId()).orElseGet(
-                        () -> stockStore.save(command.getStockId(), stockRepository.findById(command.getStockId())
-                                .orElseThrow(IllegalArgumentException::new).getQuantity().toInt()));
+                int remainingStock = stockStore.getValue(command.getStockId()).orElseGet(loadRemainingStock(command));
                 validateStockReducible(command, remainingStock);
             });
             commands.forEach(command -> stockStore.reduce(command.getStockId(), command.getQuantity()));
@@ -60,9 +59,23 @@ public class StockCommandService {
         eventPublisher.publishEvent(new StockUpdatedEvent(stockIds));
     }
 
+    private Supplier<Integer> loadRemainingStock(StockReduceCommand command) {
+        return () -> stockStore.save(command.getStockId(), findStock(command.getStockId()));
+    }
+
+    private int findStock(long stockId) {
+        return stockRepository.findById(stockId)
+                .orElseThrow(IllegalArgumentException::new)
+                .getQuantity().toInt();
+    }
+
     private void validateStockReducible(StockReduceCommand command, int remainingStock) {
         Assert.isTrue(remainingStock - command.getQuantity().toInt() >= 0,
-                "stockId :" + command.getStockId() + " 현재 재고 :" + remainingStock + " 주문 재고 :" + command.getQuantity().toInt());
+                getOutOfStockMessage(command, remainingStock));
+    }
+
+    private String getOutOfStockMessage(StockReduceCommand command, int remainingStock) {
+        return "stockId :" + command.getStockId() + " 현재 재고 :" + remainingStock + " 주문 재고 :" + command.getQuantity().toInt();
     }
 
     @Transactional

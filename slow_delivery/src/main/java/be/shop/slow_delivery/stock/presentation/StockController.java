@@ -15,20 +15,6 @@ import java.util.stream.Collectors;
 public class StockController {
     private final StockCommandService stockCommandService;
 
-    @PostMapping("/test")
-    public void reduceByRedis(@RequestBody StockReduceDto stockReduceDto) {
-        List<StockReduceCommand> commands = stockReduceDto.getStocks().stream()
-                .map(dto -> StockReduceCommand.builder()
-                        .stockId(dto.getStockId())
-                        .quantity(new Quantity(dto.getQuantity()))
-                        .build())
-                .collect(Collectors.toList());
-
-//        stockCommandService.reduceByAtomic(commands);
-        stockCommandService.reduceByRedissonLock(commands);
-//        stockCommandService.reduceByDBLock(commands);
-    }
-
     @PatchMapping("/stock/reduce")
     public void reduceStock(@RequestBody StockReduceDto stockReduceDto) {
         List<StockReduceCommand> commands = stockReduceDto.getStocks().stream()
@@ -37,6 +23,6 @@ public class StockController {
                         .quantity(new Quantity(dto.getQuantity()))
                         .build())
                 .collect(Collectors.toList());
-        stockCommandService.reduceByDBLock(commands);
+        stockCommandService.reduceByRedissonLock(commands);
     }
 }
