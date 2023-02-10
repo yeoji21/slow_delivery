@@ -16,7 +16,7 @@ public class Money {
     @JsonProperty("amount")
     private int amount;
 
-    public Money(int amount) {
+    public Money(Integer amount) {
         Assert.isTrue(amount >= 0, "잘못된 금액입니다.");
         this.amount = amount;
     }

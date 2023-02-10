@@ -2,10 +2,12 @@ package be.shop.slow_delivery.util;
 
 import be.shop.slow_delivery.category.domain.Category;
 import be.shop.slow_delivery.category.domain.CategoryType;
+import be.shop.slow_delivery.common.domain.EmbeddedType;
 import be.shop.slow_delivery.common.domain.Money;
 import be.shop.slow_delivery.shop.application.dto.ShopInfoModifyCommand;
 import be.shop.slow_delivery.shop.domain.Shop;
 import be.shop.slow_delivery.shop.domain.ShopLocation;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -16,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UpdateUtilTest {
 
-    @Test
+    @Test @DisplayName("존재하지 않는 필드에 대한 수정 시도")
     void notExistField() throws Exception{
         //given
         Shop shop = getShop();
@@ -26,7 +28,7 @@ public class UpdateUtilTest {
         assertThrows(IllegalArgumentException.class, () -> UpdateUtil.update(shop, dto));
     }
 
-    @Test
+    @Test @DisplayName("모든 값을 채운 수정 요청")
     void update() throws Exception{
         //given
         Shop shop = getShop();
@@ -47,28 +49,8 @@ public class UpdateUtilTest {
         assertThat(shop.getBusinessTimeInfo().getDayOff()).isEqualTo(command.getBusinessTimeInfo().getDayOff());
     }
 
-    @Test
+    @Test @DisplayName("영업 시간은 변경하지 않음")
     void update_with_null() throws Exception{
-        //given
-        Shop shop = getShop();
-        ShopInfoModifyCommand command = ShopInfoModifyCommand.builder()
-                .minOrderAmount(10_000)
-                .openingHours("updated openingHours")
-                .dayOff("updated dayOff")
-                .build();
-
-        //when
-        UpdateUtil.update(shop, command);
-
-        //then
-        assertThat(shop.getMinOrderAmount()).isEqualTo(new Money(10_000));
-        assertThat(shop.getDescription()).isNotEqualTo(command.getDescription());
-        assertThat(shop.getBusinessTimeInfo().getOpeningHours()).isEqualTo(command.getBusinessTimeInfo().getOpeningHours());
-        assertThat(shop.getBusinessTimeInfo().getDayOff()).isEqualTo(command.getBusinessTimeInfo().getDayOff());
-    }
-
-    @Test
-    void update_with_null2() throws Exception{
         //given
         Shop shop = getShop();
         ShopInfoModifyCommand command = ShopInfoModifyCommand.builder()
@@ -78,9 +60,7 @@ public class UpdateUtilTest {
                 .build();
 
         //when
-        System.out.println(shop.getBusinessTimeInfo().getOpeningHours());
         UpdateUtil.update(shop, command);
-        System.out.println(shop.getBusinessTimeInfo().getOpeningHours());
 
         //then
         assertThat(shop.getMinOrderAmount()).isEqualTo(new Money(10_000));
@@ -90,30 +70,29 @@ public class UpdateUtilTest {
         assertThat(shop.getBusinessTimeInfo().getDayOff()).isEqualTo(command.getBusinessTimeInfo().getDayOff());
     }
 
-    @Test
+    @Test @DisplayName("최소 주문 금액은 변경하지 않음")
     void update_with_null3() throws Exception{
         //given
         Shop shop = getShop();
         ShopInfoModifyCommand command = ShopInfoModifyCommand.builder()
-                .openingHours("updated openingHours")
                 .description("updated description")
+                .openingHours("updated openingHours")
                 .dayOff("updated dayOff")
                 .build();
+        Money originalAmount = shop.getMinOrderAmount();
 
         //when
-        System.out.println(shop.getMinOrderAmount().toInt());
         UpdateUtil.update(shop, command);
-        System.out.println(shop.getMinOrderAmount().toInt());
 
         //then
-        assertThat(shop.getMinOrderAmount()).isNotEqualTo(new Money(10_000));
+        assertThat(shop.getMinOrderAmount()).isEqualTo(originalAmount);
         assertThat(shop.getDescription()).isEqualTo(command.getDescription());
         assertThat(shop.getBusinessTimeInfo().getOpeningHours()).isEqualTo(command.getBusinessTimeInfo().getOpeningHours());
         assertThat(shop.getBusinessTimeInfo().getDayOff()).isEqualTo(command.getBusinessTimeInfo().getDayOff());
     }
 
     static class UpdateUtil{
-
+        // TODO: 2023/02/10 null로 변경하고 싶은 거라면?
         protected static <E, D> void update(E entity, D dto) {
             try {
                 for (Field dtoField : dto.getClass().getDeclaredFields()) {
@@ -124,14 +103,16 @@ public class UpdateUtilTest {
                     dtoField.setAccessible(true);
                     entityField.setAccessible(true);
                     Object dtoValue = dtoField.get(dto);
-                    System.out.println(dtoValue);
-                    if(dtoValue == null) {
-                        System.out.println(dtoField.getName());
-                        continue;
+                    if(dtoValue == null) continue;
+                    if(dtoField.isAnnotationPresent(EmbeddedType.class)){
+                        update(entityField.get(entity), dtoValue);
                     }
-                    entityField.set(entity, dtoValue);
+                    else {
+                        entityField.set(entity, dtoValue);
+                    }
                 }
             } catch (Exception e) {
+                System.out.println(e.getMessage());
                 throw new IllegalArgumentException(e.getCause());
             }
         }

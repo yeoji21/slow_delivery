@@ -3,6 +3,7 @@ package be.shop.slow_delivery.common.domain;
 import be.shop.slow_delivery.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import javax.persistence.Embeddable;
 
 import static be.shop.slow_delivery.exception.ErrorCode.PHONE_NUMBER;
 
+@Getter
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
